@@ -9,6 +9,7 @@ import Footer from "./components/Footer";
 import Home from "./pages/Home";
 import Contact from "./pages/Contact";
 import Login from "./pages/auth/Login";
+import UserDashboard from "./pages/user/UserDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
               <Route path="/" element={<Home />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/user-dashboard" element={<Login />} />
+              <Route path="/dashboard" element={<UserDashboard />} />
               <Route path="/admin-dashboard" element={<Login />} />
               <Route path="*" element={<NotFound />} />
             </Routes>

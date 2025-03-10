@@ -300,6 +300,7 @@ export type Database = {
     }
     Enums: {
       user_role: "user" | "admin"
+      water_type: "raw_water" | "clean_water" | "inlet_water" | "outlet_water"
     }
     CompositeTypes: {
       [_ in never]: never

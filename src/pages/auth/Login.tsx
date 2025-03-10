@@ -38,7 +38,7 @@ const Login = () => {
       if (profileData.role === "admin") {
         navigate("/admin-dashboard");
       } else {
-        navigate("/user-dashboard");
+        navigate("/dashboard");
       }
       
       toast.success("Successfully signed in!");
