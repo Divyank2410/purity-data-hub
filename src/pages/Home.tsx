@@ -144,7 +144,7 @@ const Home = () => {
                     <TabsContent value="raw" className="mt-4">
                       <DataTable 
                         data={waterData.filter(
-                          item => item.plant_id === plant.id && item.water_type === 'raw'
+                          item => item.plant_id === plant.id && item.water_type === 'raw_water'
                         )} 
                         fields={[
                           { key: 'turbidity', label: 'Turbidity' },
@@ -162,7 +162,7 @@ const Home = () => {
                     <TabsContent value="clean" className="mt-4">
                       <DataTable 
                         data={waterData.filter(
-                          item => item.plant_id === plant.id && item.water_type === 'clean'
+                          item => item.plant_id === plant.id && item.water_type === 'clean_water'
                         )} 
                         fields={[
                           { key: 'turbidity', label: 'Turbidity' },
@@ -202,7 +202,7 @@ const Home = () => {
                     <TabsContent value="inlet" className="mt-4">
                       <DataTable 
                         data={sewerData.filter(
-                          item => item.plant_id === plant.id && item.water_type === 'inlet'
+                          item => item.plant_id === plant.id && item.water_type === 'inlet_water'
                         )} 
                         fields={[
                           { key: 'tss', label: 'TSS' },
@@ -221,7 +221,7 @@ const Home = () => {
                     <TabsContent value="outlet" className="mt-4">
                       <DataTable 
                         data={sewerData.filter(
-                          item => item.plant_id === plant.id && item.water_type === 'outlet'
+                          item => item.plant_id === plant.id && item.water_type === 'outlet_water'
                         )} 
                         fields={[
                           { key: 'tss', label: 'TSS' },
