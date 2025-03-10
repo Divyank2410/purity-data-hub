@@ -16,7 +16,7 @@ const UserDashboard = () => {
 
   useEffect(() => {
     const checkUser = async () => {
-      const { data } = await supabase.auth.getSession();
+      const { data, error } = await supabase.auth.getSession();
       
       if (!data.session) {
         navigate("/user-dashboard");
@@ -45,9 +45,15 @@ const UserDashboard = () => {
   }, [navigate]);
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    toast.success("Successfully signed out!");
-    navigate("/user-dashboard");
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      toast.success("Successfully signed out!");
+      navigate("/user-dashboard");
+    } catch (error) {
+      console.error("Error signing out:", error);
+      toast.error("Failed to sign out. Please try again.");
+    }
   };
 
   if (loading) {
