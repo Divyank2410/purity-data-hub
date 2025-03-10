@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -23,7 +22,6 @@ const Home = () => {
 
   const fetchPlants = async () => {
     try {
-      // Fetch water treatment plants
       const { data: waterPlantsData, error: waterError } = await supabase
         .from("water_treatment_plants")
         .select("*");
@@ -31,7 +29,6 @@ const Home = () => {
       if (waterError) throw waterError;
       setWaterPlants(waterPlantsData || []);
 
-      // Fetch sewer treatment plants
       const { data: sewerPlantsData, error: sewerError } = await supabase
         .from("sewer_treatment_plants")
         .select("*");
@@ -46,7 +43,6 @@ const Home = () => {
   const fetchAllData = async () => {
     setIsLoading(true);
     try {
-      // Fetch water quality data
       const { data: waterQualityData, error: waterError } = await supabase
         .from("water_quality_data")
         .select("*, water_treatment_plants(name)")
@@ -55,7 +51,6 @@ const Home = () => {
       if (waterError) throw waterError;
       setWaterData(waterQualityData || []);
 
-      // Fetch sewer quality data
       const { data: sewerQualityData, error: sewerError } = await supabase
         .from("sewer_quality_data")
         .select("*, sewer_treatment_plants(name)")
@@ -64,7 +59,6 @@ const Home = () => {
       if (sewerError) throw sewerError;
       setSewerData(sewerQualityData || []);
 
-      // Fetch amrit yojna data
       const { data: amritYojnaData, error: amritError } = await supabase
         .from("amrit_yojna_data")
         .select("*")
@@ -78,6 +72,11 @@ const Home = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const formatDateTime = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleString();
   };
 
   return (
@@ -256,6 +255,7 @@ const Home = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
+                      <TableHead>Date & Time</TableHead>
                       <TableHead>Ward No.</TableHead>
                       <TableHead>Date</TableHead>
                       <TableHead>Connection No.</TableHead>
@@ -284,6 +284,7 @@ const Home = () => {
                     ) : (
                       amritData.map((item) => (
                         <TableRow key={item.id}>
+                          <TableCell>{formatDateTime(item.date)}</TableCell>
                           <TableCell>{item.ward_no}</TableCell>
                           <TableCell>{new Date(item.date).toLocaleDateString()}</TableCell>
                           <TableCell>{item.connection_number}</TableCell>
@@ -308,13 +309,13 @@ const Home = () => {
   );
 };
 
-// Helper component for displaying data tables
 const DataTable = ({ data, fields, isLoading }) => {
   return (
     <div className="overflow-x-auto">
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead>Date & Time</TableHead>
             {fields.map((field) => (
               <TableHead key={field.key}>{field.label}</TableHead>
             ))}
@@ -323,19 +324,20 @@ const DataTable = ({ data, fields, isLoading }) => {
         <TableBody>
           {isLoading ? (
             <TableRow>
-              <TableCell colSpan={fields.length} className="text-center py-4">
+              <TableCell colSpan={fields.length + 1} className="text-center py-4">
                 Loading data...
               </TableCell>
             </TableRow>
           ) : data.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={fields.length} className="text-center py-4">
+              <TableCell colSpan={fields.length + 1} className="text-center py-4">
                 No data available
               </TableCell>
             </TableRow>
           ) : (
             data.map((item) => (
               <TableRow key={item.id}>
+                <TableCell>{formatDateTime(item.created_at)}</TableCell>
                 {fields.map((field) => (
                   <TableCell key={`${item.id}-${field.key}`}>
                     {item[field.key] || "N/A"}
