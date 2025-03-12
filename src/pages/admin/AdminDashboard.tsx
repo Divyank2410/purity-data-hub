@@ -16,44 +16,32 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     const checkAdminStatus = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        navigate("/admin-dashboard");
-        return;
-      }
-
-      // Check if the email is admin@gmail.com
-      if (session.user.email !== "admin@gmail.com") {
-        toast.error("You don't have admin access. Please contact the IT department.");
-        await supabase.auth.signOut();
-        navigate("/admin-dashboard");
-        return;
-      }
-
-      // As a double check, verify through the is_admin function
       try {
-        const { data, error } = await supabase.rpc('is_admin', {
-          user_id: session.user.id
-        });
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (!session) {
+          console.log("No session found, redirecting to login");
+          toast.error("Please login to access the admin dashboard");
+          navigate("/admin-dashboard");
+          return;
+        }
 
-        if (error || !data) {
-          console.error("RPC error:", error);
+        // Check if the email is admin@gmail.com
+        if (session.user.email !== "admin@gmail.com") {
+          console.log("Non-admin email detected:", session.user.email);
           toast.error("You don't have admin access. Please contact the IT department.");
           await supabase.auth.signOut();
           navigate("/admin-dashboard");
           return;
         }
 
+        console.log("Admin email verified:", session.user.email);
         setIsAdmin(true);
+        setLoading(false);
       } catch (err) {
         console.error("Error checking admin status:", err);
         toast.error("An error occurred. Please try again later.");
-        await supabase.auth.signOut();
         navigate("/admin-dashboard");
-        return;
-      } finally {
-        setLoading(false);
       }
     };
 
