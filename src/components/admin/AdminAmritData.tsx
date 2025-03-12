@@ -2,13 +2,14 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { DataTable } from "@/components/ui/table";
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { DatePickerWithRange } from "@/components/ui/date-range-picker";
 import { addDays } from "date-fns";
+import { DateRange } from "react-day-picker";
 
 const AdminAmritData = () => {
-  const [dateRange, setDateRange] = useState({
+  const [dateRange, setDateRange] = useState<DateRange>({
     from: addDays(new Date(), -30),
     to: new Date(),
   });
@@ -21,7 +22,7 @@ const AdminAmritData = () => {
         .from("amrit_yojna_data")
         .select("*");
 
-      if (dateRange.from && dateRange.to) {
+      if (dateRange?.from && dateRange?.to) {
         query = query.gte('created_at', dateRange.from.toISOString())
                     .lte('created_at', dateRange.to.toISOString());
       }
@@ -43,7 +44,7 @@ const AdminAmritData = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <DatePickerWithRange
           date={dateRange}
-          onDateChange={setDateRange}
+          onDateChange={(newDate: DateRange | undefined) => setDateRange(newDate || { from: undefined, to: undefined })}
         />
         <Input
           placeholder="Filter by Ward No."
@@ -53,30 +54,30 @@ const AdminAmritData = () => {
       </div>
 
       <div className="rounded-md border">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b bg-gray-50">
-              <th className="p-3 text-left">Date</th>
-              <th className="p-3 text-left">Customer Name</th>
-              <th className="p-3 text-left">Ward No.</th>
-              <th className="p-3 text-left">Connection No.</th>
-              <th className="p-3 text-left">pH Value</th>
-              <th className="p-3 text-left">TDS</th>
-            </tr>
-          </thead>
-          <tbody>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Date</TableHead>
+              <TableHead>Customer Name</TableHead>
+              <TableHead>Ward No.</TableHead>
+              <TableHead>Connection No.</TableHead>
+              <TableHead>pH Value</TableHead>
+              <TableHead>TDS</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {amritData?.map((record) => (
-              <tr key={record.id} className="border-b">
-                <td className="p-3">{new Date(record.date).toLocaleDateString()}</td>
-                <td className="p-3">{record.customer_name}</td>
-                <td className="p-3">{record.ward_no}</td>
-                <td className="p-3">{record.connection_number}</td>
-                <td className="p-3">{record.ph_value}</td>
-                <td className="p-3">{record.tds}</td>
-              </tr>
+              <TableRow key={record.id}>
+                <TableCell>{new Date(record.date).toLocaleDateString()}</TableCell>
+                <TableCell>{record.customer_name}</TableCell>
+                <TableCell>{record.ward_no}</TableCell>
+                <TableCell>{record.connection_number}</TableCell>
+                <TableCell>{record.ph_value}</TableCell>
+                <TableCell>{record.tds}</TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
     </div>
   );
