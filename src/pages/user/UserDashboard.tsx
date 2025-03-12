@@ -35,6 +35,7 @@ const UserDashboard = () => {
           navigate("/user-dashboard");
         } else if (session) {
           setUser(session.user);
+          setLoading(false);
         }
       }
     );
