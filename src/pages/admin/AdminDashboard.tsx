@@ -32,19 +32,29 @@ const AdminDashboard = () => {
       }
 
       // As a double check, verify through the is_admin function
-      const { data, error } = await supabase.rpc('is_admin', {
-        user_id: session.user.id
-      });
+      try {
+        const { data, error } = await supabase.rpc('is_admin', {
+          user_id: session.user.id
+        });
 
-      if (error || !data) {
-        toast.error("You don't have admin access. Please contact the IT department.");
+        if (error || !data) {
+          console.error("RPC error:", error);
+          toast.error("You don't have admin access. Please contact the IT department.");
+          await supabase.auth.signOut();
+          navigate("/admin-dashboard");
+          return;
+        }
+
+        setIsAdmin(true);
+      } catch (err) {
+        console.error("Error checking admin status:", err);
+        toast.error("An error occurred. Please try again later.");
         await supabase.auth.signOut();
         navigate("/admin-dashboard");
         return;
+      } finally {
+        setLoading(false);
       }
-
-      setIsAdmin(true);
-      setLoading(false);
     };
 
     checkAdminStatus();

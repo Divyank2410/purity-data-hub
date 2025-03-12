@@ -27,7 +27,12 @@ const App = () => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       if (session) {
-        fetchUserRole(session.user.id);
+        // Check if the user is the admin
+        if (session.user.email === "admin@gmail.com") {
+          setUserRole("admin");
+        } else {
+          fetchUserRole(session.user.id);
+        }
       } else {
         setLoading(false);
       }
@@ -38,7 +43,13 @@ const App = () => {
       async (_event, session) => {
         setSession(session);
         if (session) {
-          await fetchUserRole(session.user.id);
+          // Check if the user is the admin
+          if (session.user.email === "admin@gmail.com") {
+            setUserRole("admin");
+            setLoading(false);
+          } else {
+            await fetchUserRole(session.user.id);
+          }
         } else {
           setUserRole(null);
           setLoading(false);

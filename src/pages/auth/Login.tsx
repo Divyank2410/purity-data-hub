@@ -22,6 +22,14 @@ const Login = () => {
       const { data } = await supabase.auth.getSession();
       if (data.session) {
         // User is already logged in, redirect to dashboard
+        // Check if the user is admin
+        if (data.session.user.email === "admin@gmail.com") {
+          // Send them directly to admin dashboard
+          navigate("/admin-dashboard");
+          return;
+        }
+        
+        // If not admin, check their role from profiles
         const { data: profileData } = await supabase
           .from("profiles")
           .select("role")
@@ -46,7 +54,7 @@ const Login = () => {
     
     try {
       // Check if attempting admin login with incorrect credentials
-      if (isAdminLogin && (email !== "admin@gmail.com" || password !== "123456")) {
+      if (isAdminLogin && email !== "admin@gmail.com") {
         throw new Error("Invalid admin credentials. Please contact the IT department.");
       }
       
@@ -57,30 +65,37 @@ const Login = () => {
       
       if (error) throw error;
       
-      // Check user role for admin redirect
-      const { data: profileData, error: profileError } = await supabase
-        .from("profiles")
-        .select("role")
-        .eq("id", data.user.id)
-        .single();
-        
-      if (profileError) throw profileError;
-      
-      if (isAdminLogin && profileData.role !== "admin") {
+      // For admin login, verify it's the admin user
+      if (isAdminLogin && data.user.email !== "admin@gmail.com") {
         // Force logout if non-admin tries to login to admin page
         await supabase.auth.signOut();
         throw new Error("You do not have admin access. Please contact the IT department.");
       }
       
-      if (profileData.role === "admin") {
+      if (data.user.email === "admin@gmail.com") {
         navigate("/admin-dashboard");
+        toast.success("Successfully signed in as Admin!");
       } else {
-        navigate("/dashboard");
+        // Check user role for regular user redirect
+        const { data: profileData, error: profileError } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", data.user.id)
+          .single();
+          
+        if (profileError) throw profileError;
+        
+        if (profileData.role === "admin") {
+          navigate("/admin-dashboard");
+        } else {
+          navigate("/dashboard");
+        }
+        
+        toast.success("Successfully signed in!");
       }
-      
-      toast.success("Successfully signed in!");
     } catch (error) {
       toast.error(error.message || "Error signing in");
+      console.error("Sign in error:", error);
     } finally {
       setLoading(false);
     }
@@ -113,6 +128,7 @@ const Login = () => {
       document.getElementById("sign-in-tab").click();
     } catch (error) {
       toast.error(error.message || "Error signing up");
+      console.error("Sign up error:", error);
     } finally {
       setLoading(false);
     }
