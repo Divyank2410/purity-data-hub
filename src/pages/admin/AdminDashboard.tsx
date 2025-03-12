@@ -23,14 +23,23 @@ const AdminDashboard = () => {
         return;
       }
 
-      // Check if user is admin using the is_admin function
+      // Check if the email is admin@gmail.com
+      if (session.user.email !== "admin@gmail.com") {
+        toast.error("You don't have admin access. Please contact the IT department.");
+        await supabase.auth.signOut();
+        navigate("/admin-dashboard");
+        return;
+      }
+
+      // As a double check, verify through the is_admin function
       const { data, error } = await supabase.rpc('is_admin', {
         user_id: session.user.id
       });
 
       if (error || !data) {
-        toast.error("You don't have admin access");
-        navigate("/");
+        toast.error("You don't have admin access. Please contact the IT department.");
+        await supabase.auth.signOut();
+        navigate("/admin-dashboard");
         return;
       }
 

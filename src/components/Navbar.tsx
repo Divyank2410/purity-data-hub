@@ -6,7 +6,7 @@ import { Menu, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-const Navbar = ({ session }) => {
+const Navbar = ({ session, userRole }) => {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -43,11 +43,19 @@ const Navbar = ({ session }) => {
             
             {session ? (
               <>
-                <Link to="/dashboard" className="ml-4">
-                  <Button variant="outline" className="border-blue-600 text-blue-600 hover:bg-blue-50">
-                    My Dashboard
-                  </Button>
-                </Link>
+                {userRole === "admin" ? (
+                  <Link to="/admin-dashboard" className="ml-4">
+                    <Button variant="outline" className="border-blue-600 text-blue-600 hover:bg-blue-50">
+                      Admin Dashboard
+                    </Button>
+                  </Link>
+                ) : (
+                  <Link to="/dashboard" className="ml-4">
+                    <Button variant="outline" className="border-blue-600 text-blue-600 hover:bg-blue-50">
+                      My Dashboard
+                    </Button>
+                  </Link>
+                )}
                 <Button 
                   onClick={handleSignOut}
                   className="ml-2 bg-blue-600 hover:bg-blue-700 text-white"
@@ -105,13 +113,23 @@ const Navbar = ({ session }) => {
             
             {session ? (
               <>
-                <Link 
-                  to="/dashboard" 
-                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50"
-                  onClick={() => setIsOpen(false)}
-                >
-                  My Dashboard
-                </Link>
+                {userRole === "admin" ? (
+                  <Link 
+                    to="/admin-dashboard" 
+                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Admin Dashboard
+                  </Link>
+                ) : (
+                  <Link 
+                    to="/dashboard" 
+                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    My Dashboard
+                  </Link>
+                )}
                 <button
                   onClick={() => {
                     handleSignOut();
