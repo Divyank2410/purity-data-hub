@@ -155,6 +155,7 @@ const Home = () => {
                           { key: 'dissolved_oxygen', label: 'Dissolved Oxygen' },
                         ]}
                         isLoading={isLoading}
+                        formatDateTime={formatDateTime}
                       />
                     </TabsContent>
                     
@@ -173,6 +174,7 @@ const Home = () => {
                           { key: 'dissolved_oxygen', label: 'Dissolved Oxygen' },
                         ]}
                         isLoading={isLoading}
+                        formatDateTime={formatDateTime}
                       />
                     </TabsContent>
                   </Tabs>
@@ -214,6 +216,7 @@ const Home = () => {
                           { key: 'fecal_coliform', label: 'Fecal Coliform' },
                         ]}
                         isLoading={isLoading}
+                        formatDateTime={formatDateTime}
                       />
                     </TabsContent>
                     
@@ -233,6 +236,7 @@ const Home = () => {
                           { key: 'fecal_coliform', label: 'Fecal Coliform' },
                         ]}
                         isLoading={isLoading}
+                        formatDateTime={formatDateTime}
                       />
                     </TabsContent>
                   </Tabs>
@@ -309,7 +313,7 @@ const Home = () => {
   );
 };
 
-const DataTable = ({ data, fields, isLoading }) => {
+const DataTable = ({ data, fields, isLoading, formatDateTime }) => {
   return (
     <div className="overflow-x-auto">
       <Table>
