@@ -12,6 +12,9 @@ import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
+// Create a query client key for water data that can be shared across components
+export const WATER_DATA_QUERY_KEY = "waterData";
+
 const AdminWaterData = () => {
   const [dateRange, setDateRange] = useState<DateRange>({
     from: addDays(new Date(), -30),
@@ -77,8 +80,18 @@ const AdminWaterData = () => {
         throw error;
       }
       
+      // Success toast
       toast.success("Record deleted successfully");
+      
+      // Refetch data to update the admin dashboard
       refetch();
+      
+      // Invalidate shared query keys to update homepage
+      const event = new CustomEvent('invalidateQueries', { 
+        detail: { queryKey: WATER_DATA_QUERY_KEY } 
+      });
+      window.dispatchEvent(event);
+      
     } catch (error) {
       console.error("Error deleting record:", error);
       toast.error("Failed to delete record");

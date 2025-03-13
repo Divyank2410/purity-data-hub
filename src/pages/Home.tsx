@@ -6,72 +6,87 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Separator } from "@/components/ui/separator";
 import { RefreshCw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { WATER_DATA_QUERY_KEY } from "@/components/admin/AdminWaterData";
+import { SEWER_DATA_QUERY_KEY } from "@/components/admin/AdminSewerData";
+import { AMRIT_DATA_QUERY_KEY } from "@/components/admin/AdminAmritData";
 
 const Home = () => {
-  const [waterData, setWaterData] = useState([]);
-  const [sewerData, setSewerData] = useState([]);
-  const [amritData, setAmritData] = useState([]);
-  const [waterPlants, setWaterPlants] = useState([]);
-  const [sewerPlants, setSewerPlants] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-
+  const queryClient = useQueryClient();
+  
   useEffect(() => {
-    fetchPlants();
-    fetchAllData();
-  }, []);
+    const handleInvalidateQuery = (event: CustomEvent<{ queryKey: string }>) => {
+      queryClient.invalidateQueries({ queryKey: [event.detail.queryKey] });
+    };
 
-  const fetchPlants = async () => {
-    try {
-      const { data: waterPlantsData, error: waterError } = await supabase
-        .from("water_treatment_plants")
-        .select("*");
-
-      if (waterError) throw waterError;
-      setWaterPlants(waterPlantsData || []);
-
-      const { data: sewerPlantsData, error: sewerError } = await supabase
-        .from("sewer_treatment_plants")
-        .select("*");
-
-      if (sewerError) throw sewerError;
-      setSewerPlants(sewerPlantsData || []);
-    } catch (error) {
-      console.error("Error fetching plants:", error);
+    window.addEventListener('invalidateQueries', handleInvalidateQuery as EventListener);
+    
+    return () => {
+      window.removeEventListener('invalidateQueries', handleInvalidateQuery as EventListener);
+    };
+  }, [queryClient]);
+  
+  const { data: waterPlants = [], isLoading: isLoadingWaterPlants } = useQuery({
+    queryKey: ["waterPlants"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("water_treatment_plants").select("*");
+      if (error) throw error;
+      return data || [];
     }
-  };
-
-  const fetchAllData = async () => {
-    setIsLoading(true);
-    try {
-      const { data: waterQualityData, error: waterError } = await supabase
+  });
+  
+  const { data: sewerPlants = [], isLoading: isLoadingSewerPlants } = useQuery({
+    queryKey: ["sewerPlants"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("sewer_treatment_plants").select("*");
+      if (error) throw error;
+      return data || [];
+    }
+  });
+  
+  const { data: waterData = [], isLoading: isLoadingWaterData } = useQuery({
+    queryKey: [WATER_DATA_QUERY_KEY],
+    queryFn: async () => {
+      const { data, error } = await supabase
         .from("water_quality_data")
         .select("*, water_treatment_plants(name)")
         .order("created_at", { ascending: false });
-
-      if (waterError) throw waterError;
-      setWaterData(waterQualityData || []);
-
-      const { data: sewerQualityData, error: sewerError } = await supabase
+      if (error) throw error;
+      return data || [];
+    }
+  });
+  
+  const { data: sewerData = [], isLoading: isLoadingSewerData } = useQuery({
+    queryKey: [SEWER_DATA_QUERY_KEY],
+    queryFn: async () => {
+      const { data, error } = await supabase
         .from("sewer_quality_data")
         .select("*, sewer_treatment_plants(name)")
         .order("created_at", { ascending: false });
-
-      if (sewerError) throw sewerError;
-      setSewerData(sewerQualityData || []);
-
-      const { data: amritYojnaData, error: amritError } = await supabase
+      if (error) throw error;
+      return data || [];
+    }
+  });
+  
+  const { data: amritData = [], isLoading: isLoadingAmritData } = useQuery({
+    queryKey: [AMRIT_DATA_QUERY_KEY],
+    queryFn: async () => {
+      const { data, error } = await supabase
         .from("amrit_yojna_data")
         .select("*")
         .order("created_at", { ascending: false })
         .limit(20);
-
-      if (amritError) throw amritError;
-      setAmritData(amritYojnaData || []);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    } finally {
-      setIsLoading(false);
+      if (error) throw error;
+      return data || [];
     }
+  });
+  
+  const isLoading = isLoadingWaterPlants || isLoadingSewerPlants || isLoadingWaterData || isLoadingSewerData || isLoadingAmritData;
+  
+  const handleRefresh = () => {
+    queryClient.invalidateQueries({ queryKey: [WATER_DATA_QUERY_KEY] });
+    queryClient.invalidateQueries({ queryKey: [SEWER_DATA_QUERY_KEY] });
+    queryClient.invalidateQueries({ queryKey: [AMRIT_DATA_QUERY_KEY] });
   };
 
   const formatDateTime = (dateString: string) => {
@@ -99,7 +114,7 @@ const Home = () => {
               to ensure clean and safe water for all citizens.
             </p>
             <div className="flex flex-wrap gap-4">
-              <Button variant="secondary" onClick={fetchAllData} className="bg-white text-blue-600 hover:bg-gray-100">
+              <Button variant="secondary" onClick={handleRefresh} className="bg-white text-blue-600 hover:bg-gray-100">
                 <RefreshCw className="mr-2 h-4 w-4" />
                 Refresh Data
               </Button>
@@ -357,3 +372,4 @@ const DataTable = ({ data, fields, isLoading, formatDateTime }) => {
 };
 
 export default Home;
+

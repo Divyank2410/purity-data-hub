@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,6 +11,8 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
+
+export const AMRIT_DATA_QUERY_KEY = "amritData";
 
 const AdminAmritData = () => {
   const [dateRange, setDateRange] = useState<DateRange>({
@@ -64,7 +65,14 @@ const AdminAmritData = () => {
       }
       
       toast.success("Record deleted successfully");
+      
       refetch();
+      
+      const event = new CustomEvent('invalidateQueries', { 
+        detail: { queryKey: AMRIT_DATA_QUERY_KEY } 
+      });
+      window.dispatchEvent(event);
+      
     } catch (error) {
       console.error("Error deleting record:", error);
       toast.error("Failed to delete record");
