@@ -7,6 +7,8 @@ import { Input } from "@/components/ui/input";
 import { DatePickerWithRange } from "@/components/ui/date-range-picker";
 import { addDays } from "date-fns";
 import { DateRange } from "react-day-picker";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const AdminAmritData = () => {
   const [dateRange, setDateRange] = useState<DateRange>({
@@ -14,9 +16,11 @@ const AdminAmritData = () => {
     to: new Date(),
   });
   const [wardFilter, setWardFilter] = useState("");
+  const [customerNameFilter, setCustomerNameFilter] = useState("");
+  const [connectionFilter, setConnectionFilter] = useState("");
 
   const { data: amritData, isLoading } = useQuery({
-    queryKey: ["adminAmritData", dateRange, wardFilter],
+    queryKey: ["adminAmritData", dateRange, wardFilter, customerNameFilter, connectionFilter],
     queryFn: async () => {
       let query = supabase
         .from("amrit_yojna_data")
@@ -28,57 +32,113 @@ const AdminAmritData = () => {
       }
 
       if (wardFilter) {
-        query = query.eq('ward_no', wardFilter);
+        query = query.ilike('ward_no', `%${wardFilter}%`);
       }
 
-      const { data, error } = await query;
+      if (customerNameFilter) {
+        query = query.ilike('customer_name', `%${customerNameFilter}%`);
+      }
+
+      if (connectionFilter) {
+        query = query.ilike('connection_number', `%${connectionFilter}%`);
+      }
+
+      const { data, error } = await query.order('created_at', { ascending: false });
       if (error) throw error;
       return data;
     }
   });
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return (
+    <div className="flex justify-center items-center h-64">
+      <p className="text-lg text-gray-500">Loading Amrit Yojna data...</p>
+    </div>
+  );
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <DatePickerWithRange
-          date={dateRange}
-          onDateChange={(newDate: DateRange | undefined) => setDateRange(newDate || { from: undefined, to: undefined })}
-        />
-        <Input
-          placeholder="Filter by Ward No."
-          value={wardFilter}
-          onChange={(e) => setWardFilter(e.target.value)}
-        />
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Amrit Yojna Data Filters</CardTitle>
+          <CardDescription>Filter data by various parameters</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <DatePickerWithRange
+              date={dateRange}
+              onDateChange={(newDate: DateRange | undefined) => setDateRange(newDate || { from: undefined, to: undefined })}
+            />
+            <Input
+              placeholder="Filter by Ward No."
+              value={wardFilter}
+              onChange={(e) => setWardFilter(e.target.value)}
+            />
+            <Input
+              placeholder="Filter by Customer Name"
+              value={customerNameFilter}
+              onChange={(e) => setCustomerNameFilter(e.target.value)}
+            />
+            <Input
+              placeholder="Filter by Connection No."
+              value={connectionFilter}
+              onChange={(e) => setConnectionFilter(e.target.value)}
+            />
+          </div>
+        </CardContent>
+      </Card>
 
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Date</TableHead>
-              <TableHead>Customer Name</TableHead>
-              <TableHead>Ward No.</TableHead>
-              <TableHead>Connection No.</TableHead>
-              <TableHead>pH Value</TableHead>
-              <TableHead>TDS</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {amritData?.map((record) => (
-              <TableRow key={record.id}>
-                <TableCell>{new Date(record.date).toLocaleDateString()}</TableCell>
-                <TableCell>{record.customer_name}</TableCell>
-                <TableCell>{record.ward_no}</TableCell>
-                <TableCell>{record.connection_number}</TableCell>
-                <TableCell>{record.ph_value}</TableCell>
-                <TableCell>{record.tds}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Amrit Yojna Records</CardTitle>
+          <CardDescription>
+            Total Records: {amritData?.length || 0}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="rounded-md border overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Customer Name</TableHead>
+                  <TableHead>Mobile No.</TableHead>
+                  <TableHead>Ward No.</TableHead>
+                  <TableHead>Connection No.</TableHead>
+                  <TableHead>pH Value</TableHead>
+                  <TableHead>TDS</TableHead>
+                  <TableHead>Color</TableHead>
+                  <TableHead>Smell</TableHead>
+                  <TableHead>Conductivity</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {amritData?.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={10} className="text-center h-24">
+                      No records found
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  amritData?.map((record) => (
+                    <TableRow key={record.id}>
+                      <TableCell>{new Date(record.date).toLocaleDateString()}</TableCell>
+                      <TableCell>{record.customer_name}</TableCell>
+                      <TableCell>{record.mobile_no}</TableCell>
+                      <TableCell>{record.ward_no}</TableCell>
+                      <TableCell>{record.connection_number}</TableCell>
+                      <TableCell>{record.ph_value || "-"}</TableCell>
+                      <TableCell>{record.tds || "-"}</TableCell>
+                      <TableCell>{record.color || "-"}</TableCell>
+                      <TableCell>{record.smell || "-"}</TableCell>
+                      <TableCell>{record.conductivity_cl || "-"}</TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
