@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -55,19 +56,25 @@ const AdminAmritData = () => {
 
   const handleDelete = async (id: string) => {
     try {
+      console.log("Deleting Amrit Yojna record with ID:", id);
+      
       const { error } = await supabase
         .from("amrit_yojna_data")
         .delete()
         .eq('id', id);
         
       if (error) {
+        console.error("Supabase delete error:", error);
         throw error;
       }
       
+      console.log("Delete successful, refetching data");
       toast.success("Record deleted successfully");
       
-      refetch();
+      // Refetch data immediately to update the admin dashboard
+      await refetch();
       
+      // Dispatch event to update homepage
       const event = new CustomEvent('invalidateQueries', { 
         detail: { queryKey: AMRIT_DATA_QUERY_KEY } 
       });

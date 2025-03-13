@@ -16,6 +16,7 @@ const Home = () => {
   
   useEffect(() => {
     const handleInvalidateQuery = (event: CustomEvent<{ queryKey: string }>) => {
+      console.log("Invalidating query from event:", event.detail.queryKey);
       queryClient.invalidateQueries({ queryKey: [event.detail.queryKey] });
     };
 
@@ -84,9 +85,11 @@ const Home = () => {
   const isLoading = isLoadingWaterPlants || isLoadingSewerPlants || isLoadingWaterData || isLoadingSewerData || isLoadingAmritData;
   
   const handleRefresh = () => {
+    console.log("Manually refreshing all data");
     queryClient.invalidateQueries({ queryKey: [WATER_DATA_QUERY_KEY] });
     queryClient.invalidateQueries({ queryKey: [SEWER_DATA_QUERY_KEY] });
     queryClient.invalidateQueries({ queryKey: [AMRIT_DATA_QUERY_KEY] });
+    toast.success("Data refreshed");
   };
 
   const formatDateTime = (dateString: string) => {
@@ -372,4 +375,3 @@ const DataTable = ({ data, fields, isLoading, formatDateTime }) => {
 };
 
 export default Home;
-

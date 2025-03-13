@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { DatePickerWithRange } from "@/components/ui/date-range-picker";
@@ -16,6 +16,7 @@ import { toast } from "sonner";
 export const SEWER_DATA_QUERY_KEY = "sewerData";
 
 const AdminSewerData = () => {
+  const queryClient = useQueryClient();
   const [dateRange, setDateRange] = useState<DateRange>({
     from: addDays(new Date(), -30),
     to: new Date(),
@@ -71,22 +72,28 @@ const AdminSewerData = () => {
 
   const handleDelete = async (id: string) => {
     try {
+      console.log("Deleting sewer record with ID:", id);
+      
       const { error } = await supabase
         .from("sewer_quality_data")
         .delete()
         .eq('id', id);
         
       if (error) {
+        console.error("Supabase delete error:", error);
         throw error;
       }
       
-      // Success toast
+      console.log("Delete successful, refetching data");
       toast.success("Record deleted successfully");
       
-      // Refetch data to update the admin dashboard
-      refetch();
+      // Refetch data immediately to update the admin dashboard
+      await refetch();
       
-      // Invalidate shared query keys to update homepage
+      // Invalidate shared query key directly
+      queryClient.invalidateQueries({ queryKey: [SEWER_DATA_QUERY_KEY] });
+      
+      // Also dispatch event to update homepage
       const event = new CustomEvent('invalidateQueries', { 
         detail: { queryKey: SEWER_DATA_QUERY_KEY } 
       });
