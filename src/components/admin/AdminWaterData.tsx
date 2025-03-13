@@ -3,7 +3,6 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
-import { Input } from "@/components/ui/input";
 import { DatePickerWithRange } from "@/components/ui/date-range-picker";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { addDays } from "date-fns";
@@ -25,8 +24,10 @@ const AdminWaterData = () => {
         .select(`
           *,
           water_treatment_plants (
+            id,
             name,
-            location
+            location,
+            capacity
           )
         `);
 
@@ -49,7 +50,23 @@ const AdminWaterData = () => {
     }
   });
 
-  if (isLoading) return <div>Loading...</div>;
+  const { data: plants } = useQuery({
+    queryKey: ["waterTreatmentPlants"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("water_treatment_plants")
+        .select("*");
+      
+      if (error) throw error;
+      return data;
+    }
+  });
+
+  if (isLoading) return (
+    <div className="flex justify-center items-center p-8">
+      <p className="text-lg">Loading water treatment data...</p>
+    </div>
+  );
 
   return (
     <div className="space-y-4">
@@ -68,29 +85,57 @@ const AdminWaterData = () => {
             <SelectItem value="clean_water">Clean Water</SelectItem>
           </SelectContent>
         </Select>
+        <Select value={plantFilter} onValueChange={setPlantFilter}>
+          <SelectTrigger>
+            <SelectValue placeholder="Filter by plant" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Plants</SelectItem>
+            {plants?.map(plant => (
+              <SelectItem key={plant.id} value={plant.id}>{plant.name}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
-      <div className="rounded-md border">
+      <div className="rounded-md border overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead>Date</TableHead>
-              <TableHead>Plant</TableHead>
-              <TableHead>Type</TableHead>
+              <TableHead>Plant Name</TableHead>
+              <TableHead>Plant Location</TableHead>
+              <TableHead>Plant Capacity</TableHead>
+              <TableHead>Water Type</TableHead>
               <TableHead>pH Value</TableHead>
               <TableHead>Turbidity</TableHead>
               <TableHead>Chlorides</TableHead>
+              <TableHead>Alkalinity</TableHead>
+              <TableHead>Hardness</TableHead>
+              <TableHead>Iron</TableHead>
+              <TableHead>Dissolved Oxygen</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
+            {waterData?.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={12} className="text-center py-4">No data found for the selected filters</TableCell>
+              </TableRow>
+            )}
             {waterData?.map((record) => (
               <TableRow key={record.id}>
                 <TableCell>{new Date(record.created_at).toLocaleDateString()}</TableCell>
-                <TableCell>{record.water_treatment_plants?.name}</TableCell>
+                <TableCell>{record.water_treatment_plants?.name || 'N/A'}</TableCell>
+                <TableCell>{record.water_treatment_plants?.location || 'N/A'}</TableCell>
+                <TableCell>{record.water_treatment_plants?.capacity || 'N/A'}</TableCell>
                 <TableCell>{record.water_type}</TableCell>
-                <TableCell>{record.ph_value}</TableCell>
-                <TableCell>{record.turbidity}</TableCell>
-                <TableCell>{record.chlorides}</TableCell>
+                <TableCell>{record.ph_value || 'N/A'}</TableCell>
+                <TableCell>{record.turbidity || 'N/A'}</TableCell>
+                <TableCell>{record.chlorides || 'N/A'}</TableCell>
+                <TableCell>{record.alkalinity || 'N/A'}</TableCell>
+                <TableCell>{record.hardness || 'N/A'}</TableCell>
+                <TableCell>{record.iron || 'N/A'}</TableCell>
+                <TableCell>{record.dissolved_oxygen || 'N/A'}</TableCell>
               </TableRow>
             ))}
           </TableBody>

@@ -8,6 +8,7 @@ import AdminWaterData from "@/components/admin/AdminWaterData";
 import AdminSewerData from "@/components/admin/AdminSewerData";
 import AdminAmritData from "@/components/admin/AdminAmritData";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -48,6 +49,12 @@ const AdminDashboard = () => {
     checkAdminStatus();
   }, [navigate]);
 
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    toast.success("Successfully logged out");
+    navigate("/");
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -67,6 +74,13 @@ const AdminDashboard = () => {
           <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
           <p className="text-gray-600 mt-1">View and manage all data</p>
         </div>
+        <Button 
+          variant="outline" 
+          onClick={handleSignOut}
+          className="mt-4 md:mt-0"
+        >
+          Sign Out
+        </Button>
       </div>
 
       <Card className="mb-8">
