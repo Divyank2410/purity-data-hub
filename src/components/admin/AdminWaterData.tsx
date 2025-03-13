@@ -7,6 +7,10 @@ import { DatePickerWithRange } from "@/components/ui/date-range-picker";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { addDays } from "date-fns";
 import { DateRange } from "react-day-picker";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import { Trash2 } from "lucide-react";
+import { toast } from "sonner";
 
 const AdminWaterData = () => {
   const [dateRange, setDateRange] = useState<DateRange>({
@@ -16,7 +20,7 @@ const AdminWaterData = () => {
   const [plantFilter, setPlantFilter] = useState("all");
   const [waterType, setWaterType] = useState("all");
 
-  const { data: waterData, isLoading } = useQuery({
+  const { data: waterData, isLoading, refetch } = useQuery({
     queryKey: ["adminWaterData", dateRange, plantFilter, waterType],
     queryFn: async () => {
       let query = supabase
@@ -61,6 +65,25 @@ const AdminWaterData = () => {
       return data;
     }
   });
+
+  const handleDelete = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from("water_quality_data")
+        .delete()
+        .eq('id', id);
+        
+      if (error) {
+        throw error;
+      }
+      
+      toast.success("Record deleted successfully");
+      refetch();
+    } catch (error) {
+      console.error("Error deleting record:", error);
+      toast.error("Failed to delete record");
+    }
+  };
 
   if (isLoading) return (
     <div className="flex justify-center items-center p-8">
@@ -114,12 +137,13 @@ const AdminWaterData = () => {
               <TableHead>Hardness</TableHead>
               <TableHead>Iron</TableHead>
               <TableHead>Dissolved Oxygen</TableHead>
+              <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {waterData?.length === 0 && (
               <TableRow>
-                <TableCell colSpan={12} className="text-center py-4">No data found for the selected filters</TableCell>
+                <TableCell colSpan={13} className="text-center py-4">No data found for the selected filters</TableCell>
               </TableRow>
             )}
             {waterData?.map((record) => (
@@ -136,6 +160,36 @@ const AdminWaterData = () => {
                 <TableCell>{record.hardness || 'N/A'}</TableCell>
                 <TableCell>{record.iron || 'N/A'}</TableCell>
                 <TableCell>{record.dissolved_oxygen || 'N/A'}</TableCell>
+                <TableCell>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="text-red-500 hover:text-red-700 hover:bg-red-100"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Confirm Deletion</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Are you sure you want to delete this water quality record? This action cannot be undone.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction 
+                          className="bg-red-600 hover:bg-red-700 text-white"
+                          onClick={() => handleDelete(record.id)}
+                        >
+                          Delete
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>

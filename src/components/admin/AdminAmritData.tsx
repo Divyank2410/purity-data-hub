@@ -8,7 +8,10 @@ import { DatePickerWithRange } from "@/components/ui/date-range-picker";
 import { addDays } from "date-fns";
 import { DateRange } from "react-day-picker";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import { Trash2 } from "lucide-react";
+import { toast } from "sonner";
 
 const AdminAmritData = () => {
   const [dateRange, setDateRange] = useState<DateRange>({
@@ -19,7 +22,7 @@ const AdminAmritData = () => {
   const [customerNameFilter, setCustomerNameFilter] = useState("");
   const [connectionFilter, setConnectionFilter] = useState("");
 
-  const { data: amritData, isLoading } = useQuery({
+  const { data: amritData, isLoading, refetch } = useQuery({
     queryKey: ["adminAmritData", dateRange, wardFilter, customerNameFilter, connectionFilter],
     queryFn: async () => {
       let query = supabase
@@ -48,6 +51,25 @@ const AdminAmritData = () => {
       return data;
     }
   });
+
+  const handleDelete = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from("amrit_yojna_data")
+        .delete()
+        .eq('id', id);
+        
+      if (error) {
+        throw error;
+      }
+      
+      toast.success("Record deleted successfully");
+      refetch();
+    } catch (error) {
+      console.error("Error deleting record:", error);
+      toast.error("Failed to delete record");
+    }
+  };
 
   if (isLoading) return (
     <div className="flex justify-center items-center h-64">
@@ -109,12 +131,13 @@ const AdminAmritData = () => {
                   <TableHead>Color</TableHead>
                   <TableHead>Smell</TableHead>
                   <TableHead>Conductivity</TableHead>
+                  <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {amritData?.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={10} className="text-center h-24">
+                    <TableCell colSpan={11} className="text-center h-24">
                       No records found
                     </TableCell>
                   </TableRow>
@@ -131,6 +154,36 @@ const AdminAmritData = () => {
                       <TableCell>{record.color || "-"}</TableCell>
                       <TableCell>{record.smell || "-"}</TableCell>
                       <TableCell>{record.conductivity_cl || "-"}</TableCell>
+                      <TableCell>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="text-red-500 hover:text-red-700 hover:bg-red-100"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Confirm Deletion</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Are you sure you want to delete this record? This action cannot be undone.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction 
+                                className="bg-red-600 hover:bg-red-700 text-white"
+                                onClick={() => handleDelete(record.id)}
+                              >
+                                Delete
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </TableCell>
                     </TableRow>
                   ))
                 )}
