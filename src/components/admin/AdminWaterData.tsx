@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -80,19 +81,20 @@ const AdminWaterData = () => {
         
       if (error) {
         console.error("Supabase delete error:", error);
-        throw error;
+        toast.error("Failed to delete record: " + error.message);
+        return;
       }
       
       console.log("Delete successful, refetching data");
       toast.success("Record deleted successfully");
       
-      // Refetch data immediately to update the admin dashboard
+      // Immediately update local data
       await refetch();
       
-      // Invalidate shared query key directly
+      // Update global query cache
       queryClient.invalidateQueries({ queryKey: [WATER_DATA_QUERY_KEY] });
       
-      // Also dispatch event to update homepage
+      // Dispatch event to update homepage
       const event = new CustomEvent('invalidateQueries', { 
         detail: { queryKey: WATER_DATA_QUERY_KEY } 
       });

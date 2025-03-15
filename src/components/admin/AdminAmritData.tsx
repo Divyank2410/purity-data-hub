@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
@@ -16,6 +16,7 @@ import { toast } from "sonner";
 export const AMRIT_DATA_QUERY_KEY = "amritData";
 
 const AdminAmritData = () => {
+  const queryClient = useQueryClient();
   const [dateRange, setDateRange] = useState<DateRange>({
     from: addDays(new Date(), -30),
     to: new Date(),
@@ -65,14 +66,18 @@ const AdminAmritData = () => {
         
       if (error) {
         console.error("Supabase delete error:", error);
-        throw error;
+        toast.error("Failed to delete record: " + error.message);
+        return;
       }
       
       console.log("Delete successful, refetching data");
       toast.success("Record deleted successfully");
       
-      // Refetch data immediately to update the admin dashboard
+      // Immediately update local data
       await refetch();
+      
+      // Update global query cache
+      queryClient.invalidateQueries({ queryKey: [AMRIT_DATA_QUERY_KEY] });
       
       // Dispatch event to update homepage
       const event = new CustomEvent('invalidateQueries', { 

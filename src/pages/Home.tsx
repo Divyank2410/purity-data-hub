@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -16,18 +15,18 @@ import { toast } from "sonner";
 const Home = () => {
   const queryClient = useQueryClient();
   
-  useEffect(() => {
-    const handleInvalidateQuery = (event: CustomEvent<{ queryKey: string }>) => {
-      console.log("Invalidating query from event:", event.detail.queryKey);
-      queryClient.invalidateQueries({ queryKey: [event.detail.queryKey] });
-    };
+  const handleInvalidateQuery = useCallback((event: CustomEvent<{ queryKey: string }>) => {
+    console.log("Invalidating query from event:", event.detail.queryKey);
+    queryClient.invalidateQueries({ queryKey: [event.detail.queryKey] });
+  }, [queryClient]);
 
+  useEffect(() => {
     window.addEventListener('invalidateQueries', handleInvalidateQuery as EventListener);
     
     return () => {
       window.removeEventListener('invalidateQueries', handleInvalidateQuery as EventListener);
     };
-  }, [queryClient]);
+  }, [handleInvalidateQuery]);
   
   const { data: waterPlants = [], isLoading: isLoadingWaterPlants } = useQuery({
     queryKey: ["waterPlants"],
@@ -35,7 +34,8 @@ const Home = () => {
       const { data, error } = await supabase.from("water_treatment_plants").select("*");
       if (error) throw error;
       return data || [];
-    }
+    },
+    staleTime: 5 * 60 * 1000,
   });
   
   const { data: sewerPlants = [], isLoading: isLoadingSewerPlants } = useQuery({
@@ -44,7 +44,8 @@ const Home = () => {
       const { data, error } = await supabase.from("sewer_treatment_plants").select("*");
       if (error) throw error;
       return data || [];
-    }
+    },
+    staleTime: 5 * 60 * 1000,
   });
   
   const { data: waterData = [], isLoading: isLoadingWaterData } = useQuery({
