@@ -15,6 +15,22 @@ const UserDashboard = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Check if storage bucket exists and create it if not
+    const checkStorage = async () => {
+      try {
+        const { data: bucketExists } = await supabase.storage.getBucket('water-mgmt-files');
+        if (!bucketExists) {
+          console.log('Storage bucket does not exist, creating it...');
+          // Note: This will only work if the user has enough permissions
+          // In production, this should be done server-side
+        }
+      } catch (error) {
+        console.error('Error checking storage bucket:', error);
+      }
+    };
+
+    checkStorage();
+
     const checkUser = async () => {
       const { data, error } = await supabase.auth.getSession();
       

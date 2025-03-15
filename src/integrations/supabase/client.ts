@@ -21,7 +21,8 @@ const supabaseOptions = {
     },
     fetch: (url: RequestInfo, init?: RequestInit) => {
       // Add a timeout to prevent hanging requests
-      const timeout = 30000; // 30 seconds
+      // Use a longer timeout for file uploads (60 seconds instead of 30)
+      const timeout = 60000;
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), timeout);
       

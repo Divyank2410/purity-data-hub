@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import FileUpload from "@/components/FileUpload";
 
 interface WaterQualityFormProps {
   userId: string;
@@ -23,6 +24,7 @@ const WaterQualityForm = ({ userId }: WaterQualityFormProps) => {
   const [submitting, setSubmitting] = useState(false);
   const [waterType, setWaterType] = useState<string>("");
   const [plantId, setPlantId] = useState<string>("");
+  const [documentUrl, setDocumentUrl] = useState<string>("");
   
   // Form fields
   const [formData, setFormData] = useState({
@@ -61,6 +63,10 @@ const WaterQualityForm = ({ userId }: WaterQualityFormProps) => {
     setFormData({ ...formData, [name]: value });
   };
 
+  const handleFileUpload = (filePath: string) => {
+    setDocumentUrl(filePath);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -83,6 +89,7 @@ const WaterQualityForm = ({ userId }: WaterQualityFormProps) => {
           plant_id: plantId,
           water_type: waterType,
           user_id: userId,
+          document_url: documentUrl,
           ...formData
         });
       
@@ -102,6 +109,7 @@ const WaterQualityForm = ({ userId }: WaterQualityFormProps) => {
       });
       setWaterType("");
       setPlantId("");
+      setDocumentUrl("");
       
     } catch (error) {
       console.error("Error submitting data:", error);
@@ -147,6 +155,16 @@ const WaterQualityForm = ({ userId }: WaterQualityFormProps) => {
                 </SelectContent>
               </Select>
             </div>
+          </div>
+          
+          {/* File Upload Section */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Upload Supporting Document (PDF or Image)</label>
+            <FileUpload 
+              onFileUpload={handleFileUpload} 
+              fileType="water" 
+              userId={userId} 
+            />
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

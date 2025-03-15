@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import FileUpload from "@/components/FileUpload";
 
 interface AmritYojnaFormProps {
   userId: string;
@@ -13,6 +14,7 @@ interface AmritYojnaFormProps {
 
 const AmritYojnaForm = ({ userId }: AmritYojnaFormProps) => {
   const [submitting, setSubmitting] = useState(false);
+  const [documentUrl, setDocumentUrl] = useState<string>("");
   
   // Form fields
   const [formData, setFormData] = useState({
@@ -33,6 +35,10 @@ const AmritYojnaForm = ({ userId }: AmritYojnaFormProps) => {
     setFormData({ ...formData, [name]: value });
   };
 
+  const handleFileUpload = (filePath: string) => {
+    setDocumentUrl(filePath);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -50,7 +56,8 @@ const AmritYojnaForm = ({ userId }: AmritYojnaFormProps) => {
         .from("amrit_yojna_data")
         .insert({
           ...formData,
-          user_id: userId
+          user_id: userId,
+          document_url: documentUrl
         });
       
       if (error) throw error;
@@ -70,6 +77,7 @@ const AmritYojnaForm = ({ userId }: AmritYojnaFormProps) => {
         tds: "",
         conductivity_cl: "",
       });
+      setDocumentUrl("");
       
     } catch (error) {
       console.error("Error submitting data:", error);
@@ -146,6 +154,16 @@ const AmritYojnaForm = ({ userId }: AmritYojnaFormProps) => {
                 required
               />
             </div>
+          </div>
+          
+          {/* File Upload Section */}
+          <div className="space-y-2">
+            <Label>Upload Supporting Document (PDF or Image)</Label>
+            <FileUpload 
+              onFileUpload={handleFileUpload} 
+              fileType="amrit" 
+              userId={userId} 
+            />
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
