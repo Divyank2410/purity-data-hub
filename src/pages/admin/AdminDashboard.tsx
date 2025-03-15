@@ -23,7 +23,7 @@ const AdminDashboard = () => {
         if (!session) {
           console.log("No session found, redirecting to login");
           toast.error("Please login to access the admin dashboard");
-          navigate("/admin-dashboard");
+          navigate("/admin-dashboard", { replace: true });
           return;
         }
 
@@ -32,7 +32,7 @@ const AdminDashboard = () => {
           console.log("Non-admin email detected:", session.user.email);
           toast.error("You don't have admin access. Please contact the IT department.");
           await supabase.auth.signOut();
-          navigate("/admin-dashboard");
+          navigate("/admin-dashboard", { replace: true });
           return;
         }
 
@@ -42,7 +42,7 @@ const AdminDashboard = () => {
       } catch (err) {
         console.error("Error checking admin status:", err);
         toast.error("An error occurred. Please try again later.");
-        navigate("/admin-dashboard");
+        navigate("/admin-dashboard", { replace: true });
       }
     };
 
@@ -50,15 +50,23 @@ const AdminDashboard = () => {
   }, [navigate]);
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    toast.success("Successfully logged out");
-    navigate("/");
+    try {
+      await supabase.auth.signOut();
+      toast.success("Successfully logged out");
+      navigate("/", { replace: true });
+    } catch (error) {
+      console.error("Sign out error:", error);
+      toast.error("Failed to sign out. Please try again.");
+    }
   };
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p>Loading dashboard...</p>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p>Loading dashboard...</p>
+        </div>
       </div>
     );
   }

@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,36 +16,46 @@ const Login = () => {
   const [checkingSession, setCheckingSession] = useState(true);
   const isAdminLogin = location.pathname.includes("admin");
 
-  useEffect(() => {
-    const checkSession = async () => {
-      const { data } = await supabase.auth.getSession();
+  const checkSession = useCallback(async () => {
+    try {
+      const { data, error } = await supabase.auth.getSession();
+      
+      if (error) throw error;
+      
       if (data.session) {
         // User is already logged in, redirect to dashboard
         // Check if the user is admin
         if (data.session.user.email === "admin@gmail.com") {
           // Send them directly to admin dashboard
-          navigate("/admin-dashboard");
+          navigate("/admin-dashboard", { replace: true });
           return;
         }
         
         // If not admin, check their role from profiles
-        const { data: profileData } = await supabase
+        const { data: profileData, error: profileError } = await supabase
           .from("profiles")
           .select("role")
           .eq("id", data.session.user.id)
-          .single();
+          .maybeSingle();
+          
+        if (profileError) throw profileError;
           
         if (profileData?.role === "admin") {
-          navigate("/admin-dashboard");
+          navigate("/admin-dashboard", { replace: true });
         } else {
-          navigate("/dashboard");
+          navigate("/dashboard", { replace: true });
         }
       }
+    } catch (error) {
+      console.error("Error checking session:", error);
+    } finally {
       setCheckingSession(false);
-    };
+    }
+  }, [navigate, isAdminLogin]);
     
+  useEffect(() => {
     checkSession();
-  }, [navigate]);
+  }, [checkSession]);
 
   const handleSignIn = async (e) => {
     e.preventDefault();
@@ -73,7 +82,7 @@ const Login = () => {
       }
       
       if (data.user.email === "admin@gmail.com") {
-        navigate("/admin-dashboard");
+        navigate("/admin-dashboard", { replace: true });
         toast.success("Successfully signed in as Admin!");
       } else {
         // Check user role for regular user redirect
@@ -81,14 +90,14 @@ const Login = () => {
           .from("profiles")
           .select("role")
           .eq("id", data.user.id)
-          .single();
+          .maybeSingle();
           
         if (profileError) throw profileError;
         
-        if (profileData.role === "admin") {
-          navigate("/admin-dashboard");
+        if (profileData?.role === "admin") {
+          navigate("/admin-dashboard", { replace: true });
         } else {
-          navigate("/dashboard");
+          navigate("/dashboard", { replace: true });
         }
         
         toast.success("Successfully signed in!");
@@ -137,7 +146,10 @@ const Login = () => {
   if (checkingSession) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p>Loading...</p>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p>Loading...</p>
+        </div>
       </div>
     );
   }

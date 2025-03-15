@@ -1,10 +1,11 @@
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 import WaterQualityForm from "@/components/forms/WaterQualityForm";
 import SewerQualityForm from "@/components/forms/SewerQualityForm";
 import AmritYojnaForm from "@/components/forms/AmritYojnaForm";
@@ -14,15 +15,38 @@ const UserDashboard = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Use useCallback to prevent recreation on each render
+  const checkUser = useCallback(async () => {
+    try {
+      const { data, error } = await supabase.auth.getSession();
+      
+      if (error) throw error;
+      
+      if (!data.session) {
+        navigate("/user-dashboard", { replace: true });
+        return;
+      }
+      
+      setUser(data.session.user);
+    } catch (error) {
+      console.error("Error checking user session:", error);
+      toast.error("Error loading dashboard. Please try again.");
+      navigate("/user-dashboard", { replace: true });
+    } finally {
+      setLoading(false);
+    }
+  }, [navigate]);
+
   useEffect(() => {
-    // Check if storage bucket exists and create it if not
+    // Check storage bucket exists on component mount
     const checkStorage = async () => {
       try {
         const { data: bucketExists } = await supabase.storage.getBucket('water-mgmt-files');
         if (!bucketExists) {
           console.log('Storage bucket does not exist, creating it...');
-          // Note: This will only work if the user has enough permissions
-          // In production, this should be done server-side
+          await supabase.storage.createBucket('water-mgmt-files', {
+            public: true
+          });
         }
       } catch (error) {
         console.error('Error checking storage bucket:', error);
@@ -30,25 +54,12 @@ const UserDashboard = () => {
     };
 
     checkStorage();
-
-    const checkUser = async () => {
-      const { data, error } = await supabase.auth.getSession();
-      
-      if (!data.session) {
-        navigate("/user-dashboard");
-        return;
-      }
-      
-      setUser(data.session.user);
-      setLoading(false);
-    };
-
     checkUser();
 
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (event === "SIGNED_OUT") {
-          navigate("/user-dashboard");
+          navigate("/user-dashboard", { replace: true });
         } else if (session) {
           setUser(session.user);
           setLoading(false);
@@ -59,14 +70,14 @@ const UserDashboard = () => {
     return () => {
       authListener.subscription.unsubscribe();
     };
-  }, [navigate]);
+  }, [navigate, checkUser]);
 
   const handleSignOut = async () => {
     try {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
       toast.success("Successfully signed out!");
-      navigate("/user-dashboard");
+      navigate("/user-dashboard", { replace: true });
     } catch (error) {
       console.error("Error signing out:", error);
       toast.error("Failed to sign out. Please try again.");
@@ -76,7 +87,10 @@ const UserDashboard = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p>Loading dashboard...</p>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p>Loading dashboard...</p>
+        </div>
       </div>
     );
   }
@@ -88,12 +102,13 @@ const UserDashboard = () => {
           <h1 className="text-3xl font-bold text-gray-900">User Dashboard</h1>
           <p className="text-gray-600 mt-1">Enter water and sewerage testing data</p>
         </div>
-        <button
+        <Button
           onClick={handleSignOut}
-          className="mt-4 md:mt-0 px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded text-gray-800"
+          variant="outline"
+          className="mt-4 md:mt-0"
         >
           Sign Out
-        </button>
+        </Button>
       </div>
 
       <Card className="mb-8">

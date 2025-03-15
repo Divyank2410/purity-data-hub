@@ -15,7 +15,16 @@ import UserDashboard from "./pages/user/UserDashboard";
 import NotFound from "./pages/NotFound";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 
-const queryClient = new QueryClient();
+// Create QueryClient with optimized settings
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false, // Prevents unnecessary refetches
+      retry: 1, // Limit retries to reduce load
+      staleTime: 30000, // Consider data fresh for 30 seconds
+    },
+  },
+});
 
 const App = () => {
   const [session, setSession] = useState(null);
@@ -24,23 +33,31 @@ const App = () => {
 
   useEffect(() => {
     // Check for active session on load
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      if (session) {
-        // Check if the user is the admin
-        if (session.user.email === "admin@gmail.com") {
-          setUserRole("admin");
-        } else {
-          fetchUserRole(session.user.id);
+    const checkSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        setSession(session);
+        
+        if (session) {
+          // Check if the user is the admin
+          if (session.user.email === "admin@gmail.com") {
+            setUserRole("admin");
+          } else {
+            await fetchUserRole(session.user.id);
+          }
         }
-      } else {
+        setLoading(false);
+      } catch (error) {
+        console.error("Error checking session:", error);
         setLoading(false);
       }
-    });
+    };
 
-    // Listen for auth changes
+    checkSession();
+
+    // Listen for auth changes - using the subscription to avoid memory leaks
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
+      (_event, session) => {
         setSession(session);
         if (session) {
           // Check if the user is the admin
@@ -48,7 +65,7 @@ const App = () => {
             setUserRole("admin");
             setLoading(false);
           } else {
-            await fetchUserRole(session.user.id);
+            fetchUserRole(session.user.id);
           }
         } else {
           setUserRole(null);
@@ -66,15 +83,39 @@ const App = () => {
         .from("profiles")
         .select("role")
         .eq("id", userId)
-        .single();
+        .maybeSingle(); // Using maybeSingle to avoid errors
       
       if (error) throw error;
-      setUserRole(data.role);
+      if (data) setUserRole(data.role);
     } catch (error) {
       console.error("Error fetching user role:", error);
     } finally {
       setLoading(false);
     }
+  };
+
+  // Preload the components to improve perceived performance
+  const renderProtectedRoute = (Component, requiredRole = null) => {
+    if (loading) {
+      return (
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
+            <p>Loading...</p>
+          </div>
+        </div>
+      );
+    }
+    
+    if (!session) {
+      return <Login />;
+    }
+    
+    if (requiredRole && userRole !== requiredRole) {
+      return <Login />;
+    }
+    
+    return <Component />;
   };
 
   return (
@@ -89,24 +130,9 @@ const App = () => {
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/contact" element={<Contact />} />
-                <Route path="/user-dashboard" element={!loading && !session ? <Login /> : <Navigate to="/dashboard" />} />
-                <Route path="/dashboard" element={!loading && session ? <UserDashboard /> : <Navigate to="/user-dashboard" />} />
-                <Route 
-                  path="/admin-dashboard" 
-                  element={
-                    !loading ? (
-                      session && userRole === "admin" ? (
-                        <AdminDashboard />
-                      ) : (
-                        <Login />
-                      )
-                    ) : (
-                      <div className="min-h-screen flex items-center justify-center">
-                        <p>Loading...</p>
-                      </div>
-                    )
-                  } 
-                />
+                <Route path="/user-dashboard" element={!session ? <Login /> : <Navigate to="/dashboard" />} />
+                <Route path="/dashboard" element={renderProtectedRoute(UserDashboard)} />
+                <Route path="/admin-dashboard" element={renderProtectedRoute(AdminDashboard, "admin")} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>
