@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,6 +12,82 @@ import { WATER_DATA_QUERY_KEY } from "@/components/admin/AdminWaterData";
 import { SEWER_DATA_QUERY_KEY } from "@/components/admin/AdminSewerData";
 import { AMRIT_DATA_QUERY_KEY } from "@/components/admin/AdminAmritData";
 import { toast } from "sonner";
+
+// Define interfaces for our data types
+interface WaterTreatmentPlant {
+  id: string;
+  name: string;
+  location: string;
+  capacity?: string;
+}
+
+interface SewerTreatmentPlant {
+  id: string;
+  name: string;
+  location: string;
+  capacity?: string;
+}
+
+interface WaterQualityData {
+  id: string;
+  created_at: string;
+  plant_id: string;
+  water_type: string;
+  turbidity?: string;
+  ph_value?: string;
+  alkalinity?: string;
+  chlorides?: string;
+  hardness?: string;
+  iron?: string;
+  dissolved_oxygen?: string;
+  water_treatment_plants?: {
+    name: string;
+  };
+}
+
+interface SewerQualityData {
+  id: string;
+  created_at: string;
+  plant_id: string;
+  water_type: string;
+  tss?: string;
+  ph_value?: string;
+  cod?: string;
+  bod?: string;
+  ammonical_nitrogen?: string;
+  total_nitrogen?: string;
+  total_phosphorus?: string;
+  fecal_coliform?: string;
+  sewer_treatment_plants?: {
+    name: string;
+  };
+}
+
+interface AmritYojnaData {
+  id: string;
+  date: string;
+  ward_no: string;
+  connection_number: string;
+  customer_name: string;
+  mobile_no: string;
+  color?: string;
+  smell?: string;
+  ph_value?: string;
+  tds?: string;
+  conductivity_cl?: string;
+}
+
+interface DataField {
+  key: string;
+  label: string;
+}
+
+interface DataTableProps {
+  data: any[];
+  fields: DataField[];
+  isLoading: boolean;
+  formatDateTime: (dateString: string) => string;
+}
 
 const Home = () => {
   const queryClient = useQueryClient();
@@ -33,7 +110,7 @@ const Home = () => {
     queryFn: async () => {
       const { data, error } = await supabase.from("water_treatment_plants").select("*");
       if (error) throw error;
-      return data || [];
+      return data as WaterTreatmentPlant[] || [];
     },
     staleTime: 5 * 60 * 1000,
   });
@@ -43,7 +120,7 @@ const Home = () => {
     queryFn: async () => {
       const { data, error } = await supabase.from("sewer_treatment_plants").select("*");
       if (error) throw error;
-      return data || [];
+      return data as SewerTreatmentPlant[] || [];
     },
     staleTime: 5 * 60 * 1000,
   });
@@ -56,7 +133,7 @@ const Home = () => {
         .select("*, water_treatment_plants(name)")
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return data || [];
+      return data as WaterQualityData[] || [];
     }
   });
   
@@ -68,7 +145,7 @@ const Home = () => {
         .select("*, sewer_treatment_plants(name)")
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return data || [];
+      return data as SewerQualityData[] || [];
     }
   });
   
@@ -81,7 +158,7 @@ const Home = () => {
         .order("created_at", { ascending: false })
         .limit(20);
       if (error) throw error;
-      return data || [];
+      return data as AmritYojnaData[] || [];
     }
   });
   
@@ -334,7 +411,7 @@ const Home = () => {
   );
 };
 
-const DataTable = ({ data, fields, isLoading, formatDateTime }) => {
+const DataTable = ({ data, fields, isLoading, formatDateTime }: DataTableProps) => {
   return (
     <div className="overflow-x-auto">
       <Table>

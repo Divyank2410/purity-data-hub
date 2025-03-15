@@ -52,13 +52,16 @@ const AmritYojnaForm = ({ userId }: AmritYojnaFormProps) => {
     setSubmitting(true);
     
     try {
+      // Create a payload that conforms to the DB schema
+      const formPayload = {
+        ...formData,
+        document_url: documentUrl,
+        user_id: userId,
+      };
+
       const { error } = await supabase
         .from("amrit_yojna_data")
-        .insert({
-          ...formData,
-          user_id: userId,
-          document_url: documentUrl
-        });
+        .insert(formPayload as any);
       
       if (error) throw error;
       

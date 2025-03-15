@@ -83,10 +83,13 @@ const App = () => {
         .from("profiles")
         .select("role")
         .eq("id", userId)
-        .maybeSingle(); // Using maybeSingle to avoid errors
+        .maybeSingle();
       
       if (error) throw error;
-      if (data) setUserRole(data.role);
+      // Check if data exists and has a role property before accessing it
+      if (data && 'role' in data) {
+        setUserRole(data.role);
+      }
     } catch (error) {
       console.error("Error fetching user role:", error);
     } finally {

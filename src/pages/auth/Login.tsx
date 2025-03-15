@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -36,11 +37,15 @@ const Login = () => {
           .from("profiles")
           .select("role")
           .eq("id", data.session.user.id)
-          .maybeSingle();
+          .single();
           
-        if (profileError) throw profileError;
+        if (profileError) {
+          // Handle profile error silently and redirect to dashboard
+          navigate("/dashboard", { replace: true });
+          return;
+        }
           
-        if (profileData?.role === "admin") {
+        if (profileData && profileData.role === "admin") {
           navigate("/admin-dashboard", { replace: true });
         } else {
           navigate("/dashboard", { replace: true });
@@ -90,11 +95,16 @@ const Login = () => {
           .from("profiles")
           .select("role")
           .eq("id", data.user.id)
-          .maybeSingle();
+          .single();
           
-        if (profileError) throw profileError;
+        if (profileError) {
+          // If there's an error getting role, just redirect to regular dashboard
+          navigate("/dashboard", { replace: true });
+          toast.success("Successfully signed in!");
+          return;
+        }
         
-        if (profileData?.role === "admin") {
+        if (profileData && profileData.role === "admin") {
           navigate("/admin-dashboard", { replace: true });
         } else {
           navigate("/dashboard", { replace: true });

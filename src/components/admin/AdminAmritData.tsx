@@ -51,7 +51,7 @@ const AdminAmritData = () => {
 
       const { data, error } = await query.order('created_at', { ascending: false });
       if (error) throw error;
-      return data;
+      return data || [];
     }
   });
 
@@ -62,7 +62,7 @@ const AdminAmritData = () => {
       const { error } = await supabase
         .from("amrit_yojna_data")
         .delete()
-        .eq('id', id);
+        .eq('id', id as any);
         
       if (error) {
         console.error("Supabase delete error:", error);

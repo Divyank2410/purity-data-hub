@@ -39,9 +39,6 @@ const supabaseOptions = {
   realtime: {
     timeout: 30000, // 30 second timeout for realtime connections
   },
-  db: {
-    schema: 'public',
-  },
 };
 
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, supabaseOptions);

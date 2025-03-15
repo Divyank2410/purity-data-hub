@@ -16,6 +16,7 @@ interface SewerTreatmentPlant {
   id: string;
   name: string;
   location: string;
+  capacity?: string;
 }
 
 const SewerQualityForm = ({ userId }: SewerQualityFormProps) => {
@@ -47,7 +48,8 @@ const SewerQualityForm = ({ userId }: SewerQualityFormProps) => {
           .select("*");
         
         if (error) throw error;
-        setPlants(data || []);
+        // Cast to our defined interface to avoid TypeScript errors
+        setPlants(data as SewerTreatmentPlant[] || []);
       } catch (error) {
         console.error("Error fetching plants:", error);
         toast.error("Failed to fetch sewer treatment plants");
@@ -84,15 +86,18 @@ const SewerQualityForm = ({ userId }: SewerQualityFormProps) => {
     setSubmitting(true);
     
     try {
+      // Create a payload that conforms to the DB schema
+      const formPayload = {
+        ...formData,
+        plant_id: plantId,
+        water_type: waterType,
+        user_id: userId,
+        document_url: documentUrl,
+      };
+
       const { error } = await supabase
         .from("sewer_quality_data")
-        .insert({
-          plant_id: plantId,
-          water_type: waterType,
-          user_id: userId,
-          document_url: documentUrl,
-          ...formData
-        });
+        .insert(formPayload as any);
       
       if (error) throw error;
       

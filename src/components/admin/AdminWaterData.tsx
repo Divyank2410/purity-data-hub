@@ -45,16 +45,18 @@ const AdminWaterData = () => {
       }
 
       if (plantFilter !== "all") {
-        query = query.eq('plant_id', plantFilter);
+        // Cast UUID string to UUID type
+        query = query.eq('plant_id', plantFilter as any);
       }
 
       if (waterType !== "all") {
-        query = query.eq('water_type', waterType);
+        // Cast water_type string to enum type
+        query = query.eq('water_type', waterType as any);
       }
 
       const { data, error } = await query;
       if (error) throw error;
-      return data;
+      return data || [];
     }
   });
 
@@ -66,7 +68,7 @@ const AdminWaterData = () => {
         .select("*");
       
       if (error) throw error;
-      return data;
+      return data || [];
     }
   });
 
@@ -77,7 +79,7 @@ const AdminWaterData = () => {
       const { error } = await supabase
         .from("water_quality_data")
         .delete()
-        .eq('id', id);
+        .eq('id', id as any);
         
       if (error) {
         console.error("Supabase delete error:", error);
