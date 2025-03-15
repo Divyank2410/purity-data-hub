@@ -17,6 +17,7 @@ export type Database = {
           created_at: string
           customer_name: string
           date: string
+          document_url: string | null
           id: string
           mobile_no: string
           ph_value: string | null
@@ -34,6 +35,7 @@ export type Database = {
           created_at?: string
           customer_name: string
           date: string
+          document_url?: string | null
           id?: string
           mobile_no: string
           ph_value?: string | null
@@ -51,6 +53,7 @@ export type Database = {
           created_at?: string
           customer_name?: string
           date?: string
+          document_url?: string | null
           id?: string
           mobile_no?: string
           ph_value?: string | null
@@ -123,6 +126,7 @@ export type Database = {
           bod: string | null
           cod: string | null
           created_at: string
+          document_url: string | null
           fecal_coliform: string | null
           id: string
           ph_value: string | null
@@ -139,6 +143,7 @@ export type Database = {
           bod?: string | null
           cod?: string | null
           created_at?: string
+          document_url?: string | null
           fecal_coliform?: string | null
           id?: string
           ph_value?: string | null
@@ -155,6 +160,7 @@ export type Database = {
           bod?: string | null
           cod?: string | null
           created_at?: string
+          document_url?: string | null
           fecal_coliform?: string | null
           id?: string
           ph_value?: string | null
@@ -209,6 +215,7 @@ export type Database = {
           chlorides: string | null
           created_at: string
           dissolved_oxygen: string | null
+          document_url: string | null
           hardness: string | null
           id: string
           iron: string | null
@@ -224,6 +231,7 @@ export type Database = {
           chlorides?: string | null
           created_at?: string
           dissolved_oxygen?: string | null
+          document_url?: string | null
           hardness?: string | null
           id?: string
           iron?: string | null
@@ -239,6 +247,7 @@ export type Database = {
           chlorides?: string | null
           created_at?: string
           dissolved_oxygen?: string | null
+          document_url?: string | null
           hardness?: string | null
           id?: string
           iron?: string | null
