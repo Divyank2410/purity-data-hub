@@ -11,9 +11,34 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import DocumentViewer from "./DocumentViewer";
 
 // Create a query client key for sewer data that can be shared across components
 export const SEWER_DATA_QUERY_KEY = "sewerData";
+
+interface SewerTreatmentPlant {
+  id: string;
+  name: string;
+  location: string;
+  capacity: string;
+}
+
+interface SewerQualityData {
+  id: string;
+  plant_id: string;
+  water_type: string;
+  tss: string;
+  ph_value: string;
+  cod: string;
+  bod: string;
+  ammonical_nitrogen: string;
+  total_nitrogen: string;
+  total_phosphorus: string;
+  fecal_coliform: string;
+  created_at: string;
+  document_url: string | null;
+  sewer_treatment_plants?: SewerTreatmentPlant;
+}
 
 const AdminSewerData = () => {
   const queryClient = useQueryClient();
@@ -56,7 +81,7 @@ const AdminSewerData = () => {
 
       const { data, error } = await query;
       if (error) throw error;
-      return data || [];
+      return (data || []) as SewerQualityData[];
     }
   });
 
@@ -68,7 +93,7 @@ const AdminSewerData = () => {
         .select("*");
       
       if (error) throw error;
-      return data || [];
+      return (data || []) as SewerTreatmentPlant[];
     }
   });
 
@@ -161,13 +186,14 @@ const AdminSewerData = () => {
               <TableHead>Total Nitrogen</TableHead>
               <TableHead>Total Phosphorus</TableHead>
               <TableHead>Fecal Coliform</TableHead>
+              <TableHead>Document</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {sewerData?.length === 0 && (
               <TableRow>
-                <TableCell colSpan={14} className="text-center py-4">No data found for the selected filters</TableCell>
+                <TableCell colSpan={15} className="text-center py-4">No data found for the selected filters</TableCell>
               </TableRow>
             )}
             {sewerData?.map((record) => (
@@ -185,6 +211,9 @@ const AdminSewerData = () => {
                 <TableCell>{record.total_nitrogen || 'N/A'}</TableCell>
                 <TableCell>{record.total_phosphorus || 'N/A'}</TableCell>
                 <TableCell>{record.fecal_coliform || 'N/A'}</TableCell>
+                <TableCell>
+                  <DocumentViewer documentUrl={record.document_url} />
+                </TableCell>
                 <TableCell>
                   <AlertDialog>
                     <AlertDialogTrigger asChild>

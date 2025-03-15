@@ -11,9 +11,33 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import DocumentViewer from "./DocumentViewer";
 
 // Create a query client key for water data that can be shared across components
 export const WATER_DATA_QUERY_KEY = "waterData";
+
+interface WaterTreatmentPlant {
+  id: string;
+  name: string;
+  location: string;
+  capacity: string;
+}
+
+interface WaterQualityData {
+  id: string;
+  plant_id: string;
+  water_type: string;
+  ph_value: string;
+  turbidity: string;
+  chlorides: string;
+  alkalinity: string;
+  hardness: string;
+  iron: string;
+  dissolved_oxygen: string;
+  created_at: string;
+  document_url: string | null;
+  water_treatment_plants?: WaterTreatmentPlant;
+}
 
 const AdminWaterData = () => {
   const queryClient = useQueryClient();
@@ -56,7 +80,7 @@ const AdminWaterData = () => {
 
       const { data, error } = await query;
       if (error) throw error;
-      return data || [];
+      return (data || []) as WaterQualityData[];
     }
   });
 
@@ -68,7 +92,7 @@ const AdminWaterData = () => {
         .select("*");
       
       if (error) throw error;
-      return data || [];
+      return (data || []) as WaterTreatmentPlant[];
     }
   });
 
@@ -160,13 +184,14 @@ const AdminWaterData = () => {
               <TableHead>Hardness</TableHead>
               <TableHead>Iron</TableHead>
               <TableHead>Dissolved Oxygen</TableHead>
+              <TableHead>Document</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {waterData?.length === 0 && (
               <TableRow>
-                <TableCell colSpan={13} className="text-center py-4">No data found for the selected filters</TableCell>
+                <TableCell colSpan={14} className="text-center py-4">No data found for the selected filters</TableCell>
               </TableRow>
             )}
             {waterData?.map((record) => (
@@ -183,6 +208,9 @@ const AdminWaterData = () => {
                 <TableCell>{record.hardness || 'N/A'}</TableCell>
                 <TableCell>{record.iron || 'N/A'}</TableCell>
                 <TableCell>{record.dissolved_oxygen || 'N/A'}</TableCell>
+                <TableCell>
+                  <DocumentViewer documentUrl={record.document_url} />
+                </TableCell>
                 <TableCell>
                   <AlertDialog>
                     <AlertDialogTrigger asChild>

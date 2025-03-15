@@ -24,7 +24,11 @@ const supabaseOptions = {
     fetch: (url: RequestInfo, init?: RequestInit) => {
       // Set reasonable timeouts based on operation type
       const isFileUpload = typeof init?.body === 'object' && init?.body instanceof FormData;
-      const timeout = isFileUpload ? 120000 : 30000; // 2 minutes for uploads, 30 seconds for other operations
+      const isDocumentFetch = url.toString().includes('/storage/v1/object');
+      
+      // Longer timeout for file uploads and document downloads
+      const timeout = isFileUpload ? 120000 : 
+                      isDocumentFetch ? 60000 : 30000; 
       
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), timeout);
@@ -32,7 +36,7 @@ const supabaseOptions = {
       return fetch(url, {
         ...init,
         signal: controller.signal,
-        cache: 'no-store', // Force fresh data on each request
+        cache: isDocumentFetch ? 'force-cache' : 'no-store', // Cache documents
       }).finally(() => clearTimeout(timeoutId));
     }
   },

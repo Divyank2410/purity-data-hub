@@ -12,8 +12,24 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import DocumentViewer from "./DocumentViewer";
 
 export const AMRIT_DATA_QUERY_KEY = "amritData";
+
+interface AmritYojnaData {
+  id: string;
+  ward_no: string;
+  smell: string;
+  date: string;
+  color: string;
+  mobile_no: string;
+  customer_name: string;
+  ph_value: string;
+  tds: string;
+  connection_number: string;
+  conductivity_cl: string;
+  document_url: string | null;
+}
 
 const AdminAmritData = () => {
   const queryClient = useQueryClient();
@@ -51,7 +67,7 @@ const AdminAmritData = () => {
 
       const { data, error } = await query.order('created_at', { ascending: false });
       if (error) throw error;
-      return data || [];
+      return (data || []) as AmritYojnaData[];
     }
   });
 
@@ -151,13 +167,14 @@ const AdminAmritData = () => {
                   <TableHead>Color</TableHead>
                   <TableHead>Smell</TableHead>
                   <TableHead>Conductivity</TableHead>
+                  <TableHead>Document</TableHead>
                   <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {amritData?.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={11} className="text-center h-24">
+                    <TableCell colSpan={12} className="text-center h-24">
                       No records found
                     </TableCell>
                   </TableRow>
@@ -174,6 +191,9 @@ const AdminAmritData = () => {
                       <TableCell>{record.color || "-"}</TableCell>
                       <TableCell>{record.smell || "-"}</TableCell>
                       <TableCell>{record.conductivity_cl || "-"}</TableCell>
+                      <TableCell>
+                        <DocumentViewer documentUrl={record.document_url} />
+                      </TableCell>
                       <TableCell>
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
