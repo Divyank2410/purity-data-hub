@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -13,7 +12,6 @@ import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import DocumentViewer from "./DocumentViewer";
 
-// Create a query client key for water data that can be shared across components
 export const WATER_DATA_QUERY_KEY = "waterData";
 
 interface WaterTreatmentPlant {
@@ -76,10 +74,11 @@ const AdminWaterData = () => {
         query = query.eq('water_type', waterType as string);
       }
 
-      const { data, error } = await query;
+      const { data, error } = await query.order('created_at', { ascending: false });
       if (error) throw error;
       return (data || []) as WaterQualityData[];
-    }
+    },
+    staleTime: 0
   });
 
   const { data: plants } = useQuery({
@@ -101,7 +100,7 @@ const AdminWaterData = () => {
       const { error } = await supabase
         .from("water_quality_data")
         .delete()
-        .eq('id', id as string);
+        .eq('id', id);
         
       if (error) {
         console.error("Supabase delete error:", error);
@@ -112,19 +111,14 @@ const AdminWaterData = () => {
       console.log("Delete successful, updating UI");
       toast.success("Record deleted successfully");
       
-      // Manually update the UI by filtering out the deleted record
-      if (waterData) {
-        const updatedData = waterData.filter(item => item.id !== id);
-        queryClient.setQueryData(["adminWaterData", dateRange, plantFilter, waterType], updatedData);
-      }
+      await refetch();
       
-      // Force invalidate all queries related to water data
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["adminWaterData"] }),
-        queryClient.invalidateQueries({ queryKey: [WATER_DATA_QUERY_KEY] })
+        queryClient.invalidateQueries({ queryKey: [WATER_DATA_QUERY_KEY] }),
+        queryClient.invalidateQueries()
       ]);
       
-      // Dispatch event to update home page
       const event = new CustomEvent('dataUpdated', { 
         detail: { queryKey: WATER_DATA_QUERY_KEY } 
       });

@@ -90,13 +90,16 @@ interface DataTableProps {
 const Home = () => {
   const queryClient = useQueryClient();
   
-  const handleInvalidateQuery = useCallback((event: CustomEvent<{ queryKey: string }>) => {
-    console.log("Invalidating query from event:", event.detail.queryKey);
-    queryClient.invalidateQueries({ queryKey: [event.detail.queryKey] });
-  }, [queryClient]);
-
   const handleDataUpdated = useCallback((event: CustomEvent<{ queryKey: string }>) => {
     console.log("Data updated event received for:", event.detail.queryKey);
+    
+    queryClient.invalidateQueries({ queryKey: [event.detail.queryKey] });
+    toast.success(`${event.detail.queryKey} data has been updated`);
+    console.log(`Invalidated query: ${event.detail.queryKey}`);
+  }, [queryClient]);
+
+  const handleInvalidateQuery = useCallback((event: CustomEvent<{ queryKey: string }>) => {
+    console.log("Invalidating query from event:", event.detail.queryKey);
     queryClient.invalidateQueries({ queryKey: [event.detail.queryKey] });
   }, [queryClient]);
 
@@ -104,9 +107,12 @@ const Home = () => {
     window.addEventListener('invalidateQueries', handleInvalidateQuery as EventListener);
     window.addEventListener('dataUpdated', handleDataUpdated as EventListener);
     
+    console.log("Home component: Event listeners for data updates attached");
+    
     return () => {
       window.removeEventListener('invalidateQueries', handleInvalidateQuery as EventListener);
       window.removeEventListener('dataUpdated', handleDataUpdated as EventListener);
+      console.log("Home component: Event listeners removed");
     };
   }, [handleInvalidateQuery, handleDataUpdated]);
   
