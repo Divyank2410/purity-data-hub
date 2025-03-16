@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,7 +12,6 @@ import { SEWER_DATA_QUERY_KEY } from "@/components/admin/AdminSewerData";
 import { AMRIT_DATA_QUERY_KEY } from "@/components/admin/AdminAmritData";
 import { toast } from "sonner";
 
-// Define interfaces for our data types
 interface WaterTreatmentPlant {
   id: string;
   name: string;
@@ -97,13 +95,20 @@ const Home = () => {
     queryClient.invalidateQueries({ queryKey: [event.detail.queryKey] });
   }, [queryClient]);
 
+  const handleDataUpdated = useCallback((event: CustomEvent<{ queryKey: string }>) => {
+    console.log("Data updated event received for:", event.detail.queryKey);
+    queryClient.invalidateQueries({ queryKey: [event.detail.queryKey] });
+  }, [queryClient]);
+
   useEffect(() => {
     window.addEventListener('invalidateQueries', handleInvalidateQuery as EventListener);
+    window.addEventListener('dataUpdated', handleDataUpdated as EventListener);
     
     return () => {
       window.removeEventListener('invalidateQueries', handleInvalidateQuery as EventListener);
+      window.removeEventListener('dataUpdated', handleDataUpdated as EventListener);
     };
-  }, [handleInvalidateQuery]);
+  }, [handleInvalidateQuery, handleDataUpdated]);
   
   const { data: waterPlants = [], isLoading: isLoadingWaterPlants } = useQuery({
     queryKey: ["waterPlants"],

@@ -69,11 +69,11 @@ const AdminWaterData = () => {
       }
 
       if (plantFilter !== "all") {
-        query = query.eq('plant_id', plantFilter);
+        query = query.eq('plant_id', plantFilter as string);
       }
 
       if (waterType !== "all") {
-        query = query.eq('water_type', waterType);
+        query = query.eq('water_type', waterType as string);
       }
 
       const { data, error } = await query;
@@ -101,7 +101,7 @@ const AdminWaterData = () => {
       const { error } = await supabase
         .from("water_quality_data")
         .delete()
-        .eq('id', id);
+        .eq('id', id as string);
         
       if (error) {
         console.error("Supabase delete error:", error);
@@ -109,16 +109,23 @@ const AdminWaterData = () => {
         return;
       }
       
-      console.log("Delete successful, refetching data");
+      console.log("Delete successful, updating UI");
       toast.success("Record deleted successfully");
       
-      // Force invalidate and refetch
-      await queryClient.invalidateQueries({ queryKey: ["adminWaterData"] });
-      await queryClient.invalidateQueries({ queryKey: [WATER_DATA_QUERY_KEY] });
-      await refetch();
+      // Manually update the UI by filtering out the deleted record
+      if (waterData) {
+        const updatedData = waterData.filter(item => item.id !== id);
+        queryClient.setQueryData(["adminWaterData", dateRange, plantFilter, waterType], updatedData);
+      }
       
-      // Dispatch event to update homepage
-      const event = new CustomEvent('invalidateQueries', { 
+      // Force invalidate all queries related to water data
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["adminWaterData"] }),
+        queryClient.invalidateQueries({ queryKey: [WATER_DATA_QUERY_KEY] })
+      ]);
+      
+      // Dispatch event to update home page
+      const event = new CustomEvent('dataUpdated', { 
         detail: { queryKey: WATER_DATA_QUERY_KEY } 
       });
       window.dispatchEvent(event);

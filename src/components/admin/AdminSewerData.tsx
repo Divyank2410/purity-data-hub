@@ -70,11 +70,11 @@ const AdminSewerData = () => {
       }
 
       if (plantFilter !== "all") {
-        query = query.eq('plant_id', plantFilter);
+        query = query.eq('plant_id', plantFilter as string);
       }
 
       if (waterType !== "all") {
-        query = query.eq('water_type', waterType);
+        query = query.eq('water_type', waterType as string);
       }
 
       const { data, error } = await query;
@@ -102,7 +102,7 @@ const AdminSewerData = () => {
       const { error } = await supabase
         .from("sewer_quality_data")
         .delete()
-        .eq('id', id);
+        .eq('id', id as string);
         
       if (error) {
         console.error("Supabase delete error:", error);
@@ -110,16 +110,23 @@ const AdminSewerData = () => {
         return;
       }
       
-      console.log("Delete successful, refetching data");
+      console.log("Delete successful, updating UI");
       toast.success("Record deleted successfully");
       
-      // Force invalidate and refetch
-      await queryClient.invalidateQueries({ queryKey: ["adminSewerData"] });
-      await queryClient.invalidateQueries({ queryKey: [SEWER_DATA_QUERY_KEY] });
-      await refetch();
+      // Manually update the UI by filtering out the deleted record
+      if (sewerData) {
+        const updatedData = sewerData.filter(item => item.id !== id);
+        queryClient.setQueryData(["adminSewerData", dateRange, plantFilter, waterType], updatedData);
+      }
       
-      // Dispatch event to update homepage
-      const event = new CustomEvent('invalidateQueries', { 
+      // Force invalidate all queries related to sewer data
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["adminSewerData"] }),
+        queryClient.invalidateQueries({ queryKey: [SEWER_DATA_QUERY_KEY] })
+      ]);
+      
+      // Dispatch event to update home page
+      const event = new CustomEvent('dataUpdated', { 
         detail: { queryKey: SEWER_DATA_QUERY_KEY } 
       });
       window.dispatchEvent(event);
