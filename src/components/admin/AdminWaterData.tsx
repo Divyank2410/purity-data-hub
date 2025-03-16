@@ -27,13 +27,13 @@ interface WaterQualityData {
   id: string;
   plant_id: string;
   water_type: string;
-  ph_value: string;
-  turbidity: string;
-  chlorides: string;
-  alkalinity: string;
-  hardness: string;
-  iron: string;
-  dissolved_oxygen: string;
+  ph_value: string | null;
+  turbidity: string | null;
+  chlorides: string | null;
+  alkalinity: string | null;
+  hardness: string | null;
+  iron: string | null;
+  dissolved_oxygen: string | null;
   created_at: string;
   document_url: string | null;
   water_treatment_plants?: WaterTreatmentPlant;
@@ -69,13 +69,11 @@ const AdminWaterData = () => {
       }
 
       if (plantFilter !== "all") {
-        // Cast UUID string to UUID type
-        query = query.eq('plant_id', plantFilter as any);
+        query = query.eq('plant_id', plantFilter);
       }
 
       if (waterType !== "all") {
-        // Cast water_type string to enum type
-        query = query.eq('water_type', waterType as any);
+        query = query.eq('water_type', waterType);
       }
 
       const { data, error } = await query;
@@ -103,7 +101,7 @@ const AdminWaterData = () => {
       const { error } = await supabase
         .from("water_quality_data")
         .delete()
-        .eq('id', id as any);
+        .eq('id', id);
         
       if (error) {
         console.error("Supabase delete error:", error);
@@ -114,11 +112,10 @@ const AdminWaterData = () => {
       console.log("Delete successful, refetching data");
       toast.success("Record deleted successfully");
       
-      // Immediately update local data
+      // Force invalidate and refetch
+      await queryClient.invalidateQueries({ queryKey: ["adminWaterData"] });
+      await queryClient.invalidateQueries({ queryKey: [WATER_DATA_QUERY_KEY] });
       await refetch();
-      
-      // Update global query cache
-      queryClient.invalidateQueries({ queryKey: [WATER_DATA_QUERY_KEY] });
       
       // Dispatch event to update homepage
       const event = new CustomEvent('invalidateQueries', { 

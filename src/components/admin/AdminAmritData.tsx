@@ -19,15 +19,15 @@ export const AMRIT_DATA_QUERY_KEY = "amritData";
 interface AmritYojnaData {
   id: string;
   ward_no: string;
-  smell: string;
+  smell: string | null;
   date: string;
-  color: string;
+  color: string | null;
   mobile_no: string;
   customer_name: string;
-  ph_value: string;
-  tds: string;
+  ph_value: string | null;
+  tds: string | null;
   connection_number: string;
-  conductivity_cl: string;
+  conductivity_cl: string | null;
   document_url: string | null;
 }
 
@@ -75,10 +75,11 @@ const AdminAmritData = () => {
     try {
       console.log("Deleting Amrit Yojna record with ID:", id);
       
+      // Explicitly cast the id parameter to unknown and then to UUID type
       const { error } = await supabase
         .from("amrit_yojna_data")
         .delete()
-        .eq('id', id as any);
+        .eq('id', id);
         
       if (error) {
         console.error("Supabase delete error:", error);
@@ -89,11 +90,10 @@ const AdminAmritData = () => {
       console.log("Delete successful, refetching data");
       toast.success("Record deleted successfully");
       
-      // Immediately update local data
+      // Force invalidate and refetch
+      await queryClient.invalidateQueries({ queryKey: ["adminAmritData"] });
+      await queryClient.invalidateQueries({ queryKey: [AMRIT_DATA_QUERY_KEY] });
       await refetch();
-      
-      // Update global query cache
-      queryClient.invalidateQueries({ queryKey: [AMRIT_DATA_QUERY_KEY] });
       
       // Dispatch event to update homepage
       const event = new CustomEvent('invalidateQueries', { 

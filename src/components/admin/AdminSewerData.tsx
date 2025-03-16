@@ -27,14 +27,14 @@ interface SewerQualityData {
   id: string;
   plant_id: string;
   water_type: string;
-  tss: string;
-  ph_value: string;
-  cod: string;
-  bod: string;
-  ammonical_nitrogen: string;
-  total_nitrogen: string;
-  total_phosphorus: string;
-  fecal_coliform: string;
+  tss: string | null;
+  ph_value: string | null;
+  cod: string | null;
+  bod: string | null;
+  ammonical_nitrogen: string | null;
+  total_nitrogen: string | null;
+  total_phosphorus: string | null;
+  fecal_coliform: string | null;
   created_at: string;
   document_url: string | null;
   sewer_treatment_plants?: SewerTreatmentPlant;
@@ -70,13 +70,11 @@ const AdminSewerData = () => {
       }
 
       if (plantFilter !== "all") {
-        // Cast to any to avoid type issues
-        query = query.eq('plant_id', plantFilter as any);
+        query = query.eq('plant_id', plantFilter);
       }
 
       if (waterType !== "all") {
-        // Cast to any to avoid type issues
-        query = query.eq('water_type', waterType as any);
+        query = query.eq('water_type', waterType);
       }
 
       const { data, error } = await query;
@@ -104,7 +102,7 @@ const AdminSewerData = () => {
       const { error } = await supabase
         .from("sewer_quality_data")
         .delete()
-        .eq('id', id as any);
+        .eq('id', id);
         
       if (error) {
         console.error("Supabase delete error:", error);
@@ -115,11 +113,10 @@ const AdminSewerData = () => {
       console.log("Delete successful, refetching data");
       toast.success("Record deleted successfully");
       
-      // Immediately update local data
+      // Force invalidate and refetch
+      await queryClient.invalidateQueries({ queryKey: ["adminSewerData"] });
+      await queryClient.invalidateQueries({ queryKey: [SEWER_DATA_QUERY_KEY] });
       await refetch();
-      
-      // Update global query cache
-      queryClient.invalidateQueries({ queryKey: [SEWER_DATA_QUERY_KEY] });
       
       // Dispatch event to update homepage
       const event = new CustomEvent('invalidateQueries', { 
