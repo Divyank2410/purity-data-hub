@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -68,7 +67,8 @@ const AdminAmritData = () => {
       const { data, error } = await query.order('created_at', { ascending: false });
       if (error) throw error;
       return (data || []) as AmritYojnaData[];
-    }
+    },
+    staleTime: 0 // Disable caching to always fetch fresh data
   });
 
   const handleDelete = async (id: string) => {
@@ -78,7 +78,7 @@ const AdminAmritData = () => {
       const { error } = await supabase
         .from("amrit_yojna_data")
         .delete()
-        .eq('id', id as string);
+        .eq('id', id);
         
       if (error) {
         console.error("Supabase delete error:", error);
@@ -89,16 +89,14 @@ const AdminAmritData = () => {
       console.log("Delete successful, updating UI");
       toast.success("Record deleted successfully");
       
-      // Manually update the UI by filtering out the deleted record
-      if (amritData) {
-        const updatedData = amritData.filter(item => item.id !== id);
-        queryClient.setQueryData(["adminAmritData", dateRange, wardFilter, customerNameFilter, connectionFilter], updatedData);
-      }
+      // Force refetch data to update UI immediately
+      await refetch();
       
-      // Force invalidate all queries related to amrit data
+      // Also invalidate any related queries
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["adminAmritData"] }),
-        queryClient.invalidateQueries({ queryKey: [AMRIT_DATA_QUERY_KEY] })
+        queryClient.invalidateQueries({ queryKey: [AMRIT_DATA_QUERY_KEY] }),
+        queryClient.invalidateQueries() // Invalidate all queries to ensure everything is up-to-date
       ]);
       
       // Dispatch event to update home page

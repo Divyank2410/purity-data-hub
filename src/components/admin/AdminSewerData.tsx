@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -13,7 +12,6 @@ import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import DocumentViewer from "./DocumentViewer";
 
-// Create a query client key for sewer data that can be shared across components
 export const SEWER_DATA_QUERY_KEY = "sewerData";
 
 interface SewerTreatmentPlant {
@@ -77,10 +75,11 @@ const AdminSewerData = () => {
         query = query.eq('water_type', waterType as string);
       }
 
-      const { data, error } = await query;
+      const { data, error } = await query.order('created_at', { ascending: false });
       if (error) throw error;
       return (data || []) as SewerQualityData[];
-    }
+    },
+    staleTime: 0
   });
 
   const { data: plants } = useQuery({
@@ -102,7 +101,7 @@ const AdminSewerData = () => {
       const { error } = await supabase
         .from("sewer_quality_data")
         .delete()
-        .eq('id', id as string);
+        .eq('id', id);
         
       if (error) {
         console.error("Supabase delete error:", error);
@@ -113,19 +112,14 @@ const AdminSewerData = () => {
       console.log("Delete successful, updating UI");
       toast.success("Record deleted successfully");
       
-      // Manually update the UI by filtering out the deleted record
-      if (sewerData) {
-        const updatedData = sewerData.filter(item => item.id !== id);
-        queryClient.setQueryData(["adminSewerData", dateRange, plantFilter, waterType], updatedData);
-      }
+      await refetch();
       
-      // Force invalidate all queries related to sewer data
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["adminSewerData"] }),
-        queryClient.invalidateQueries({ queryKey: [SEWER_DATA_QUERY_KEY] })
+        queryClient.invalidateQueries({ queryKey: [SEWER_DATA_QUERY_KEY] }),
+        queryClient.invalidateQueries()
       ]);
       
-      // Dispatch event to update home page
       const event = new CustomEvent('dataUpdated', { 
         detail: { queryKey: SEWER_DATA_QUERY_KEY } 
       });
