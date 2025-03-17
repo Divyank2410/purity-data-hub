@@ -5,7 +5,6 @@ import { DateRange } from "react-day-picker";
 import SewerDataFilters from "./sewer-data/SewerDataFilters";
 import SewerDataTable from "./sewer-data/SewerDataTable";
 import { useSewerData } from "./sewer-data/useSewerData";
-import { useSewerDataDelete } from "./sewer-data/useSewerDataDelete";
 
 export const SEWER_DATA_QUERY_KEY = "sewerData";
 
@@ -17,13 +16,11 @@ const AdminSewerData = () => {
   const [plantFilter, setPlantFilter] = useState("all");
   const [waterType, setWaterType] = useState("all");
 
-  const { sewerData, plants, isLoading, refetch } = useSewerData(
+  const { sewerData, plants, isLoading } = useSewerData(
     dateRange,
     plantFilter,
     waterType
   );
-
-  const { handleDelete } = useSewerDataDelete(refetch);
 
   return (
     <div className="space-y-4">
@@ -39,7 +36,6 @@ const AdminSewerData = () => {
 
       <SewerDataTable 
         data={sewerData || []}
-        onDelete={handleDelete}
         isLoading={isLoading}
       />
     </div>
