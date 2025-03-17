@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,6 +11,8 @@ import { WATER_DATA_QUERY_KEY } from "@/components/admin/AdminWaterData";
 import { SEWER_DATA_QUERY_KEY } from "@/components/admin/AdminSewerData";
 import { AMRIT_DATA_QUERY_KEY } from "@/components/admin/AdminAmritData";
 import { toast } from "sonner";
+import WaterQualityChart from "@/components/WaterQualityChart";
+import SewerQualityChart from "@/components/SewerQualityChart";
 
 interface WaterTreatmentPlant {
   id: string;
@@ -137,22 +138,18 @@ const Home = () => {
     staleTime: 5 * 60 * 1000,
   });
   
-  // Modified to fetch only the latest entry for each plant and water type
   const { data: waterData = [], isLoading: isLoadingWaterData } = useQuery({
     queryKey: [WATER_DATA_QUERY_KEY],
     queryFn: async () => {
-      // Get all plants first
       const { data: plantsData, error: plantsError } = await supabase
         .from("water_treatment_plants")
         .select("id");
       
       if (plantsError) throw plantsError;
       
-      // For each plant, get the latest raw and clean water entries
       const latestEntries = [];
       
       for (const plant of plantsData) {
-        // Get latest raw water entry
         const { data: rawData, error: rawError } = await supabase
           .from("water_quality_data")
           .select("*, water_treatment_plants(name)")
@@ -165,7 +162,6 @@ const Home = () => {
           latestEntries.push(rawData[0]);
         }
         
-        // Get latest clean water entry
         const { data: cleanData, error: cleanError } = await supabase
           .from("water_quality_data")
           .select("*, water_treatment_plants(name)")
@@ -183,22 +179,18 @@ const Home = () => {
     }
   });
   
-  // Modified to fetch only the latest entry for each plant and water type
   const { data: sewerData = [], isLoading: isLoadingSewerData } = useQuery({
     queryKey: [SEWER_DATA_QUERY_KEY],
     queryFn: async () => {
-      // Get all plants first
       const { data: plantsData, error: plantsError } = await supabase
         .from("sewer_treatment_plants")
         .select("id");
       
       if (plantsError) throw plantsError;
       
-      // For each plant, get the latest inlet and outlet water entries
       const latestEntries = [];
       
       for (const plant of plantsData) {
-        // Get latest inlet water entry
         const { data: inletData, error: inletError } = await supabase
           .from("sewer_quality_data")
           .select("*, sewer_treatment_plants(name)")
@@ -211,7 +203,6 @@ const Home = () => {
           latestEntries.push(inletData[0]);
         }
         
-        // Get latest outlet water entry
         const { data: outletData, error: outletError } = await supabase
           .from("sewer_quality_data")
           .select("*, sewer_treatment_plants(name)")
@@ -229,7 +220,6 @@ const Home = () => {
     }
   });
   
-  // Modified to fetch only the latest Amrit Yojna entry
   const { data: amritData = [], isLoading: isLoadingAmritData } = useQuery({
     queryKey: [AMRIT_DATA_QUERY_KEY],
     queryFn: async () => {
@@ -305,6 +295,30 @@ const Home = () => {
         </TabsList>
 
         <TabsContent value="water" className="mt-6">
+          <div className="mb-8">
+            <h3 className="text-xl font-semibold mb-4">Water Quality Data Charts</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {waterPlants.map((plant) => {
+                const rawWaterData = waterData.find(
+                  item => item.plant_id === plant.id && item.water_type === 'raw_water'
+                );
+                const cleanWaterData = waterData.find(
+                  item => item.plant_id === plant.id && item.water_type === 'clean_water'
+                );
+                
+                return (
+                  <WaterQualityChart 
+                    key={`chart-${plant.id}`}
+                    plantName={plant.name}
+                    rawWaterData={rawWaterData}
+                    cleanWaterData={cleanWaterData}
+                  />
+                );
+              })}
+            </div>
+          </div>
+          
+          <h3 className="text-xl font-semibold mb-4">Detailed Water Quality Data</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {waterPlants.map((plant) => (
               <Card key={plant.id}>
@@ -365,6 +379,30 @@ const Home = () => {
         </TabsContent>
 
         <TabsContent value="sewer" className="mt-6">
+          <div className="mb-8">
+            <h3 className="text-xl font-semibold mb-4">Sewer Quality Data Charts</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {sewerPlants.map((plant) => {
+                const inletWaterData = sewerData.find(
+                  item => item.plant_id === plant.id && item.water_type === 'inlet_water'
+                );
+                const outletWaterData = sewerData.find(
+                  item => item.plant_id === plant.id && item.water_type === 'outlet_water'
+                );
+                
+                return (
+                  <SewerQualityChart 
+                    key={`chart-${plant.id}`}
+                    plantName={plant.name}
+                    inletWaterData={inletWaterData}
+                    outletWaterData={outletWaterData}
+                  />
+                );
+              })}
+            </div>
+          </div>
+          
+          <h3 className="text-xl font-semibold mb-4">Detailed Sewer Quality Data</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {sewerPlants.map((plant) => (
               <Card key={plant.id}>
@@ -537,3 +575,4 @@ const DataTable = ({ data, fields, isLoading, formatDateTime }: DataTableProps) 
 };
 
 export default Home;
+
