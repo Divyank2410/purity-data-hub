@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -136,30 +137,99 @@ const Home = () => {
     staleTime: 5 * 60 * 1000,
   });
   
+  // Modified to fetch only the latest entry for each plant and water type
   const { data: waterData = [], isLoading: isLoadingWaterData } = useQuery({
     queryKey: [WATER_DATA_QUERY_KEY],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("water_quality_data")
-        .select("*, water_treatment_plants(name)")
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      return data as WaterQualityData[] || [];
+      // Get all plants first
+      const { data: plantsData, error: plantsError } = await supabase
+        .from("water_treatment_plants")
+        .select("id");
+      
+      if (plantsError) throw plantsError;
+      
+      // For each plant, get the latest raw and clean water entries
+      const latestEntries = [];
+      
+      for (const plant of plantsData) {
+        // Get latest raw water entry
+        const { data: rawData, error: rawError } = await supabase
+          .from("water_quality_data")
+          .select("*, water_treatment_plants(name)")
+          .eq("plant_id", plant.id)
+          .eq("water_type", "raw_water")
+          .order("created_at", { ascending: false })
+          .limit(1);
+        
+        if (!rawError && rawData.length > 0) {
+          latestEntries.push(rawData[0]);
+        }
+        
+        // Get latest clean water entry
+        const { data: cleanData, error: cleanError } = await supabase
+          .from("water_quality_data")
+          .select("*, water_treatment_plants(name)")
+          .eq("plant_id", plant.id)
+          .eq("water_type", "clean_water")
+          .order("created_at", { ascending: false })
+          .limit(1);
+        
+        if (!cleanError && cleanData.length > 0) {
+          latestEntries.push(cleanData[0]);
+        }
+      }
+      
+      return latestEntries as WaterQualityData[] || [];
     }
   });
   
+  // Modified to fetch only the latest entry for each plant and water type
   const { data: sewerData = [], isLoading: isLoadingSewerData } = useQuery({
     queryKey: [SEWER_DATA_QUERY_KEY],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("sewer_quality_data")
-        .select("*, sewer_treatment_plants(name)")
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      return data as SewerQualityData[] || [];
+      // Get all plants first
+      const { data: plantsData, error: plantsError } = await supabase
+        .from("sewer_treatment_plants")
+        .select("id");
+      
+      if (plantsError) throw plantsError;
+      
+      // For each plant, get the latest inlet and outlet water entries
+      const latestEntries = [];
+      
+      for (const plant of plantsData) {
+        // Get latest inlet water entry
+        const { data: inletData, error: inletError } = await supabase
+          .from("sewer_quality_data")
+          .select("*, sewer_treatment_plants(name)")
+          .eq("plant_id", plant.id)
+          .eq("water_type", "inlet_water")
+          .order("created_at", { ascending: false })
+          .limit(1);
+        
+        if (!inletError && inletData.length > 0) {
+          latestEntries.push(inletData[0]);
+        }
+        
+        // Get latest outlet water entry
+        const { data: outletData, error: outletError } = await supabase
+          .from("sewer_quality_data")
+          .select("*, sewer_treatment_plants(name)")
+          .eq("plant_id", plant.id)
+          .eq("water_type", "outlet_water")
+          .order("created_at", { ascending: false })
+          .limit(1);
+        
+        if (!outletError && outletData.length > 0) {
+          latestEntries.push(outletData[0]);
+        }
+      }
+      
+      return latestEntries as SewerQualityData[] || [];
     }
   });
   
+  // Modified to fetch only the latest Amrit Yojna entry
   const { data: amritData = [], isLoading: isLoadingAmritData } = useQuery({
     queryKey: [AMRIT_DATA_QUERY_KEY],
     queryFn: async () => {
@@ -167,7 +237,8 @@ const Home = () => {
         .from("amrit_yojna_data")
         .select("*")
         .order("created_at", { ascending: false })
-        .limit(20);
+        .limit(1);
+      
       if (error) throw error;
       return data as AmritYojnaData[] || [];
     }
