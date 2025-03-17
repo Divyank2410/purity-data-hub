@@ -1,15 +1,12 @@
+
 import { useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { DatePickerWithRange } from "@/components/ui/date-range-picker";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { addDays } from "date-fns";
 import { DateRange } from "react-day-picker";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
-import { toast } from "sonner";
 import DocumentViewer from "./DocumentViewer";
 
 export const WATER_DATA_QUERY_KEY = "waterData";
@@ -38,7 +35,6 @@ interface WaterQualityData {
 }
 
 const AdminWaterData = () => {
-  const queryClient = useQueryClient();
   const [dateRange, setDateRange] = useState<DateRange>({
     from: addDays(new Date(), -30),
     to: new Date(),
@@ -46,7 +42,7 @@ const AdminWaterData = () => {
   const [plantFilter, setPlantFilter] = useState("all");
   const [waterType, setWaterType] = useState("all");
 
-  const { data: waterData, isLoading, refetch } = useQuery({
+  const { data: waterData, isLoading } = useQuery({
     queryKey: ["adminWaterData", dateRange, plantFilter, waterType],
     queryFn: async () => {
       let query = supabase
@@ -92,43 +88,6 @@ const AdminWaterData = () => {
       return (data || []) as WaterTreatmentPlant[];
     }
   });
-
-  const handleDelete = async (id: string) => {
-    try {
-      console.log("Deleting water record with ID:", id);
-      
-      const { error } = await supabase
-        .from("water_quality_data")
-        .delete()
-        .eq('id', id);
-        
-      if (error) {
-        console.error("Supabase delete error:", error);
-        toast.error("Failed to delete record: " + error.message);
-        return;
-      }
-      
-      console.log("Delete successful, updating UI");
-      toast.success("Record deleted successfully");
-      
-      await refetch();
-      
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["adminWaterData"] }),
-        queryClient.invalidateQueries({ queryKey: [WATER_DATA_QUERY_KEY] }),
-        queryClient.invalidateQueries()
-      ]);
-      
-      const event = new CustomEvent('dataUpdated', { 
-        detail: { queryKey: WATER_DATA_QUERY_KEY } 
-      });
-      window.dispatchEvent(event);
-      
-    } catch (error) {
-      console.error("Error deleting record:", error);
-      toast.error("Failed to delete record");
-    }
-  };
 
   if (isLoading) return (
     <div className="flex justify-center items-center p-8">
@@ -183,13 +142,12 @@ const AdminWaterData = () => {
               <TableHead>Iron</TableHead>
               <TableHead>Dissolved Oxygen</TableHead>
               <TableHead>Document</TableHead>
-              <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {waterData?.length === 0 && (
               <TableRow>
-                <TableCell colSpan={14} className="text-center py-4">No data found for the selected filters</TableCell>
+                <TableCell colSpan={13} className="text-center py-4">No data found for the selected filters</TableCell>
               </TableRow>
             )}
             {waterData?.map((record) => (
@@ -208,36 +166,6 @@ const AdminWaterData = () => {
                 <TableCell>{record.dissolved_oxygen || 'N/A'}</TableCell>
                 <TableCell>
                   <DocumentViewer documentUrl={record.document_url} />
-                </TableCell>
-                <TableCell>
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="text-red-500 hover:text-red-700 hover:bg-red-100"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Confirm Deletion</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          Are you sure you want to delete this water quality record? This action cannot be undone.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction 
-                          className="bg-red-600 hover:bg-red-700 text-white"
-                          onClick={() => handleDelete(record.id)}
-                        >
-                          Delete
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
                 </TableCell>
               </TableRow>
             ))}

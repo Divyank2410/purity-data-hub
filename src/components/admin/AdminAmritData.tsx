@@ -1,5 +1,6 @@
+
 import { useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
@@ -7,10 +8,6 @@ import { DatePickerWithRange } from "@/components/ui/date-range-picker";
 import { addDays } from "date-fns";
 import { DateRange } from "react-day-picker";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
-import { toast } from "sonner";
 import DocumentViewer from "./DocumentViewer";
 
 export const AMRIT_DATA_QUERY_KEY = "amritData";
@@ -31,7 +28,6 @@ interface AmritYojnaData {
 }
 
 const AdminAmritData = () => {
-  const queryClient = useQueryClient();
   const [dateRange, setDateRange] = useState<DateRange>({
     from: addDays(new Date(), -30),
     to: new Date(),
@@ -40,7 +36,7 @@ const AdminAmritData = () => {
   const [customerNameFilter, setCustomerNameFilter] = useState("");
   const [connectionFilter, setConnectionFilter] = useState("");
 
-  const { data: amritData, isLoading, refetch } = useQuery({
+  const { data: amritData, isLoading } = useQuery({
     queryKey: ["adminAmritData", dateRange, wardFilter, customerNameFilter, connectionFilter],
     queryFn: async () => {
       let query = supabase
@@ -70,46 +66,6 @@ const AdminAmritData = () => {
     },
     staleTime: 0 // Disable caching to always fetch fresh data
   });
-
-  const handleDelete = async (id: string) => {
-    try {
-      console.log("Deleting Amrit Yojna record with ID:", id);
-      
-      const { error } = await supabase
-        .from("amrit_yojna_data")
-        .delete()
-        .eq('id', id);
-        
-      if (error) {
-        console.error("Supabase delete error:", error);
-        toast.error("Failed to delete record: " + error.message);
-        return;
-      }
-      
-      console.log("Delete successful, updating UI");
-      toast.success("Record deleted successfully");
-      
-      // Force refetch data to update UI immediately
-      await refetch();
-      
-      // Also invalidate any related queries
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["adminAmritData"] }),
-        queryClient.invalidateQueries({ queryKey: [AMRIT_DATA_QUERY_KEY] }),
-        queryClient.invalidateQueries() // Invalidate all queries to ensure everything is up-to-date
-      ]);
-      
-      // Dispatch event to update home page
-      const event = new CustomEvent('dataUpdated', { 
-        detail: { queryKey: AMRIT_DATA_QUERY_KEY } 
-      });
-      window.dispatchEvent(event);
-      
-    } catch (error) {
-      console.error("Error deleting record:", error);
-      toast.error("Failed to delete record");
-    }
-  };
 
   if (isLoading) return (
     <div className="flex justify-center items-center h-64">
@@ -172,13 +128,12 @@ const AdminAmritData = () => {
                   <TableHead>Smell</TableHead>
                   <TableHead>Conductivity</TableHead>
                   <TableHead>Document</TableHead>
-                  <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {amritData?.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={12} className="text-center h-24">
+                    <TableCell colSpan={11} className="text-center h-24">
                       No records found
                     </TableCell>
                   </TableRow>
@@ -197,36 +152,6 @@ const AdminAmritData = () => {
                       <TableCell>{record.conductivity_cl || "-"}</TableCell>
                       <TableCell>
                         <DocumentViewer documentUrl={record.document_url} />
-                      </TableCell>
-                      <TableCell>
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button 
-                              variant="ghost" 
-                              size="icon" 
-                              className="text-red-500 hover:text-red-700 hover:bg-red-100"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Confirm Deletion</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                Are you sure you want to delete this record? This action cannot be undone.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction 
-                                className="bg-red-600 hover:bg-red-700 text-white"
-                                onClick={() => handleDelete(record.id)}
-                              >
-                                Delete
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
                       </TableCell>
                     </TableRow>
                   ))
