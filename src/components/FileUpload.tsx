@@ -7,6 +7,7 @@ import { Upload, File, X } from "lucide-react";
 
 interface FileUploadProps {
   onUploadComplete: (filePath: string) => void;
+  onFileUpload?: (filePath: string) => void; // For backward compatibility
   bucketName?: string;
   folderPath?: string;
   userId?: string;
@@ -15,6 +16,7 @@ interface FileUploadProps {
 
 const FileUpload = ({ 
   onUploadComplete, 
+  onFileUpload,
   bucketName = "water-mgmt-files", 
   folderPath = "documents", 
   userId, 
@@ -70,7 +72,12 @@ const FileUpload = ({
         .from(bucketName)
         .getPublicUrl(filePath);
 
+      // Call both callbacks for backward compatibility
       onUploadComplete(data.publicUrl);
+      if (onFileUpload) {
+        onFileUpload(data.publicUrl);
+      }
+      
       toast.success("File uploaded successfully");
       setSelectedFile(null);
     } catch (error) {
