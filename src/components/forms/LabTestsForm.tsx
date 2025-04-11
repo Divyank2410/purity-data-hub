@@ -63,7 +63,7 @@ const labTestFormSchema = z.object({
   totalColiform: z.string().optional(),
   eColiCount: z.string().optional(),
   notes: z.string().optional(),
-  // New fields for submitter information
+  // Submitter information
   submitterName: z.string().min(2, {
     message: "Submitter name must be at least 2 characters.",
   }),
@@ -79,12 +79,23 @@ const labTestFormSchema = z.object({
   waterSource: z.string().min(2, {
     message: "Water source must be at least 2 characters.",
   }),
-  // New fields for sample collector information
+  // Sample collector information
   collectorName: z.string().min(2, {
     message: "Collector name must be at least 2 characters.",
   }),
   isDepartmental: z.boolean().default(false),
   serialNo: z.string().optional(),
+  // New test parameters
+  calcium: z.string().optional(),
+  chloride: z.string().optional(),
+  fluoride: z.string().optional(),
+  freeResidualChlorine: z.string().optional(),
+  iron: z.string().optional(),
+  magnesium: z.string().optional(),
+  sulphate: z.string().optional(),
+  tds: z.string().optional(),
+  totalAlkalinity: z.string().optional(),
+  totalHardness: z.string().optional(),
 });
 
 type LabTestFormValues = z.infer<typeof labTestFormSchema>;
@@ -110,7 +121,7 @@ const LabTestsForm = ({ userId }: { userId: string }) => {
     totalColiform: "",
     eColiCount: "",
     notes: "",
-    // New fields defaults
+    // Submitter info defaults
     submitterName: "",
     submitterAddress: "",
     submitterEmail: "",
@@ -119,6 +130,17 @@ const LabTestsForm = ({ userId }: { userId: string }) => {
     collectorName: "",
     isDepartmental: false,
     serialNo: "",
+    // New test parameters defaults
+    calcium: "",
+    chloride: "",
+    fluoride: "",
+    freeResidualChlorine: "",
+    iron: "",
+    magnesium: "",
+    sulphate: "",
+    tds: "",
+    totalAlkalinity: "",
+    totalHardness: "",
   };
 
   const form = useForm<LabTestFormValues>({
@@ -153,7 +175,7 @@ const LabTestsForm = ({ userId }: { userId: string }) => {
         e_coli_count: data.eColiCount,
         notes: data.notes,
         document_url: documentUrl,
-        // New fields
+        // Submitter info
         submitter_name: data.submitterName,
         submitter_address: data.submitterAddress,
         submitter_email: data.submitterEmail,
@@ -163,6 +185,17 @@ const LabTestsForm = ({ userId }: { userId: string }) => {
         collector_name: data.collectorName,
         is_departmental: data.isDepartmental,
         serial_no: data.serialNo,
+        // New test parameters
+        calcium: data.calcium,
+        chloride: data.chloride,
+        fluoride: data.fluoride,
+        free_residual_chlorine: data.freeResidualChlorine,
+        iron: data.iron, 
+        magnesium: data.magnesium,
+        sulphate: data.sulphate,
+        tds: data.tds,
+        total_alkalinity: data.totalAlkalinity,
+        total_hardness: data.totalHardness,
       });
 
       if (error) throw error;
@@ -552,6 +585,34 @@ const LabTestsForm = ({ userId }: { userId: string }) => {
                   
                   <FormField
                     control={form.control}
+                    name="calcium"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Calcium (as Ca) (mg/L)</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Enter calcium value" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="chloride"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Chloride (as Cl) (mg/L)</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Enter chloride value" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
                     name="totalColiform"
                     render={({ field }) => (
                       <FormItem>
@@ -572,6 +633,118 @@ const LabTestsForm = ({ userId }: { userId: string }) => {
                         <FormLabel>E. coli Count (MPN/100ml)</FormLabel>
                         <FormControl>
                           <Input placeholder="Enter E. coli count" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="fluoride"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Fluoride (as F) (mg/L)</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Enter fluoride value" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="freeResidualChlorine"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Free Residual Chlorine (mg/L)</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Enter free residual chlorine" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="iron"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Iron (as Fe) (mg/L)</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Enter iron value" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="magnesium"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Magnesium (as Mg) (mg/L)</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Enter magnesium value" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="sulphate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Sulphate (as SO4) (mg/L)</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Enter sulphate value" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="tds"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>TDS (mg/L)</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Enter total dissolved solids" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="totalAlkalinity"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Total Alkalinity (as CaCO3) (mg/L)</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Enter total alkalinity" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="totalHardness"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Total Hardness (as CaCO3) (mg/L)</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Enter total hardness" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

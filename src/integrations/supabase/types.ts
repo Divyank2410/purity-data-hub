@@ -68,6 +68,8 @@ export type Database = {
       }
       lab_tests: {
         Row: {
+          calcium: string | null
+          chloride: string | null
           collected_by: string
           collection_date: string
           collector_name: string | null
@@ -76,8 +78,11 @@ export type Database = {
           dissolved_oxygen: string | null
           document_url: string | null
           e_coli_count: string | null
+          fluoride: string | null
+          free_residual_chlorine: string | null
           id: string
           is_departmental: boolean | null
+          magnesium: string | null
           notes: string | null
           ph_value: string | null
           received_date: string
@@ -89,14 +94,20 @@ export type Database = {
           submitter_address: string | null
           submitter_email: string | null
           submitter_name: string | null
+          sulphate: string | null
+          tds: string | null
           temperature: string | null
           test_type: string
+          total_alkalinity: string | null
           total_coliform: string | null
+          total_hardness: string | null
           turbidity: string | null
           user_id: string
           water_source: string | null
         }
         Insert: {
+          calcium?: string | null
+          chloride?: string | null
           collected_by: string
           collection_date: string
           collector_name?: string | null
@@ -105,8 +116,11 @@ export type Database = {
           dissolved_oxygen?: string | null
           document_url?: string | null
           e_coli_count?: string | null
+          fluoride?: string | null
+          free_residual_chlorine?: string | null
           id?: string
           is_departmental?: boolean | null
+          magnesium?: string | null
           notes?: string | null
           ph_value?: string | null
           received_date: string
@@ -118,14 +132,20 @@ export type Database = {
           submitter_address?: string | null
           submitter_email?: string | null
           submitter_name?: string | null
+          sulphate?: string | null
+          tds?: string | null
           temperature?: string | null
           test_type: string
+          total_alkalinity?: string | null
           total_coliform?: string | null
+          total_hardness?: string | null
           turbidity?: string | null
           user_id: string
           water_source?: string | null
         }
         Update: {
+          calcium?: string | null
+          chloride?: string | null
           collected_by?: string
           collection_date?: string
           collector_name?: string | null
@@ -134,8 +154,11 @@ export type Database = {
           dissolved_oxygen?: string | null
           document_url?: string | null
           e_coli_count?: string | null
+          fluoride?: string | null
+          free_residual_chlorine?: string | null
           id?: string
           is_departmental?: boolean | null
+          magnesium?: string | null
           notes?: string | null
           ph_value?: string | null
           received_date?: string
@@ -147,9 +170,13 @@ export type Database = {
           submitter_address?: string | null
           submitter_email?: string | null
           submitter_name?: string | null
+          sulphate?: string | null
+          tds?: string | null
           temperature?: string | null
           test_type?: string
+          total_alkalinity?: string | null
           total_coliform?: string | null
+          total_hardness?: string | null
           turbidity?: string | null
           user_id?: string
           water_source?: string | null
