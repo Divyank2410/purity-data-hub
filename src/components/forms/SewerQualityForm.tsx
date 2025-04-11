@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -27,7 +26,6 @@ const SewerQualityForm = ({ userId }: SewerQualityFormProps) => {
   const [plantId, setPlantId] = useState<string>("");
   const [documentUrl, setDocumentUrl] = useState<string>("");
   
-  // Form fields
   const [formData, setFormData] = useState({
     tss: "",
     ph_value: "",
@@ -48,7 +46,6 @@ const SewerQualityForm = ({ userId }: SewerQualityFormProps) => {
           .select("*");
         
         if (error) throw error;
-        // Cast to our defined interface to avoid TypeScript errors
         setPlants(data as SewerTreatmentPlant[] || []);
       } catch (error) {
         console.error("Error fetching plants:", error);
@@ -66,8 +63,9 @@ const SewerQualityForm = ({ userId }: SewerQualityFormProps) => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleFileUpload = (filePath: string) => {
-    setDocumentUrl(filePath);
+  const handleDocumentUpload = (url: string) => {
+    setDocumentUrl(url);
+    toast.success("Document uploaded successfully!");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -86,7 +84,6 @@ const SewerQualityForm = ({ userId }: SewerQualityFormProps) => {
     setSubmitting(true);
     
     try {
-      // Create a payload that conforms to the DB schema
       const formPayload = {
         ...formData,
         plant_id: plantId,
@@ -103,7 +100,6 @@ const SewerQualityForm = ({ userId }: SewerQualityFormProps) => {
       
       toast.success("Sewer quality data submitted successfully!");
       
-      // Reset form
       setFormData({
         tss: "",
         ph_value: "",
@@ -164,13 +160,13 @@ const SewerQualityForm = ({ userId }: SewerQualityFormProps) => {
             </div>
           </div>
           
-          {/* File Upload Section */}
           <div className="space-y-2">
             <label className="text-sm font-medium">Upload Supporting Document (PDF or Image)</label>
-            <FileUpload 
-              onFileUpload={handleFileUpload} 
-              fileType="sewer" 
-              userId={userId} 
+            <FileUpload
+              onUploadComplete={handleDocumentUpload}
+              onFileUpload={handleDocumentUpload}
+              fileType="sewer"
+              userId={userId}
             />
           </div>
           

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -35,7 +34,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import FileUpload from "@/components/FileUpload";
 
-// Define a schema for lab test form validation
 const labTestFormSchema = z.object({
   sampleId: z.string().min(3, {
     message: "Sample ID must be at least 3 characters.",
@@ -72,7 +70,6 @@ const LabTestsForm = ({ userId }: { userId: string }) => {
   const [documentUrl, setDocumentUrl] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("sample-info");
   
-  // Define default form values
   const defaultValues: Partial<LabTestFormValues> = {
     sampleId: "",
     sampleType: "",
@@ -95,12 +92,10 @@ const LabTestsForm = ({ userId }: { userId: string }) => {
     defaultValues,
   });
 
-  // Handle form submission
   const onSubmit = async (data: LabTestFormValues) => {
     try {
       setIsSubmitting(true);
       
-      // Insert into lab_tests table
       const { error } = await supabase.from("lab_tests").insert({
         user_id: userId,
         sample_id: data.sampleId,
@@ -133,7 +128,6 @@ const LabTestsForm = ({ userId }: { userId: string }) => {
     }
   };
 
-  // Handle document upload
   const handleDocumentUpload = (url: string) => {
     setDocumentUrl(url);
     toast.success("Document uploaded successfully!");

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -19,7 +18,7 @@ interface WaterTreatmentPlant {
   capacity?: string;
 }
 
-const WaterQualityForm = ({ userId }: WaterQualityFormProps) => {
+const WaterQualityForm = ({ userId }: { userId: string }) => {
   const [plants, setPlants] = useState<WaterTreatmentPlant[]>([]);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -27,7 +26,6 @@ const WaterQualityForm = ({ userId }: WaterQualityFormProps) => {
   const [plantId, setPlantId] = useState<string>("");
   const [documentUrl, setDocumentUrl] = useState<string>("");
   
-  // Form fields
   const [formData, setFormData] = useState({
     turbidity: "",
     ph_value: "",
@@ -47,7 +45,6 @@ const WaterQualityForm = ({ userId }: WaterQualityFormProps) => {
           .select("*");
         
         if (error) throw error;
-        // Cast data to our defined interface to avoid TypeScript errors
         setPlants(data as WaterTreatmentPlant[] || []);
       } catch (error) {
         console.error("Error fetching plants:", error);
@@ -65,8 +62,9 @@ const WaterQualityForm = ({ userId }: WaterQualityFormProps) => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleFileUpload = (filePath: string) => {
-    setDocumentUrl(filePath);
+  const handleDocumentUpload = (url: string) => {
+    setDocumentUrl(url);
+    toast.success("Document uploaded successfully!");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -85,7 +83,6 @@ const WaterQualityForm = ({ userId }: WaterQualityFormProps) => {
     setSubmitting(true);
     
     try {
-      // Create an object conforming to the DB schema
       const formPayload = {
         ...formData,
         plant_id: plantId,
@@ -102,7 +99,6 @@ const WaterQualityForm = ({ userId }: WaterQualityFormProps) => {
       
       toast.success("Water quality data submitted successfully!");
       
-      // Reset form
       setFormData({
         turbidity: "",
         ph_value: "",
@@ -162,13 +158,13 @@ const WaterQualityForm = ({ userId }: WaterQualityFormProps) => {
             </div>
           </div>
           
-          {/* File Upload Section */}
           <div className="space-y-2">
             <label className="text-sm font-medium">Upload Supporting Document (PDF or Image)</label>
-            <FileUpload 
-              onFileUpload={handleFileUpload} 
-              fileType="water" 
-              userId={userId} 
+            <FileUpload
+              onUploadComplete={handleDocumentUpload}
+              onFileUpload={handleDocumentUpload}
+              fileType="water"
+              userId={userId}
             />
           </div>
           

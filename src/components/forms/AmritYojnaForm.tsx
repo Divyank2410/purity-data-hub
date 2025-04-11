@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -15,8 +14,7 @@ interface AmritYojnaFormProps {
 const AmritYojnaForm = ({ userId }: AmritYojnaFormProps) => {
   const [submitting, setSubmitting] = useState(false);
   const [documentUrl, setDocumentUrl] = useState<string>("");
-  
-  // Form fields
+
   const [formData, setFormData] = useState({
     ward_no: "",
     date: "",
@@ -35,14 +33,14 @@ const AmritYojnaForm = ({ userId }: AmritYojnaFormProps) => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleFileUpload = (filePath: string) => {
-    setDocumentUrl(filePath);
+  const handleDocumentUpload = (url: string) => {
+    setDocumentUrl(url);
+    toast.success("Document uploaded successfully!");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Basic validation
     if (!formData.ward_no || !formData.date || !formData.connection_number || 
         !formData.customer_name || !formData.mobile_no) {
       toast.error("Please fill all required fields");
@@ -52,7 +50,6 @@ const AmritYojnaForm = ({ userId }: AmritYojnaFormProps) => {
     setSubmitting(true);
     
     try {
-      // Create a payload that conforms to the DB schema
       const formPayload = {
         ...formData,
         document_url: documentUrl,
@@ -67,7 +64,6 @@ const AmritYojnaForm = ({ userId }: AmritYojnaFormProps) => {
       
       toast.success("Amrit Yojna data submitted successfully!");
       
-      // Reset form
       setFormData({
         ward_no: "",
         date: "",
@@ -159,13 +155,13 @@ const AmritYojnaForm = ({ userId }: AmritYojnaFormProps) => {
             </div>
           </div>
           
-          {/* File Upload Section */}
           <div className="space-y-2">
             <Label>Upload Supporting Document (PDF or Image)</Label>
-            <FileUpload 
-              onFileUpload={handleFileUpload} 
-              fileType="amrit" 
-              userId={userId} 
+            <FileUpload
+              onUploadComplete={handleDocumentUpload}
+              onFileUpload={handleDocumentUpload}
+              fileType="amrit"
+              userId={userId}
             />
           </div>
           
