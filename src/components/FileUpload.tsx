@@ -6,12 +6,20 @@ import { toast } from "sonner";
 import { Upload, File, X } from "lucide-react";
 
 interface FileUploadProps {
-  onFileUpload: (filePath: string) => void;
-  fileType: "water" | "sewer" | "amrit";
-  userId: string;
+  onUploadComplete: (filePath: string) => void;
+  bucketName?: string;
+  folderPath?: string;
+  userId?: string;
+  fileType?: "water" | "sewer" | "amrit" | "lab";
 }
 
-const FileUpload = ({ onFileUpload, fileType, userId }: FileUploadProps) => {
+const FileUpload = ({ 
+  onUploadComplete, 
+  bucketName = "water-mgmt-files", 
+  folderPath = "documents", 
+  userId, 
+  fileType = "water" 
+}: FileUploadProps) => {
   const [uploading, setUploading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   
@@ -45,12 +53,12 @@ const FileUpload = ({ onFileUpload, fileType, userId }: FileUploadProps) => {
     try {
       // Create a unique file name to prevent collisions
       const fileExt = selectedFile.name.split(".").pop();
-      const fileName = `${fileType}-${userId}-${Date.now()}.${fileExt}`;
-      const filePath = `${fileType}/${fileName}`;
+      const fileName = `${folderPath}-${userId || Date.now()}-${Date.now()}.${fileExt}`;
+      const filePath = `${folderPath}/${fileName}`;
       
       // Upload file to Supabase storage
       const { error: uploadError } = await supabase.storage
-        .from("water-mgmt-files")
+        .from(bucketName)
         .upload(filePath, selectedFile);
 
       if (uploadError) {
@@ -59,10 +67,10 @@ const FileUpload = ({ onFileUpload, fileType, userId }: FileUploadProps) => {
 
       // Get public URL for the file
       const { data } = supabase.storage
-        .from("water-mgmt-files")
+        .from(bucketName)
         .getPublicUrl(filePath);
 
-      onFileUpload(data.publicUrl);
+      onUploadComplete(data.publicUrl);
       toast.success("File uploaded successfully");
       setSelectedFile(null);
     } catch (error) {

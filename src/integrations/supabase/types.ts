@@ -66,6 +66,69 @@ export type Database = {
         }
         Relationships: []
       }
+      lab_tests: {
+        Row: {
+          collected_by: string
+          collection_date: string
+          conductivity: string | null
+          created_at: string
+          dissolved_oxygen: string | null
+          document_url: string | null
+          e_coli_count: string | null
+          id: string
+          notes: string | null
+          ph_value: string | null
+          received_date: string
+          sample_id: string
+          sample_type: string
+          temperature: string | null
+          test_type: string
+          total_coliform: string | null
+          turbidity: string | null
+          user_id: string
+        }
+        Insert: {
+          collected_by: string
+          collection_date: string
+          conductivity?: string | null
+          created_at?: string
+          dissolved_oxygen?: string | null
+          document_url?: string | null
+          e_coli_count?: string | null
+          id?: string
+          notes?: string | null
+          ph_value?: string | null
+          received_date: string
+          sample_id: string
+          sample_type: string
+          temperature?: string | null
+          test_type: string
+          total_coliform?: string | null
+          turbidity?: string | null
+          user_id: string
+        }
+        Update: {
+          collected_by?: string
+          collection_date?: string
+          conductivity?: string | null
+          created_at?: string
+          dissolved_oxygen?: string | null
+          document_url?: string | null
+          e_coli_count?: string | null
+          id?: string
+          notes?: string | null
+          ph_value?: string | null
+          received_date?: string
+          sample_id?: string
+          sample_type?: string
+          temperature?: string | null
+          test_type?: string
+          total_coliform?: string | null
+          turbidity?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string

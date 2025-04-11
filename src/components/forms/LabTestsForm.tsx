@@ -3,7 +3,6 @@ import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { useNavigate } from "react-router-dom";
 import { FlaskConical, FileText, Microscope } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -69,7 +68,6 @@ const labTestFormSchema = z.object({
 type LabTestFormValues = z.infer<typeof labTestFormSchema>;
 
 const LabTestsForm = ({ userId }: { userId: string }) => {
-  const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [documentUrl, setDocumentUrl] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("sample-info");
@@ -102,7 +100,7 @@ const LabTestsForm = ({ userId }: { userId: string }) => {
     try {
       setIsSubmitting(true);
       
-      // Save lab test data to Supabase
+      // Insert into lab_tests table
       const { error } = await supabase.from("lab_tests").insert({
         user_id: userId,
         sample_id: data.sampleId,
@@ -404,9 +402,11 @@ const LabTestsForm = ({ userId }: { userId: string }) => {
                       </p>
                       
                       <FileUpload
+                        onUploadComplete={handleDocumentUpload}
                         bucketName="water-mgmt-files"
                         folderPath="lab-tests"
-                        onUploadComplete={handleDocumentUpload}
+                        userId={userId}
+                        fileType="lab"
                       />
                       
                       {documentUrl && (
