@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import WaterQualityForm from "@/components/forms/WaterQualityForm";
 import SewerQualityForm from "@/components/forms/SewerQualityForm";
 import AmritYojnaForm from "@/components/forms/AmritYojnaForm";
+import LabTestsForm from "@/components/forms/LabTestsForm";
+import { FlaskConical } from "lucide-react";
 
 const UserDashboard = () => {
   const navigate = useNavigate();
@@ -121,10 +123,14 @@ const UserDashboard = () => {
       </Card>
 
       <Tabs defaultValue="water-quality" className="w-full">
-        <TabsList className="grid grid-cols-3 mb-8">
+        <TabsList className="grid grid-cols-4 mb-8">
           <TabsTrigger value="water-quality">Water Quality Data</TabsTrigger>
           <TabsTrigger value="sewer-quality">Sewer Quality Data</TabsTrigger>
           <TabsTrigger value="amrit-yojna">Amrit Yojna Data</TabsTrigger>
+          <TabsTrigger value="lab-tests" className="flex items-center gap-1">
+            <FlaskConical className="h-4 w-4" />
+            <span>Lab Tests</span>
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="water-quality">
@@ -137,6 +143,10 @@ const UserDashboard = () => {
 
         <TabsContent value="amrit-yojna">
           <AmritYojnaForm userId={user?.id} />
+        </TabsContent>
+
+        <TabsContent value="lab-tests">
+          <LabTestsForm userId={user?.id} />
         </TabsContent>
       </Tabs>
     </div>
