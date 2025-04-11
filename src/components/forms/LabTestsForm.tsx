@@ -1,8 +1,9 @@
+
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { FlaskConical, FileText, Microscope } from "lucide-react";
+import { FlaskConical, FileText, Microscope, Camera } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -33,6 +34,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import FileUpload from "@/components/FileUpload";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const labTestFormSchema = z.object({
   sampleId: z.string().min(3, {
@@ -61,6 +63,28 @@ const labTestFormSchema = z.object({
   totalColiform: z.string().optional(),
   eColiCount: z.string().optional(),
   notes: z.string().optional(),
+  // New fields for submitter information
+  submitterName: z.string().min(2, {
+    message: "Submitter name must be at least 2 characters.",
+  }),
+  submitterAddress: z.string().min(5, {
+    message: "Address must be at least 5 characters.",
+  }),
+  submitterEmail: z.string().email({
+    message: "Please enter a valid email address.",
+  }),
+  submissionDate: z.string({
+    required_error: "Please enter the submission date.",
+  }),
+  waterSource: z.string().min(2, {
+    message: "Water source must be at least 2 characters.",
+  }),
+  // New fields for sample collector information
+  collectorName: z.string().min(2, {
+    message: "Collector name must be at least 2 characters.",
+  }),
+  isDepartmental: z.boolean().default(false),
+  serialNo: z.string().optional(),
 });
 
 type LabTestFormValues = z.infer<typeof labTestFormSchema>;
@@ -68,7 +92,8 @@ type LabTestFormValues = z.infer<typeof labTestFormSchema>;
 const LabTestsForm = ({ userId }: { userId: string }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [documentUrl, setDocumentUrl] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState("sample-info");
+  const [sampleImageUrl, setSampleImageUrl] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState("submitter-info");
   
   const defaultValues: Partial<LabTestFormValues> = {
     sampleId: "",
@@ -85,6 +110,15 @@ const LabTestsForm = ({ userId }: { userId: string }) => {
     totalColiform: "",
     eColiCount: "",
     notes: "",
+    // New fields defaults
+    submitterName: "",
+    submitterAddress: "",
+    submitterEmail: "",
+    submissionDate: new Date().toISOString().split('T')[0],
+    waterSource: "",
+    collectorName: "",
+    isDepartmental: false,
+    serialNo: "",
   };
 
   const form = useForm<LabTestFormValues>({
@@ -94,6 +128,12 @@ const LabTestsForm = ({ userId }: { userId: string }) => {
 
   const onSubmit = async (data: LabTestFormValues) => {
     try {
+      // Require sample image
+      if (!sampleImageUrl) {
+        toast.error("Please upload a sample image");
+        return;
+      }
+      
       setIsSubmitting(true);
       
       const { error } = await supabase.from("lab_tests").insert({
@@ -113,6 +153,16 @@ const LabTestsForm = ({ userId }: { userId: string }) => {
         e_coli_count: data.eColiCount,
         notes: data.notes,
         document_url: documentUrl,
+        // New fields
+        submitter_name: data.submitterName,
+        submitter_address: data.submitterAddress,
+        submitter_email: data.submitterEmail,
+        submission_date: data.submissionDate,
+        water_source: data.waterSource,
+        sample_image_url: sampleImageUrl,
+        collector_name: data.collectorName,
+        is_departmental: data.isDepartmental,
+        serial_no: data.serialNo,
       });
 
       if (error) throw error;
@@ -120,6 +170,7 @@ const LabTestsForm = ({ userId }: { userId: string }) => {
       toast.success("Lab test data saved successfully!");
       form.reset(defaultValues);
       setDocumentUrl(null);
+      setSampleImageUrl(null);
     } catch (error: any) {
       console.error("Error saving lab test data:", error);
       toast.error(error.message || "Failed to save lab test data. Please try again.");
@@ -131,6 +182,11 @@ const LabTestsForm = ({ userId }: { userId: string }) => {
   const handleDocumentUpload = (url: string) => {
     setDocumentUrl(url);
     toast.success("Document uploaded successfully!");
+  };
+  
+  const handleSampleImageUpload = (url: string) => {
+    setSampleImageUrl(url);
+    toast.success("Sample image uploaded successfully!");
   };
 
   return (
@@ -148,11 +204,121 @@ const LabTestsForm = ({ userId }: { userId: string }) => {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid grid-cols-3 mb-6">
+              <TabsList className="grid grid-cols-4 mb-6">
+                <TabsTrigger value="submitter-info">Submitter Information</TabsTrigger>
                 <TabsTrigger value="sample-info">Sample Information</TabsTrigger>
                 <TabsTrigger value="test-results">Test Results</TabsTrigger>
                 <TabsTrigger value="documents">Documents</TabsTrigger>
               </TabsList>
+              
+              <TabsContent value="submitter-info" className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="submitterName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Name of Submitter</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Enter submitter's name" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="submitterEmail"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email Address</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Enter email address" type="email" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <div className="col-span-1 md:col-span-2">
+                    <FormField
+                      control={form.control}
+                      name="submitterAddress"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Full Address</FormLabel>
+                          <FormControl>
+                            <Textarea 
+                              placeholder="Enter full address" 
+                              className="min-h-[80px]"
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  
+                  <FormField
+                    control={form.control}
+                    name="submissionDate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Date of Submission</FormLabel>
+                        <FormControl>
+                          <Input type="date" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="waterSource"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Origin Source of Water Sample</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Enter water source (e.g., Tap, Well, Lake)" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <div className="col-span-1 md:col-span-2">
+                    <FormLabel>Sample Image (Required)</FormLabel>
+                    <div className="bg-gray-50 border border-dashed border-gray-300 rounded-lg p-4 mt-2">
+                      <div className="flex flex-col items-center space-y-2">
+                        <Camera className="h-8 w-8 text-gray-400" />
+                        <h3 className="text-sm font-medium">Upload Sample Image</h3>
+                        <p className="text-xs text-gray-500 text-center">
+                          Upload an image of the water sample (JPEG, PNG)
+                        </p>
+                        
+                        <FileUpload
+                          onUploadComplete={handleSampleImageUpload}
+                          onFileUpload={handleSampleImageUpload}
+                          bucketName="water-mgmt-files"
+                          folderPath="lab-samples"
+                          userId={userId}
+                          fileType="sample"
+                        />
+                        
+                        {sampleImageUrl && (
+                          <div className="mt-2 text-sm text-green-600 flex items-center gap-1">
+                            <Camera className="h-4 w-4" />
+                            Sample image uploaded successfully
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
               
               <TabsContent value="sample-info" className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -257,6 +423,55 @@ const LabTestsForm = ({ userId }: { userId: string }) => {
                           <Input placeholder="Enter collector's name" {...field} />
                         </FormControl>
                         <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="collectorName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Collector Name</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Enter collector's full name" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="serialNo"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Serial Number</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Enter serial number" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="isDepartmental"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel>Departmental Test</FormLabel>
+                          <p className="text-sm text-muted-foreground">
+                            Check if this is a departmental test, otherwise it's from another source
+                          </p>
+                        </div>
                       </FormItem>
                     )}
                   />
@@ -397,6 +612,7 @@ const LabTestsForm = ({ userId }: { userId: string }) => {
                       
                       <FileUpload
                         onUploadComplete={handleDocumentUpload}
+                        onFileUpload={handleDocumentUpload}
                         bucketName="water-mgmt-files"
                         folderPath="lab-tests"
                         userId={userId}
@@ -419,7 +635,11 @@ const LabTestsForm = ({ userId }: { userId: string }) => {
               <Button 
                 type="button"
                 variant="outline"
-                onClick={() => form.reset(defaultValues)}
+                onClick={() => {
+                  form.reset(defaultValues);
+                  setDocumentUrl(null);
+                  setSampleImageUrl(null);
+                }}
               >
                 Reset Form
               </Button>

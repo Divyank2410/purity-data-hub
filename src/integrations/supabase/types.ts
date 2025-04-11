@@ -70,62 +70,89 @@ export type Database = {
         Row: {
           collected_by: string
           collection_date: string
+          collector_name: string | null
           conductivity: string | null
           created_at: string
           dissolved_oxygen: string | null
           document_url: string | null
           e_coli_count: string | null
           id: string
+          is_departmental: boolean | null
           notes: string | null
           ph_value: string | null
           received_date: string
           sample_id: string
+          sample_image_url: string | null
           sample_type: string
+          serial_no: string | null
+          submission_date: string | null
+          submitter_address: string | null
+          submitter_email: string | null
+          submitter_name: string | null
           temperature: string | null
           test_type: string
           total_coliform: string | null
           turbidity: string | null
           user_id: string
+          water_source: string | null
         }
         Insert: {
           collected_by: string
           collection_date: string
+          collector_name?: string | null
           conductivity?: string | null
           created_at?: string
           dissolved_oxygen?: string | null
           document_url?: string | null
           e_coli_count?: string | null
           id?: string
+          is_departmental?: boolean | null
           notes?: string | null
           ph_value?: string | null
           received_date: string
           sample_id: string
+          sample_image_url?: string | null
           sample_type: string
+          serial_no?: string | null
+          submission_date?: string | null
+          submitter_address?: string | null
+          submitter_email?: string | null
+          submitter_name?: string | null
           temperature?: string | null
           test_type: string
           total_coliform?: string | null
           turbidity?: string | null
           user_id: string
+          water_source?: string | null
         }
         Update: {
           collected_by?: string
           collection_date?: string
+          collector_name?: string | null
           conductivity?: string | null
           created_at?: string
           dissolved_oxygen?: string | null
           document_url?: string | null
           e_coli_count?: string | null
           id?: string
+          is_departmental?: boolean | null
           notes?: string | null
           ph_value?: string | null
           received_date?: string
           sample_id?: string
+          sample_image_url?: string | null
           sample_type?: string
+          serial_no?: string | null
+          submission_date?: string | null
+          submitter_address?: string | null
+          submitter_email?: string | null
+          submitter_name?: string | null
           temperature?: string | null
           test_type?: string
           total_coliform?: string | null
           turbidity?: string | null
           user_id?: string
+          water_source?: string | null
         }
         Relationships: []
       }
