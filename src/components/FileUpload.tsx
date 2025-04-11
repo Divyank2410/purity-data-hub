@@ -11,7 +11,7 @@ interface FileUploadProps {
   bucketName?: string;
   folderPath?: string;
   userId?: string;
-  fileType?: "water" | "sewer" | "amrit" | "lab";
+  fileType?: "water" | "sewer" | "amrit" | "lab" | "sample";
 }
 
 const FileUpload = ({ 
