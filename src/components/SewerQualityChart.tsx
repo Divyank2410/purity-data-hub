@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import {
   BarChart,
@@ -33,6 +34,7 @@ const SewerQualityChart: React.FC<SewerQualityChartProps> = ({
   // Animation state
   const [animate, setAnimate] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [blinkState, setBlinkState] = useState(false);
 
   // Restart animation periodically
   useEffect(() => {
@@ -52,6 +54,15 @@ const SewerQualityChart: React.FC<SewerQualityChartProps> = ({
     }, 10000); // Show refresh indicator every 10 seconds
 
     return () => clearInterval(refreshIndicatorInterval);
+  }, []);
+
+  // Blinking animation effect
+  useEffect(() => {
+    const blinkInterval = setInterval(() => {
+      setBlinkState(prev => !prev);
+    }, 2000); // Toggle every 2 seconds
+
+    return () => clearInterval(blinkInterval);
   }, []);
 
   // Prepare data for chart
@@ -127,11 +138,15 @@ const SewerQualityChart: React.FC<SewerQualityChartProps> = ({
         </div>
       </CardHeader>
       <CardContent>
-        <div className="h-[300px]">
+        <div className={`h-[300px] ${blinkState ? "opacity-90" : "opacity-100"} transition-opacity duration-1000`}>
+          <div className={`absolute inset-0 pointer-events-none ${blinkState ? "bg-orange-500/5" : "bg-transparent"} transition-colors duration-1000 rounded-lg`}></div>
           <ChartContainer
             config={chartConfig}
-            className="w-full"
+            className="w-full relative"
           >
+            {blinkState && (
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-orange-500/10 animate-ping"></div>
+            )}
             <BarChart
               data={chartData}
               margin={{
