@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import {
   BarChart,
@@ -9,7 +8,6 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-  Animate,
 } from "recharts";
 import {
   Card,
