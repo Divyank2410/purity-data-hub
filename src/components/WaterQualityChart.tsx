@@ -9,6 +9,7 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
+  Animate,
 } from "recharts";
 import {
   Card,
@@ -34,7 +35,6 @@ const WaterQualityChart: React.FC<WaterQualityChartProps> = ({
   // Animation state
   const [animate, setAnimate] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [blinkState, setBlinkState] = useState(false);
 
   // Restart animation periodically
   useEffect(() => {
@@ -54,15 +54,6 @@ const WaterQualityChart: React.FC<WaterQualityChartProps> = ({
     }, 10000); // Show refresh indicator every 10 seconds
 
     return () => clearInterval(refreshIndicatorInterval);
-  }, []);
-
-  // Blinking animation effect
-  useEffect(() => {
-    const blinkInterval = setInterval(() => {
-      setBlinkState(prev => !prev);
-    }, 2000); // Toggle every 2 seconds
-
-    return () => clearInterval(blinkInterval);
   }, []);
 
   // Prepare data for chart
@@ -138,52 +129,46 @@ const WaterQualityChart: React.FC<WaterQualityChartProps> = ({
         </div>
       </CardHeader>
       <CardContent>
-        <div className={`h-[300px] ${blinkState ? "opacity-90" : "opacity-100"} transition-opacity duration-1000`}>
-          <div className={`absolute inset-0 pointer-events-none ${blinkState ? "bg-blue-500/5" : "bg-transparent"} transition-colors duration-1000 rounded-lg`}></div>
+        <div className="h-[300px]">
           <ChartContainer
             config={chartConfig}
-            className="w-full relative"
+            className="w-full"
           >
-            <React.Fragment>
-              {blinkState && (
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-blue-500/10 animate-ping"></div>
-              )}
-              <BarChart
-                data={chartData}
-                margin={{
-                  top: 20,
-                  right: 30,
-                  left: 20,
-                  bottom: 70,
-                }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" angle={-45} textAnchor="end" height={70} />
-                <YAxis />
-                <ChartTooltip
-                  content={<ChartTooltipContent />}
-                />
-                <Legend wrapperStyle={{ bottom: 0 }} />
-                <Bar 
-                  dataKey="raw" 
-                  fill="var(--color-raw)" 
-                  name="Raw Water" 
-                  animationBegin={0}
-                  animationDuration={2000}
-                  animationEasing="ease-in-out"
-                  isAnimationActive={animate}
-                />
-                <Bar 
-                  dataKey="clean" 
-                  fill="var(--color-clean)" 
-                  name="Clean Water" 
-                  animationBegin={300}
-                  animationDuration={2000}
-                  animationEasing="ease-in-out"
-                  isAnimationActive={animate}
-                />
-              </BarChart>
-            </React.Fragment>
+            <BarChart
+              data={chartData}
+              margin={{
+                top: 20,
+                right: 30,
+                left: 20,
+                bottom: 70,
+              }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" angle={-45} textAnchor="end" height={70} />
+              <YAxis />
+              <ChartTooltip
+                content={<ChartTooltipContent />}
+              />
+              <Legend wrapperStyle={{ bottom: 0 }} />
+              <Bar 
+                dataKey="raw" 
+                fill="var(--color-raw)" 
+                name="Raw Water" 
+                animationBegin={0}
+                animationDuration={2000}
+                animationEasing="ease-in-out"
+                isAnimationActive={animate}
+              />
+              <Bar 
+                dataKey="clean" 
+                fill="var(--color-clean)" 
+                name="Clean Water" 
+                animationBegin={300}
+                animationDuration={2000}
+                animationEasing="ease-in-out"
+                isAnimationActive={animate}
+              />
+            </BarChart>
           </ChartContainer>
         </div>
       </CardContent>
