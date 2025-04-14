@@ -34,6 +34,8 @@ const parameterLimits = {
   alkalinity: { min: 30, max: 400, unit: "mg/L" },
   chlorides: { min: 0, max: 250, unit: "mg/L" },
   hardness: { min: 0, max: 300, unit: "mg/L" },
+  iron: { min: 0, max: 0.3, unit: "mg/L" },
+  dissolved_oxygen: { min: 4, max: 12, unit: "mg/L" },
 };
 
 const WaterQualityChart: React.FC<WaterQualityChartProps> = ({
@@ -106,6 +108,22 @@ const WaterQualityChart: React.FC<WaterQualityChartProps> = ({
       min: parameterLimits.hardness.min,
       max: parameterLimits.hardness.max,
       unit: parameterLimits.hardness.unit,
+    },
+    {
+      name: "Iron",
+      raw: rawWaterData?.iron ? parseFloat(rawWaterData.iron) : 0,
+      clean: cleanWaterData?.iron ? parseFloat(cleanWaterData.iron) : 0,
+      min: parameterLimits.iron.min,
+      max: parameterLimits.iron.max,
+      unit: parameterLimits.iron.unit,
+    },
+    {
+      name: "Dissolved Oxygen",
+      raw: rawWaterData?.dissolved_oxygen ? parseFloat(rawWaterData.dissolved_oxygen) : 0,
+      clean: cleanWaterData?.dissolved_oxygen ? parseFloat(cleanWaterData.dissolved_oxygen) : 0,
+      min: parameterLimits.dissolved_oxygen.min,
+      max: parameterLimits.dissolved_oxygen.max,
+      unit: parameterLimits.dissolved_oxygen.unit,
     },
   ];
 
@@ -181,60 +199,58 @@ const WaterQualityChart: React.FC<WaterQualityChartProps> = ({
             config={chartConfig}
             className="w-full"
           >
-            <React.Fragment>
-              <BarChart
-                data={chartData}
-                margin={{
-                  top: 20,
-                  right: 30,
-                  left: 20,
-                  bottom: 70,
-                }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" angle={-45} textAnchor="end" height={70} />
-                <YAxis />
-                <Tooltip content={<CustomTooltip />} />
-                <Legend wrapperStyle={{ bottom: 0 }} />
-                {/* Add reference lines for min and max values */}
-                <ReferenceLine 
-                  y={8.5} 
-                  label={{ value: "Max pH", position: 'insideTopRight' }} 
-                  stroke="#ea384c"
-                  strokeDasharray="3 3" 
-                  strokeWidth={1.5}
-                  ifOverflow="extendDomain"
-                  isFront={true}
-                />
-                <ReferenceLine 
-                  y={6.5} 
-                  label={{ value: "Min pH", position: 'insideBottomRight' }} 
-                  stroke="#0ea5e9" 
-                  strokeDasharray="3 3"
-                  strokeWidth={1.5}
-                  ifOverflow="extendDomain"
-                  isFront={true}
-                />
-                <Bar 
-                  dataKey="raw" 
-                  fill="var(--color-raw)" 
-                  name="Raw Water" 
-                  animationBegin={0}
-                  animationDuration={2000}
-                  animationEasing="ease-in-out"
-                  isAnimationActive={animate}
-                />
-                <Bar 
-                  dataKey="clean" 
-                  fill="var(--color-clean)" 
-                  name="Clean Water" 
-                  animationBegin={300}
-                  animationDuration={2000}
-                  animationEasing="ease-in-out"
-                  isAnimationActive={animate}
-                />
-              </BarChart>
-            </React.Fragment>
+            <BarChart
+              data={chartData}
+              margin={{
+                top: 20,
+                right: 30,
+                left: 20,
+                bottom: 70,
+              }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" angle={-45} textAnchor="end" height={70} />
+              <YAxis />
+              <Tooltip content={<CustomTooltip />} />
+              <Legend wrapperStyle={{ bottom: 0 }} />
+              {/* Add reference lines for min and max values */}
+              <ReferenceLine 
+                y={8.5} 
+                label={{ value: "Max pH", position: 'insideTopRight' }} 
+                stroke="#ea384c"
+                strokeDasharray="3 3" 
+                strokeWidth={1.5}
+                ifOverflow="extendDomain"
+                isFront={true}
+              />
+              <ReferenceLine 
+                y={6.5} 
+                label={{ value: "Min pH", position: 'insideBottomRight' }} 
+                stroke="#0ea5e9" 
+                strokeDasharray="3 3"
+                strokeWidth={1.5}
+                ifOverflow="extendDomain"
+                isFront={true}
+              />
+              <Bar 
+                dataKey="raw" 
+                fill="var(--color-raw)" 
+                name="Raw Water" 
+                animationBegin={0}
+                animationDuration={2000}
+                animationEasing="ease-in-out"
+                isAnimationActive={animate}
+              />
+              <Bar 
+                dataKey="clean" 
+                fill="var(--color-clean)" 
+                name="Clean Water" 
+                animationBegin={300}
+                animationDuration={2000}
+                animationEasing="ease-in-out"
+                isAnimationActive={animate}
+              />
+            </BarChart>
           </ChartContainer>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mt-4 text-xs">

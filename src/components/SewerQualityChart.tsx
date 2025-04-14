@@ -34,6 +34,9 @@ const parameterLimits = {
   cod: { min: 0, max: 120, unit: "mg/L" },
   bod: { min: 0, max: 30, unit: "mg/L" },
   ammonical_nitrogen: { min: 0, max: 50, unit: "mg/L" },
+  total_nitrogen: { min: 0, max: 100, unit: "mg/L" },
+  total_phosphorus: { min: 0, max: 5, unit: "mg/L" },
+  fecal_coliform: { min: 0, max: 1000, unit: "MPN/100mL" },
 };
 
 const SewerQualityChart: React.FC<SewerQualityChartProps> = ({
@@ -106,6 +109,30 @@ const SewerQualityChart: React.FC<SewerQualityChartProps> = ({
       min: parameterLimits.ammonical_nitrogen.min,
       max: parameterLimits.ammonical_nitrogen.max,
       unit: parameterLimits.ammonical_nitrogen.unit,
+    },
+    {
+      name: "Total Nitrogen",
+      inlet: inletWaterData?.total_nitrogen ? parseFloat(inletWaterData.total_nitrogen) : 0,
+      outlet: outletWaterData?.total_nitrogen ? parseFloat(outletWaterData.total_nitrogen) : 0,
+      min: parameterLimits.total_nitrogen.min,
+      max: parameterLimits.total_nitrogen.max,
+      unit: parameterLimits.total_nitrogen.unit,
+    },
+    {
+      name: "Total Phosphorus",
+      inlet: inletWaterData?.total_phosphorus ? parseFloat(inletWaterData.total_phosphorus) : 0,
+      outlet: outletWaterData?.total_phosphorus ? parseFloat(outletWaterData.total_phosphorus) : 0,
+      min: parameterLimits.total_phosphorus.min,
+      max: parameterLimits.total_phosphorus.max,
+      unit: parameterLimits.total_phosphorus.unit,
+    },
+    {
+      name: "Fecal Coliform",
+      inlet: inletWaterData?.fecal_coliform ? parseFloat(inletWaterData.fecal_coliform) : 0,
+      outlet: outletWaterData?.fecal_coliform ? parseFloat(outletWaterData.fecal_coliform) : 0,
+      min: parameterLimits.fecal_coliform.min,
+      max: parameterLimits.fecal_coliform.max,
+      unit: parameterLimits.fecal_coliform.unit,
     },
   ];
 
@@ -181,60 +208,58 @@ const SewerQualityChart: React.FC<SewerQualityChartProps> = ({
             config={chartConfig}
             className="w-full"
           >
-            <React.Fragment>
-              <BarChart
-                data={chartData}
-                margin={{
-                  top: 20,
-                  right: 30,
-                  left: 20,
-                  bottom: 70,
-                }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" angle={-45} textAnchor="end" height={70} />
-                <YAxis />
-                <Tooltip content={<CustomTooltip />} />
-                <Legend wrapperStyle={{ bottom: 0 }} />
-                {/* Add reference lines for min and max values */}
-                <ReferenceLine 
-                  y={9.0} 
-                  label={{ value: "Max pH", position: 'insideTopRight' }} 
-                  stroke="#ea384c"
-                  strokeDasharray="3 3" 
-                  strokeWidth={1.5}
-                  ifOverflow="extendDomain"
-                  isFront={true}
-                />
-                <ReferenceLine 
-                  y={6.0} 
-                  label={{ value: "Min pH", position: 'insideBottomRight' }} 
-                  stroke="#0ea5e9" 
-                  strokeDasharray="3 3"
-                  strokeWidth={1.5}
-                  ifOverflow="extendDomain"
-                  isFront={true}
-                />
-                <Bar 
-                  dataKey="inlet" 
-                  fill="var(--color-inlet)" 
-                  name="Inlet Water" 
-                  animationBegin={0}
-                  animationDuration={2000}
-                  animationEasing="ease-in-out"
-                  isAnimationActive={animate}
-                />
-                <Bar 
-                  dataKey="outlet" 
-                  fill="var(--color-outlet)" 
-                  name="Outlet Water" 
-                  animationBegin={300}
-                  animationDuration={2000}
-                  animationEasing="ease-in-out"
-                  isAnimationActive={animate}
-                />
-              </BarChart>
-            </React.Fragment>
+            <BarChart
+              data={chartData}
+              margin={{
+                top: 20,
+                right: 30,
+                left: 20,
+                bottom: 70,
+              }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" angle={-45} textAnchor="end" height={70} />
+              <YAxis />
+              <Tooltip content={<CustomTooltip />} />
+              <Legend wrapperStyle={{ bottom: 0 }} />
+              {/* Add reference lines for min and max values */}
+              <ReferenceLine 
+                y={9.0} 
+                label={{ value: "Max pH", position: 'insideTopRight' }} 
+                stroke="#ea384c"
+                strokeDasharray="3 3" 
+                strokeWidth={1.5}
+                ifOverflow="extendDomain"
+                isFront={true}
+              />
+              <ReferenceLine 
+                y={6.0} 
+                label={{ value: "Min pH", position: 'insideBottomRight' }} 
+                stroke="#0ea5e9" 
+                strokeDasharray="3 3"
+                strokeWidth={1.5}
+                ifOverflow="extendDomain"
+                isFront={true}
+              />
+              <Bar 
+                dataKey="inlet" 
+                fill="var(--color-inlet)" 
+                name="Inlet Water" 
+                animationBegin={0}
+                animationDuration={2000}
+                animationEasing="ease-in-out"
+                isAnimationActive={animate}
+              />
+              <Bar 
+                dataKey="outlet" 
+                fill="var(--color-outlet)" 
+                name="Outlet Water" 
+                animationBegin={300}
+                animationDuration={2000}
+                animationEasing="ease-in-out"
+                isAnimationActive={animate}
+              />
+            </BarChart>
           </ChartContainer>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mt-4 text-xs">
