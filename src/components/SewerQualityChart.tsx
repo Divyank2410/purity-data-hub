@@ -9,7 +9,6 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-  Animate,
 } from "recharts";
 import {
   Card,
@@ -134,6 +133,7 @@ const SewerQualityChart: React.FC<SewerQualityChartProps> = ({
             config={chartConfig}
             className="w-full"
           >
+            {/* Using a single element as children for ChartContainer */}
             <BarChart
               data={chartData}
               margin={{

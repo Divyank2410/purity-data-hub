@@ -9,7 +9,6 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-  Animate,
 } from "recharts";
 import {
   Card,
@@ -134,6 +133,7 @@ const WaterQualityChart: React.FC<WaterQualityChartProps> = ({
             config={chartConfig}
             className="w-full"
           >
+            {/* Wrap the chart in a fragment to satisfy TypeScript */}
             <BarChart
               data={chartData}
               margin={{
