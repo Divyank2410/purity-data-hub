@@ -144,44 +144,46 @@ const SewerQualityChart: React.FC<SewerQualityChartProps> = ({
             config={chartConfig}
             className="w-full relative"
           >
-            {blinkState && (
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-orange-500/10 animate-ping"></div>
-            )}
-            <BarChart
-              data={chartData}
-              margin={{
-                top: 20,
-                right: 30,
-                left: 20,
-                bottom: 70,
-              }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" angle={-45} textAnchor="end" height={70} />
-              <YAxis />
-              <ChartTooltip
-                content={<ChartTooltipContent />}
-              />
-              <Legend wrapperStyle={{ bottom: 0 }} />
-              <Bar 
-                dataKey="inlet" 
-                fill="var(--color-inlet)" 
-                name="Inlet Water" 
-                animationBegin={0}
-                animationDuration={2000}
-                animationEasing="ease-in-out"
-                isAnimationActive={animate}
-              />
-              <Bar 
-                dataKey="outlet" 
-                fill="var(--color-outlet)" 
-                name="Outlet Water" 
-                animationBegin={300}
-                animationDuration={2000}
-                animationEasing="ease-in-out"
-                isAnimationActive={animate}
-              />
-            </BarChart>
+            <React.Fragment>
+              {blinkState && (
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-orange-500/10 animate-ping"></div>
+              )}
+              <BarChart
+                data={chartData}
+                margin={{
+                  top: 20,
+                  right: 30,
+                  left: 20,
+                  bottom: 70,
+                }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" angle={-45} textAnchor="end" height={70} />
+                <YAxis />
+                <ChartTooltip
+                  content={<ChartTooltipContent />}
+                />
+                <Legend wrapperStyle={{ bottom: 0 }} />
+                <Bar 
+                  dataKey="inlet" 
+                  fill="var(--color-inlet)" 
+                  name="Inlet Water" 
+                  animationBegin={0}
+                  animationDuration={2000}
+                  animationEasing="ease-in-out"
+                  isAnimationActive={animate}
+                />
+                <Bar 
+                  dataKey="outlet" 
+                  fill="var(--color-outlet)" 
+                  name="Outlet Water" 
+                  animationBegin={300}
+                  animationDuration={2000}
+                  animationEasing="ease-in-out"
+                  isAnimationActive={animate}
+                />
+              </BarChart>
+            </React.Fragment>
           </ChartContainer>
         </div>
       </CardContent>
