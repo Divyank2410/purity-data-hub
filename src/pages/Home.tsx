@@ -91,6 +91,27 @@ interface DataTableProps {
 
 const Home = () => {
   const queryClient = useQueryClient();
+  const [autoRefreshEnabled, setAutoRefreshEnabled] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  
+  useEffect(() => {
+    if (!autoRefreshEnabled) return;
+    
+    const refreshInterval = setInterval(() => {
+      console.log("Auto-refreshing data");
+      setIsRefreshing(true);
+      
+      queryClient.invalidateQueries({ queryKey: [WATER_DATA_QUERY_KEY] });
+      queryClient.invalidateQueries({ queryKey: [SEWER_DATA_QUERY_KEY] });
+      queryClient.invalidateQueries({ queryKey: [AMRIT_DATA_QUERY_KEY] });
+      
+      setTimeout(() => {
+        setIsRefreshing(false);
+      }, 1000);
+    }, 10000);
+    
+    return () => clearInterval(refreshInterval);
+  }, [queryClient, autoRefreshEnabled]);
   
   const handleDataUpdated = useCallback((event: CustomEvent<{ queryKey: string }>) => {
     console.log("Data updated event received for:", event.detail.queryKey);
@@ -238,15 +259,31 @@ const Home = () => {
   
   const handleRefresh = () => {
     console.log("Manually refreshing all data");
+    setIsRefreshing(true);
+    
     queryClient.invalidateQueries({ queryKey: [WATER_DATA_QUERY_KEY] });
     queryClient.invalidateQueries({ queryKey: [SEWER_DATA_QUERY_KEY] });
     queryClient.invalidateQueries({ queryKey: [AMRIT_DATA_QUERY_KEY] });
+    
     toast.success("Data refreshed");
+    
+    setTimeout(() => {
+      setIsRefreshing(false);
+    }, 1000);
   };
 
   const formatDateTime = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleString();
+  };
+
+  const toggleAutoRefresh = () => {
+    setAutoRefreshEnabled(prev => !prev);
+    if (!autoRefreshEnabled) {
+      toast.success("Auto-refresh enabled");
+    } else {
+      toast.info("Auto-refresh disabled");
+    }
   };
 
   return (
@@ -268,11 +305,31 @@ const Home = () => {
               Comprehensive monitoring and testing of water and sewerage systems across Gwalior 
               to ensure clean and safe water for all citizens.
             </p>
-            <div className="flex flex-wrap gap-4">
-              <Button variant="secondary" onClick={handleRefresh} className="bg-white text-blue-600 hover:bg-gray-100">
-                <RefreshCw className="mr-2 h-4 w-4" />
-                Refresh Data
+            <div className="flex flex-wrap gap-4 items-center">
+              <Button 
+                variant="secondary" 
+                onClick={handleRefresh} 
+                className="bg-white text-blue-600 hover:bg-gray-100"
+                disabled={isRefreshing}
+              >
+                <RefreshCw className={`mr-2 h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
+                {isRefreshing ? "Refreshing..." : "Refresh Data"}
               </Button>
+              
+              <Button 
+                variant="outline" 
+                onClick={toggleAutoRefresh} 
+                className={`${autoRefreshEnabled ? "bg-green-100 border-green-400 text-green-700" : "bg-white text-gray-600"} hover:bg-gray-100`}
+              >
+                Auto-Refresh: {autoRefreshEnabled ? "On" : "Off"}
+              </Button>
+              
+              {autoRefreshEnabled && (
+                <div className="flex items-center space-x-2 text-white">
+                  <span className="text-xs">Refreshing every 10 seconds</span>
+                  <div className="h-2 w-2 rounded-full bg-green-400 animate-pulse"></div>
+                </div>
+              )}
             </div>
           </div>
           <div className="absolute right-0 bottom-0 opacity-20">
@@ -571,4 +628,3 @@ const DataTable = ({ data, fields, isLoading, formatDateTime }: DataTableProps) 
 };
 
 export default Home;
-
