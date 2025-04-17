@@ -215,7 +215,9 @@ const Home = () => {
         }
       }
       
-      return latestEntries as WaterQualityData[] || [];
+      return latestEntries.filter(
+        entry => !excludedPlantNames.includes(entry.water_treatment_plants?.name || '')
+      ) || [];
     }
   });
   
@@ -256,7 +258,9 @@ const Home = () => {
         }
       }
       
-      return latestEntries as SewerQualityData[] || [];
+      return latestEntries.filter(
+        entry => !excludedPlantNames.includes(entry.sewer_treatment_plants?.name || '')
+      ) || [];
     }
   });
   
@@ -372,167 +376,171 @@ const Home = () => {
 
         <TabsContent value="water" className="mt-6">
           <div className="grid grid-cols-1 gap-6">
-            {waterPlants.map((plant) => {
-              const rawWaterData = waterData.find(
-                item => item.plant_id === plant.id && item.water_type === 'raw_water'
-              );
-              const cleanWaterData = waterData.find(
-                item => item.plant_id === plant.id && item.water_type === 'clean_water'
-              );
-              
-              return (
-                <Card key={plant.id} className="overflow-hidden">
-                  <CardHeader>
-                    <CardTitle>{plant.name}</CardTitle>
-                    <CardDescription>Location: {plant.location}</CardDescription>
-                    {plant.capacity && <CardDescription>Capacity: {plant.capacity}</CardDescription>}
-                  </CardHeader>
-                  <CardContent className="p-0">
-                    <div className="grid grid-cols-1 md:grid-cols-2">
-                      <div className="p-6 border-r border-b md:border-b-0">
-                        <WaterQualityChart 
-                          plantName={plant.name}
-                          rawWaterData={rawWaterData}
-                          cleanWaterData={cleanWaterData}
-                        />
+            {waterPlants
+              .filter(plant => !excludedPlantNames.includes(plant.name))
+              .map((plant) => {
+                const rawWaterData = waterData.find(
+                  item => item.plant_id === plant.id && item.water_type === 'raw_water'
+                );
+                const cleanWaterData = waterData.find(
+                  item => item.plant_id === plant.id && item.water_type === 'clean_water'
+                );
+                
+                return (
+                  <Card key={plant.id} className="overflow-hidden">
+                    <CardHeader>
+                      <CardTitle>{plant.name}</CardTitle>
+                      <CardDescription>Location: {plant.location}</CardDescription>
+                      {plant.capacity && <CardDescription>Capacity: {plant.capacity}</CardDescription>}
+                    </CardHeader>
+                    <CardContent className="p-0">
+                      <div className="grid grid-cols-1 md:grid-cols-2">
+                        <div className="p-6 border-r border-b md:border-b-0">
+                          <WaterQualityChart 
+                            plantName={plant.name}
+                            rawWaterData={rawWaterData}
+                            cleanWaterData={cleanWaterData}
+                          />
+                        </div>
+                        <div className="p-6">
+                          <Tabs defaultValue="raw" className="w-full">
+                            <TabsList className="w-full mb-4">
+                              <TabsTrigger value="raw" className="flex-1">Raw Water</TabsTrigger>
+                              <TabsTrigger value="clean" className="flex-1">Clean Water</TabsTrigger>
+                            </TabsList>
+                            
+                            <TabsContent value="raw">
+                              <h4 className="text-sm font-medium mb-2">Raw Water Parameters</h4>
+                              <DataTable 
+                                data={waterData.filter(
+                                  item => item.plant_id === plant.id && item.water_type === 'raw_water'
+                                )} 
+                                fields={[
+                                  { key: 'turbidity', label: 'Turbidity' },
+                                  { key: 'ph_value', label: 'PH Value' },
+                                  { key: 'alkalinity', label: 'Alkalinity' },
+                                  { key: 'chlorides', label: 'Chlorides' },
+                                  { key: 'hardness', label: 'Hardness' },
+                                  { key: 'iron', label: 'Iron' },
+                                  { key: 'dissolved_oxygen', label: 'Dissolved Oxygen' },
+                                ]}
+                                isLoading={isLoading}
+                                formatDateTime={formatDateTime}
+                              />
+                            </TabsContent>
+                            
+                            <TabsContent value="clean">
+                              <h4 className="text-sm font-medium mb-2">Clean Water Parameters</h4>
+                              <DataTable 
+                                data={waterData.filter(
+                                  item => item.plant_id === plant.id && item.water_type === 'clean_water'
+                                )} 
+                                fields={[
+                                  { key: 'turbidity', label: 'Turbidity' },
+                                  { key: 'ph_value', label: 'PH Value' },
+                                  { key: 'alkalinity', label: 'Alkalinity' },
+                                  { key: 'chlorides', label: 'Chlorides' },
+                                  { key: 'hardness', label: 'Hardness' },
+                                  { key: 'iron', label: 'Iron' },
+                                  { key: 'dissolved_oxygen', label: 'Dissolved Oxygen' },
+                                ]}
+                                isLoading={isLoading}
+                                formatDateTime={formatDateTime}
+                              />
+                            </TabsContent>
+                          </Tabs>
+                        </div>
                       </div>
-                      <div className="p-6">
-                        <Tabs defaultValue="raw" className="w-full">
-                          <TabsList className="w-full mb-4">
-                            <TabsTrigger value="raw" className="flex-1">Raw Water</TabsTrigger>
-                            <TabsTrigger value="clean" className="flex-1">Clean Water</TabsTrigger>
-                          </TabsList>
-                          
-                          <TabsContent value="raw">
-                            <h4 className="text-sm font-medium mb-2">Raw Water Parameters</h4>
-                            <DataTable 
-                              data={waterData.filter(
-                                item => item.plant_id === plant.id && item.water_type === 'raw_water'
-                              )} 
-                              fields={[
-                                { key: 'turbidity', label: 'Turbidity' },
-                                { key: 'ph_value', label: 'PH Value' },
-                                { key: 'alkalinity', label: 'Alkalinity' },
-                                { key: 'chlorides', label: 'Chlorides' },
-                                { key: 'hardness', label: 'Hardness' },
-                                { key: 'iron', label: 'Iron' },
-                                { key: 'dissolved_oxygen', label: 'Dissolved Oxygen' },
-                              ]}
-                              isLoading={isLoading}
-                              formatDateTime={formatDateTime}
-                            />
-                          </TabsContent>
-                          
-                          <TabsContent value="clean">
-                            <h4 className="text-sm font-medium mb-2">Clean Water Parameters</h4>
-                            <DataTable 
-                              data={waterData.filter(
-                                item => item.plant_id === plant.id && item.water_type === 'clean_water'
-                              )} 
-                              fields={[
-                                { key: 'turbidity', label: 'Turbidity' },
-                                { key: 'ph_value', label: 'PH Value' },
-                                { key: 'alkalinity', label: 'Alkalinity' },
-                                { key: 'chlorides', label: 'Chlorides' },
-                                { key: 'hardness', label: 'Hardness' },
-                                { key: 'iron', label: 'Iron' },
-                                { key: 'dissolved_oxygen', label: 'Dissolved Oxygen' },
-                              ]}
-                              isLoading={isLoading}
-                              formatDateTime={formatDateTime}
-                            />
-                          </TabsContent>
-                        </Tabs>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
+                    </CardContent>
+                  </Card>
+                );
+              })}
           </div>
         </TabsContent>
 
         <TabsContent value="sewer" className="mt-6">
           <div className="grid grid-cols-1 gap-6">
-            {sewerPlants.map((plant) => {
-              const inletWaterData = sewerData.find(
-                item => item.plant_id === plant.id && item.water_type === 'inlet_water'
-              );
-              const outletWaterData = sewerData.find(
-                item => item.plant_id === plant.id && item.water_type === 'outlet_water'
-              );
-              
-              return (
-                <Card key={plant.id} className="overflow-hidden">
-                  <CardHeader>
-                    <CardTitle>{plant.name}</CardTitle>
-                    <CardDescription>Location: {plant.location}</CardDescription>
-                    {plant.capacity && <CardDescription>Capacity: {plant.capacity}</CardDescription>}
-                  </CardHeader>
-                  <CardContent className="p-0">
-                    <div className="grid grid-cols-1 md:grid-cols-2">
-                      <div className="p-6 border-r border-b md:border-b-0">
-                        <SewerQualityChart 
-                          plantName={plant.name}
-                          inletWaterData={inletWaterData}
-                          outletWaterData={outletWaterData}
-                        />
+            {sewerPlants
+              .filter(plant => !excludedPlantNames.includes(plant.name))
+              .map((plant) => {
+                const inletWaterData = sewerData.find(
+                  item => item.plant_id === plant.id && item.water_type === 'inlet_water'
+                );
+                const outletWaterData = sewerData.find(
+                  item => item.plant_id === plant.id && item.water_type === 'outlet_water'
+                );
+                
+                return (
+                  <Card key={plant.id} className="overflow-hidden">
+                    <CardHeader>
+                      <CardTitle>{plant.name}</CardTitle>
+                      <CardDescription>Location: {plant.location}</CardDescription>
+                      {plant.capacity && <CardDescription>Capacity: {plant.capacity}</CardDescription>}
+                    </CardHeader>
+                    <CardContent className="p-0">
+                      <div className="grid grid-cols-1 md:grid-cols-2">
+                        <div className="p-6 border-r border-b md:border-b-0">
+                          <SewerQualityChart 
+                            plantName={plant.name}
+                            inletWaterData={inletWaterData}
+                            outletWaterData={outletWaterData}
+                          />
+                        </div>
+                        <div className="p-6">
+                          <Tabs defaultValue="inlet" className="w-full">
+                            <TabsList className="w-full mb-4">
+                              <TabsTrigger value="inlet" className="flex-1">Inlet Water</TabsTrigger>
+                              <TabsTrigger value="outlet" className="flex-1">Outlet Water</TabsTrigger>
+                            </TabsList>
+                            
+                            <TabsContent value="inlet">
+                              <h4 className="text-sm font-medium mb-2">Inlet Water Parameters</h4>
+                              <DataTable 
+                                data={sewerData.filter(
+                                  item => item.plant_id === plant.id && item.water_type === 'inlet_water'
+                                )} 
+                                fields={[
+                                  { key: 'tss', label: 'TSS' },
+                                  { key: 'ph_value', label: 'PH Value' },
+                                  { key: 'cod', label: 'COD' },
+                                  { key: 'bod', label: 'BOD' },
+                                  { key: 'ammonical_nitrogen', label: 'Ammonical Nitrogen' },
+                                  { key: 'total_nitrogen', label: 'Total Nitrogen' },
+                                  { key: 'total_phosphorus', label: 'Total Phosphorus' },
+                                  { key: 'fecal_coliform', label: 'Fecal Coliform' },
+                                ]}
+                                isLoading={isLoading}
+                                formatDateTime={formatDateTime}
+                              />
+                            </TabsContent>
+                            
+                            <TabsContent value="outlet">
+                              <h4 className="text-sm font-medium mb-2">Outlet Water Parameters</h4>
+                              <DataTable 
+                                data={sewerData.filter(
+                                  item => item.plant_id === plant.id && item.water_type === 'outlet_water'
+                                )} 
+                                fields={[
+                                  { key: 'tss', label: 'TSS' },
+                                  { key: 'ph_value', label: 'PH Value' },
+                                  { key: 'cod', label: 'COD' },
+                                  { key: 'bod', label: 'BOD' },
+                                  { key: 'ammonical_nitrogen', label: 'Ammonical Nitrogen' },
+                                  { key: 'total_nitrogen', label: 'Total Nitrogen' },
+                                  { key: 'total_phosphorus', label: 'Total Phosphorus' },
+                                  { key: 'fecal_coliform', label: 'Fecal Coliform' },
+                                ]}
+                                isLoading={isLoading}
+                                formatDateTime={formatDateTime}
+                              />
+                            </TabsContent>
+                          </Tabs>
+                        </div>
                       </div>
-                      <div className="p-6">
-                        <Tabs defaultValue="inlet" className="w-full">
-                          <TabsList className="w-full mb-4">
-                            <TabsTrigger value="inlet" className="flex-1">Inlet Water</TabsTrigger>
-                            <TabsTrigger value="outlet" className="flex-1">Outlet Water</TabsTrigger>
-                          </TabsList>
-                          
-                          <TabsContent value="inlet">
-                            <h4 className="text-sm font-medium mb-2">Inlet Water Parameters</h4>
-                            <DataTable 
-                              data={sewerData.filter(
-                                item => item.plant_id === plant.id && item.water_type === 'inlet_water'
-                              )} 
-                              fields={[
-                                { key: 'tss', label: 'TSS' },
-                                { key: 'ph_value', label: 'PH Value' },
-                                { key: 'cod', label: 'COD' },
-                                { key: 'bod', label: 'BOD' },
-                                { key: 'ammonical_nitrogen', label: 'Ammonical Nitrogen' },
-                                { key: 'total_nitrogen', label: 'Total Nitrogen' },
-                                { key: 'total_phosphorus', label: 'Total Phosphorus' },
-                                { key: 'fecal_coliform', label: 'Fecal Coliform' },
-                              ]}
-                              isLoading={isLoading}
-                              formatDateTime={formatDateTime}
-                            />
-                          </TabsContent>
-                          
-                          <TabsContent value="outlet">
-                            <h4 className="text-sm font-medium mb-2">Outlet Water Parameters</h4>
-                            <DataTable 
-                              data={sewerData.filter(
-                                item => item.plant_id === plant.id && item.water_type === 'outlet_water'
-                              )} 
-                              fields={[
-                                { key: 'tss', label: 'TSS' },
-                                { key: 'ph_value', label: 'PH Value' },
-                                { key: 'cod', label: 'COD' },
-                                { key: 'bod', label: 'BOD' },
-                                { key: 'ammonical_nitrogen', label: 'Ammonical Nitrogen' },
-                                { key: 'total_nitrogen', label: 'Total Nitrogen' },
-                                { key: 'total_phosphorus', label: 'Total Phosphorus' },
-                                { key: 'fecal_coliform', label: 'Fecal Coliform' },
-                              ]}
-                              isLoading={isLoading}
-                              formatDateTime={formatDateTime}
-                            />
-                          </TabsContent>
-                        </Tabs>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
+                    </CardContent>
+                  </Card>
+                );
+              })}
           </div>
         </TabsContent>
 

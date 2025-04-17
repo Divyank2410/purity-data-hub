@@ -111,6 +111,11 @@ const AdminWaterData = () => {
     </div>
   );
 
+  // Filter out any data related to excluded plants that might have been fetched
+  const filteredWaterData = waterData?.filter(
+    record => !excludedPlantNames.includes(record.water_treatment_plants?.name || '')
+  ) || [];
+
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -161,12 +166,12 @@ const AdminWaterData = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {waterData?.length === 0 && (
+            {filteredWaterData?.length === 0 && (
               <TableRow>
                 <TableCell colSpan={13} className="text-center py-4">No data found for the selected filters</TableCell>
               </TableRow>
             )}
-            {waterData?.map((record) => (
+            {filteredWaterData?.map((record) => (
               <TableRow key={record.id}>
                 <TableCell>{new Date(record.created_at).toLocaleDateString()}</TableCell>
                 <TableCell>{record.water_treatment_plants?.name || 'N/A'}</TableCell>
