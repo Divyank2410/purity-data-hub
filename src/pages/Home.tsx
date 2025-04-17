@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import WaterQualityChart from "@/components/WaterQualityChart";
 import SewerQualityChart from "@/components/SewerQualityChart";
 
+// List of plant names to exclude
 const excludedPlantNames = [
   "Motijheel WTP - Motijheel Area",
   "Maharajpura STP - Maharajpura",
@@ -154,6 +155,7 @@ const Home = () => {
       const { data, error } = await supabase.from("water_treatment_plants").select("*");
       if (error) throw error;
       
+      // Filter out excluded plants
       const filteredPlants = (data || []).filter(
         plant => !excludedPlantNames.includes(plant.name)
       );
@@ -169,6 +171,7 @@ const Home = () => {
       const { data, error } = await supabase.from("sewer_treatment_plants").select("*");
       if (error) throw error;
       
+      // Filter out excluded plants
       const filteredPlants = (data || []).filter(
         plant => !excludedPlantNames.includes(plant.name)
       );
@@ -186,6 +189,17 @@ const Home = () => {
         .select("id");
       
       if (plantsError) throw plantsError;
+      
+      // Filter out excluded plants first
+      const filteredPlantsData = (plantsData || []).filter(async (plant) => {
+        const { data } = await supabase
+          .from("water_treatment_plants")
+          .select("name")
+          .eq("id", plant.id)
+          .single();
+        
+        return data && !excludedPlantNames.includes(data.name);
+      });
       
       const latestEntries = [];
       
@@ -215,6 +229,7 @@ const Home = () => {
         }
       }
       
+      // Make sure to filter out the excluded plants from the result
       return latestEntries.filter(
         entry => !excludedPlantNames.includes(entry.water_treatment_plants?.name || '')
       ) || [];
@@ -229,6 +244,17 @@ const Home = () => {
         .select("id");
       
       if (plantsError) throw plantsError;
+      
+      // Filter out excluded plants first
+      const filteredPlantsData = (plantsData || []).filter(async (plant) => {
+        const { data } = await supabase
+          .from("sewer_treatment_plants")
+          .select("name")
+          .eq("id", plant.id)
+          .single();
+        
+        return data && !excludedPlantNames.includes(data.name);
+      });
       
       const latestEntries = [];
       
@@ -258,6 +284,7 @@ const Home = () => {
         }
       }
       
+      // Make sure to filter out the excluded plants from the result
       return latestEntries.filter(
         entry => !excludedPlantNames.includes(entry.sewer_treatment_plants?.name || '')
       ) || [];

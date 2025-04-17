@@ -49,7 +49,13 @@ export const useSewerData = (
 
       const { data, error } = await query.order('created_at', { ascending: false });
       if (error) throw error;
-      return (data || []) as SewerQualityData[];
+      
+      // Filter out excluded plants
+      const filteredData = (data || []).filter(
+        record => !excludedPlantNames.includes(record.sewer_treatment_plants?.name || '')
+      );
+      
+      return filteredData as SewerQualityData[];
     },
     staleTime: 0
   });
