@@ -184,26 +184,22 @@ const Home = () => {
   const { data: waterData = [], isLoading: isLoadingWaterData } = useQuery({
     queryKey: [WATER_DATA_QUERY_KEY],
     queryFn: async () => {
-      const { data: plantsData, error: plantsError } = await supabase
+      // First get all plants that are not excluded
+      const { data: allPlants, error: plantsError } = await supabase
         .from("water_treatment_plants")
-        .select("id");
+        .select("id, name");
       
       if (plantsError) throw plantsError;
       
       // Filter out excluded plants first
-      const filteredPlantsData = (plantsData || []).filter(async (plant) => {
-        const { data } = await supabase
-          .from("water_treatment_plants")
-          .select("name")
-          .eq("id", plant.id)
-          .single();
-        
-        return data && !excludedPlantNames.includes(data.name);
-      });
+      const filteredPlants = allPlants.filter(plant => 
+        !excludedPlantNames.includes(plant.name)
+      );
       
       const latestEntries = [];
       
-      for (const plant of plantsData) {
+      // Only process data for non-excluded plants
+      for (const plant of filteredPlants) {
         const { data: rawData, error: rawError } = await supabase
           .from("water_quality_data")
           .select("*, water_treatment_plants(name)")
@@ -229,36 +225,29 @@ const Home = () => {
         }
       }
       
-      // Make sure to filter out the excluded plants from the result
-      return latestEntries.filter(
-        entry => !excludedPlantNames.includes(entry.water_treatment_plants?.name || '')
-      ) || [];
+      return latestEntries;
     }
   });
   
   const { data: sewerData = [], isLoading: isLoadingSewerData } = useQuery({
     queryKey: [SEWER_DATA_QUERY_KEY],
     queryFn: async () => {
-      const { data: plantsData, error: plantsError } = await supabase
+      // First get all plants that are not excluded
+      const { data: allPlants, error: plantsError } = await supabase
         .from("sewer_treatment_plants")
-        .select("id");
+        .select("id, name");
       
       if (plantsError) throw plantsError;
       
       // Filter out excluded plants first
-      const filteredPlantsData = (plantsData || []).filter(async (plant) => {
-        const { data } = await supabase
-          .from("sewer_treatment_plants")
-          .select("name")
-          .eq("id", plant.id)
-          .single();
-        
-        return data && !excludedPlantNames.includes(data.name);
-      });
+      const filteredPlants = allPlants.filter(plant => 
+        !excludedPlantNames.includes(plant.name)
+      );
       
       const latestEntries = [];
       
-      for (const plant of plantsData) {
+      // Only process data for non-excluded plants
+      for (const plant of filteredPlants) {
         const { data: inletData, error: inletError } = await supabase
           .from("sewer_quality_data")
           .select("*, sewer_treatment_plants(name)")
@@ -284,10 +273,7 @@ const Home = () => {
         }
       }
       
-      // Make sure to filter out the excluded plants from the result
-      return latestEntries.filter(
-        entry => !excludedPlantNames.includes(entry.sewer_treatment_plants?.name || '')
-      ) || [];
+      return latestEntries;
     }
   });
   
@@ -403,9 +389,7 @@ const Home = () => {
 
         <TabsContent value="water" className="mt-6">
           <div className="grid grid-cols-1 gap-6">
-            {waterPlants
-              .filter(plant => !excludedPlantNames.includes(plant.name))
-              .map((plant) => {
+            {waterPlants.map((plant) => {
                 const rawWaterData = waterData.find(
                   item => item.plant_id === plant.id && item.water_type === 'raw_water'
                 );
@@ -487,9 +471,7 @@ const Home = () => {
 
         <TabsContent value="sewer" className="mt-6">
           <div className="grid grid-cols-1 gap-6">
-            {sewerPlants
-              .filter(plant => !excludedPlantNames.includes(plant.name))
-              .map((plant) => {
+            {sewerPlants.map((plant) => {
                 const inletWaterData = sewerData.find(
                   item => item.plant_id === plant.id && item.water_type === 'inlet_water'
                 );
