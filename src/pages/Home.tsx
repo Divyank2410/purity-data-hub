@@ -14,6 +14,15 @@ import { toast } from "sonner";
 import WaterQualityChart from "@/components/WaterQualityChart";
 import SewerQualityChart from "@/components/SewerQualityChart";
 
+const excludedPlantNames = [
+  "Motijheel WTP - Motijheel Area",
+  "Maharajpura STP - Maharajpura",
+  "Morar STP - Morar Region",
+  "Hazira STP - Hazira Area",
+  "Lashkar STP - Lashkar Region",
+  "Jhansi Road STP - Jhansi Road"
+];
+
 interface WaterTreatmentPlant {
   id: string;
   name: string;
@@ -144,7 +153,12 @@ const Home = () => {
     queryFn: async () => {
       const { data, error } = await supabase.from("water_treatment_plants").select("*");
       if (error) throw error;
-      return data as WaterTreatmentPlant[] || [];
+      
+      const filteredPlants = (data || []).filter(
+        plant => !excludedPlantNames.includes(plant.name)
+      );
+      
+      return filteredPlants as WaterTreatmentPlant[] || [];
     },
     staleTime: 5 * 60 * 1000,
   });
@@ -154,7 +168,12 @@ const Home = () => {
     queryFn: async () => {
       const { data, error } = await supabase.from("sewer_treatment_plants").select("*");
       if (error) throw error;
-      return data as SewerTreatmentPlant[] || [];
+      
+      const filteredPlants = (data || []).filter(
+        plant => !excludedPlantNames.includes(plant.name)
+      );
+      
+      return filteredPlants as SewerTreatmentPlant[] || [];
     },
     staleTime: 5 * 60 * 1000,
   });

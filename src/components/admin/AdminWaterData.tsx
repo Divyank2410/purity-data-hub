@@ -11,6 +11,16 @@ import DocumentViewer from "./DocumentViewer";
 
 export const WATER_DATA_QUERY_KEY = "waterData";
 
+// List of plant names to exclude
+const excludedPlantNames = [
+  "Motijheel WTP - Motijheel Area",
+  "Maharajpura STP - Maharajpura",
+  "Morar STP - Morar Region",
+  "Hazira STP - Hazira Area",
+  "Lashkar STP - Lashkar Region",
+  "Jhansi Road STP - Jhansi Road"
+];
+
 interface WaterTreatmentPlant {
   id: string;
   name: string;
@@ -85,7 +95,13 @@ const AdminWaterData = () => {
         .select("*");
       
       if (error) throw error;
-      return (data || []) as WaterTreatmentPlant[];
+      
+      // Filter out the excluded plants
+      const filteredPlants = (data || []).filter(
+        plant => !excludedPlantNames.includes(plant.name)
+      ) as WaterTreatmentPlant[];
+      
+      return filteredPlants;
     }
   });
 

@@ -4,6 +4,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { DateRange } from "react-day-picker";
 import { SewerQualityData, SewerTreatmentPlant } from "./types";
 
+// List of plant names to exclude
+const excludedPlantNames = [
+  "Motijheel WTP - Motijheel Area",
+  "Maharajpura STP - Maharajpura",
+  "Morar STP - Morar Region",
+  "Hazira STP - Hazira Area",
+  "Lashkar STP - Lashkar Region",
+  "Jhansi Road STP - Jhansi Road"
+];
+
 export const useSewerData = (
   dateRange: DateRange,
   plantFilter: string,
@@ -52,7 +62,13 @@ export const useSewerData = (
         .select("*");
       
       if (error) throw error;
-      return (data || []) as SewerTreatmentPlant[];
+      
+      // Filter out the excluded plants
+      const filteredPlants = (data || []).filter(
+        plant => !excludedPlantNames.includes(plant.name)
+      ) as SewerTreatmentPlant[];
+      
+      return filteredPlants;
     }
   });
 
