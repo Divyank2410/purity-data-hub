@@ -105,8 +105,13 @@ export default function AdminLabReports() {
               value={search}
               onChange={e => setSearch(e.target.value)}
               className="max-w-xs border-[#7E69AB]"
-              prefix={<Search className="text-[#9b87f5]" />}
+              // Fix: Using startAdornment instead of prefix or removing the icon altogether
+              // Let's use className to position the icon instead
+              className="max-w-xs border-[#7E69AB] pl-9 relative"
             />
+            <div className="absolute translate-x-3 translate-y-2.5 text-[#9b87f5] pointer-events-none">
+              <Search className="h-4 w-4" />
+            </div>
             <DatePickerWithRange
               date={dateRange.from ? {from: dateRange.from, to: dateRange.to} : undefined}
               onDateChange={d => setDateRange({from: d?.from, to: d?.to})}
