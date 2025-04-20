@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -711,7 +712,7 @@ const LabTestsForm = ({ userId }: { userId: string }) => {
                           </FormItem>
                         )}
                       />
-                      {/* Magnesium */}
+                      {/* Magnesium - This is where the error was */}
                       <FormField
                         control={form.control}
                         name="magnesium"
@@ -720,7 +721,7 @@ const LabTestsForm = ({ userId }: { userId: string }) => {
                             <FormLabel>Magnesium (as Mg) (mg/L)</FormLabel>
                             <FormControl>
                               <Input placeholder="Enter magnesium value" {...field} />
-                            FormControl>
+                            </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
