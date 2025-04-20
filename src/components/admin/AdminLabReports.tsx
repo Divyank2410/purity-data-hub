@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -104,9 +103,6 @@ export default function AdminLabReports() {
               placeholder="Search by Sample ID, Name, or Email"
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="max-w-xs border-[#7E69AB]"
-              // Fix: Using startAdornment instead of prefix or removing the icon altogether
-              // Let's use className to position the icon instead
               className="max-w-xs border-[#7E69AB] pl-9 relative"
             />
             <div className="absolute translate-x-3 translate-y-2.5 text-[#9b87f5] pointer-events-none">
