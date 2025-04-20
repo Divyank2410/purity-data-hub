@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -104,7 +103,7 @@ const LabTestsForm = ({ userId }: { userId: string }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [documentUrl, setDocumentUrl] = useState<string | null>(null);
   const [sampleImageUrl, setSampleImageUrl] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState("submitter-info");
+  const [activeTab, setActiveTab] = useState("details");
   
   const defaultValues: Partial<LabTestFormValues> = {
     sampleId: "",
@@ -237,542 +236,577 @@ const LabTestsForm = ({ userId }: { userId: string }) => {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid grid-cols-4 mb-6">
-                <TabsTrigger value="submitter-info">Submitter Information</TabsTrigger>
-                <TabsTrigger value="sample-info">Sample Information</TabsTrigger>
-                <TabsTrigger value="test-results">Test Results</TabsTrigger>
+              <TabsList className="grid grid-cols-2 mb-6">
+                <TabsTrigger value="details">Details & Results</TabsTrigger>
                 <TabsTrigger value="documents">Documents</TabsTrigger>
               </TabsList>
               
-              <TabsContent value="submitter-info" className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="submitterName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Name of Submitter</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter submitter's name" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="submitterEmail"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email Address</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter email address" type="email" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
+              {/* Unified Section: Details & Results */}
+              <TabsContent value="details" className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Submitter Information Block */}
                   <div className="col-span-1 md:col-span-2">
-                    <FormField
-                      control={form.control}
-                      name="submitterAddress"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Full Address</FormLabel>
-                          <FormControl>
-                            <Textarea 
-                              placeholder="Enter full address" 
-                              className="min-h-[80px]"
-                              {...field} 
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  
-                  <FormField
-                    control={form.control}
-                    name="submissionDate"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Date of Submission</FormLabel>
-                        <FormControl>
-                          <Input type="date" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="waterSource"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Origin Source of Water Sample</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter water source (e.g., Tap, Well, Lake)" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <div className="col-span-1 md:col-span-2">
-                    <FormLabel>Sample Image (Required)</FormLabel>
-                    <div className="bg-gray-50 border border-dashed border-gray-300 rounded-lg p-4 mt-2">
-                      <div className="flex flex-col items-center space-y-2">
-                        <Camera className="h-8 w-8 text-gray-400" />
-                        <h3 className="text-sm font-medium">Upload Sample Image</h3>
-                        <p className="text-xs text-gray-500 text-center">
-                          Upload an image of the water sample (JPEG, PNG)
-                        </p>
-                        
-                        <FileUpload
-                          onUploadComplete={handleSampleImageUpload}
-                          onFileUpload={handleSampleImageUpload}
-                          bucketName="water-mgmt-files"
-                          folderPath="lab-samples"
-                          userId={userId}
-                          fileType="sample"
-                        />
-                        
-                        {sampleImageUrl && (
-                          <div className="mt-2 text-sm text-green-600 flex items-center gap-1">
-                            <Camera className="h-4 w-4" />
-                            Sample image uploaded successfully
-                          </div>
+                    <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
+                      <span className="text-blue-500">
+                        <svg className="inline-block w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M16 21v-2a4 4 0 00-8 0v2M12 11a4 4 0 100-8 4 4 0 000 8z"/></svg>
+                      </span>
+                      Submitter Information
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Name */}
+                      <FormField
+                        control={form.control}
+                        name="submitterName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Name of Submitter</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Enter submitter's name" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
                         )}
+                      />
+                      {/* Email */}
+                      <FormField
+                        control={form.control}
+                        name="submitterEmail"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Email Address</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Enter email address" type="email" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      {/* Address */}
+                      <div className="col-span-1 md:col-span-2">
+                        <FormField
+                          control={form.control}
+                          name="submitterAddress"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Full Address</FormLabel>
+                              <FormControl>
+                                <Textarea 
+                                  placeholder="Enter full address" 
+                                  className="min-h-[80px]"
+                                  {...field} 
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                      {/* Date */}
+                      <FormField
+                        control={form.control}
+                        name="submissionDate"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Date of Submission</FormLabel>
+                            <FormControl>
+                              <Input type="date" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      {/* Water Source */}
+                      <FormField
+                        control={form.control}
+                        name="waterSource"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Origin Source of Water Sample</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Enter water source (e.g., Tap, Well, Lake)" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <div className="col-span-1 md:col-span-2 mt-4">
+                      <FormLabel>Sample Image (Required)</FormLabel>
+                      <div className="bg-gray-50 border border-dashed border-gray-300 rounded-lg p-4 mt-2">
+                        <div className="flex flex-col items-center space-y-2">
+                          <Camera className="h-8 w-8 text-gray-400" />
+                          <h3 className="text-sm font-medium">Upload Sample Image</h3>
+                          <p className="text-xs text-gray-500 text-center">
+                            Upload an image of the water sample (JPEG, PNG)
+                          </p>
+                          <FileUpload
+                            onUploadComplete={handleSampleImageUpload}
+                            onFileUpload={handleSampleImageUpload}
+                            bucketName="water-mgmt-files"
+                            folderPath="lab-samples"
+                            userId={userId}
+                            fileType="sample"
+                          />
+                          {sampleImageUrl && (
+                            <div className="mt-2 text-sm text-green-600 flex items-center gap-1">
+                              <Camera className="h-4 w-4" />
+                              Sample image uploaded successfully
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {/* Divider */}
+                  <div className="col-span-1 md:col-span-2">
+                    <div className="my-6">
+                      <div className="border-t border-gray-200" />
+                    </div>
+                  </div>
+                  {/* Sample Information Block */}
+                  <div className="col-span-1 md:col-span-2">
+                    <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
+                      <span className="text-blue-500">
+                        <svg className="inline-block w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M16 3v4"/></svg>
+                      </span>
+                      Sample Information
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Sample ID */}
+                      <FormField
+                        control={form.control}
+                        name="sampleId"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Sample ID</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Enter sample ID" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      {/* Sample Type */}
+                      <FormField
+                        control={form.control}
+                        name="sampleType"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Sample Type</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select sample type" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="raw_water">Raw Water</SelectItem>
+                                <SelectItem value="treated_water">Treated Water</SelectItem>
+                                <SelectItem value="distribution_water">Distribution Water</SelectItem>
+                                <SelectItem value="wastewater">Wastewater</SelectItem>
+                                <SelectItem value="sludge">Sludge</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      {/* Test Type */}
+                      <FormField
+                        control={form.control}
+                        name="testType"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Test Type</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select test type" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="physical">Physical Tests</SelectItem>
+                                <SelectItem value="chemical">Chemical Tests</SelectItem>
+                                <SelectItem value="microbiological">Microbiological Tests</SelectItem>
+                                <SelectItem value="comprehensive">Comprehensive Analysis</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      {/* Collection Date */}
+                      <FormField
+                        control={form.control}
+                        name="collectionDate"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Collection Date</FormLabel>
+                            <FormControl>
+                              <Input type="date" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      {/* Received Date */}
+                      <FormField
+                        control={form.control}
+                        name="receivedDate"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Received Date</FormLabel>
+                            <FormControl>
+                              <Input type="date" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      {/* Collected By */}
+                      <FormField
+                        control={form.control}
+                        name="collectedBy"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Collected By</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Enter collector's name" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      {/* Collector Name */}
+                      <FormField
+                        control={form.control}
+                        name="collectorName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Collector Name</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Enter collector's full name" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      {/* Serial No */}
+                      <FormField
+                        control={form.control}
+                        name="serialNo"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Serial Number</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Enter serial number" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      {/* Departmental Checkbox */}
+                      <FormField
+                        control={form.control}
+                        name="isDepartmental"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                            <FormControl>
+                              <Checkbox
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                              />
+                            </FormControl>
+                            <div className="space-y-1 leading-none">
+                              <FormLabel>Departmental Test</FormLabel>
+                              <p className="text-sm text-muted-foreground">
+                                Check if this is a departmental test, otherwise it's from another source
+                              </p>
+                            </div>
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </div>
+                  {/* Divider */}
+                  <div className="col-span-1 md:col-span-2">
+                    <div className="my-6">
+                      <div className="border-t border-gray-200" />
+                    </div>
+                  </div>
+                  {/* Test Results Block */}
+                  <div className="col-span-1 md:col-span-2">
+                    <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
+                      <span className="text-blue-500">
+                        <svg className="inline-block w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>
+                      </span>
+                      Test Results
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Temperature */}
+                      <FormField
+                        control={form.control}
+                        name="temperature"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Temperature (°C)</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Enter temperature" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      {/* pH */}
+                      <FormField
+                        control={form.control}
+                        name="pH"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>pH Value</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Enter pH value" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      {/* Turbidity */}
+                      <FormField
+                        control={form.control}
+                        name="turbidity"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Turbidity (NTU)</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Enter turbidity" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      {/* Dissolved Oxygen */}
+                      <FormField
+                        control={form.control}
+                        name="dissolvedOxygen"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Dissolved Oxygen (mg/L)</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Enter dissolved oxygen" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      {/* Conductivity */}
+                      <FormField
+                        control={form.control}
+                        name="conductivity"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Conductivity (µS/cm)</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Enter conductivity" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      {/* Calcium */}
+                      <FormField
+                        control={form.control}
+                        name="calcium"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Calcium (as Ca) (mg/L)</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Enter calcium value" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      {/* Chloride */}
+                      <FormField
+                        control={form.control}
+                        name="chloride"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Chloride (as Cl) (mg/L)</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Enter chloride value" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      {/* Total Coliform */}
+                      <FormField
+                        control={form.control}
+                        name="totalColiform"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Total Coliform (MPN/100ml)</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Enter total coliform" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      {/* E. coli Count */}
+                      <FormField
+                        control={form.control}
+                        name="eColiCount"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>E. coli Count (MPN/100ml)</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Enter E. coli count" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      {/* Fluoride */}
+                      <FormField
+                        control={form.control}
+                        name="fluoride"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Fluoride (as F) (mg/L)</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Enter fluoride value" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      {/* Free Residual Chlorine */}
+                      <FormField
+                        control={form.control}
+                        name="freeResidualChlorine"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Free Residual Chlorine (mg/L)</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Enter free residual chlorine" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      {/* Iron */}
+                      <FormField
+                        control={form.control}
+                        name="iron"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Iron (as Fe) (mg/L)</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Enter iron value" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      {/* Magnesium */}
+                      <FormField
+                        control={form.control}
+                        name="magnesium"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Magnesium (as Mg) (mg/L)</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Enter magnesium value" {...field} />
+                            FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      {/* Sulphate */}
+                      <FormField
+                        control={form.control}
+                        name="sulphate"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Sulphate (as SO4) (mg/L)</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Enter sulphate value" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      {/* TDS */}
+                      <FormField
+                        control={form.control}
+                        name="tds"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>TDS (mg/L)</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Enter total dissolved solids" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      {/* Total Alkalinity */}
+                      <FormField
+                        control={form.control}
+                        name="totalAlkalinity"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Total Alkalinity (as CaCO3) (mg/L)</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Enter total alkalinity" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      {/* Total Hardness */}
+                      <FormField
+                        control={form.control}
+                        name="totalHardness"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Total Hardness (as CaCO3) (mg/L)</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Enter total hardness" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      {/* Notes: Full width */}
+                      <div className="col-span-1 md:col-span-2">
+                        <FormField
+                          control={form.control}
+                          name="notes"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Additional Notes</FormLabel>
+                              <FormControl>
+                                <Textarea 
+                                  placeholder="Enter any additional observations or notes"
+                                  className="min-h-[100px]"
+                                  {...field} 
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
                       </div>
                     </div>
                   </div>
                 </div>
               </TabsContent>
               
-              <TabsContent value="sample-info" className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="sampleId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Sample ID</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter sample ID" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="sampleType"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Sample Type</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select sample type" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="raw_water">Raw Water</SelectItem>
-                            <SelectItem value="treated_water">Treated Water</SelectItem>
-                            <SelectItem value="distribution_water">Distribution Water</SelectItem>
-                            <SelectItem value="wastewater">Wastewater</SelectItem>
-                            <SelectItem value="sludge">Sludge</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="testType"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Test Type</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select test type" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="physical">Physical Tests</SelectItem>
-                            <SelectItem value="chemical">Chemical Tests</SelectItem>
-                            <SelectItem value="microbiological">Microbiological Tests</SelectItem>
-                            <SelectItem value="comprehensive">Comprehensive Analysis</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="collectionDate"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Collection Date</FormLabel>
-                        <FormControl>
-                          <Input type="date" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="receivedDate"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Received Date</FormLabel>
-                        <FormControl>
-                          <Input type="date" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="collectedBy"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Collected By</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter collector's name" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="collectorName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Collector Name</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter collector's full name" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="serialNo"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Serial Number</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter serial number" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="isDepartmental"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                        <FormControl>
-                          <Checkbox
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                        <div className="space-y-1 leading-none">
-                          <FormLabel>Departmental Test</FormLabel>
-                          <p className="text-sm text-muted-foreground">
-                            Check if this is a departmental test, otherwise it's from another source
-                          </p>
-                        </div>
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </TabsContent>
-              
-              <TabsContent value="test-results" className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="temperature"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Temperature (°C)</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter temperature" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="pH"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>pH Value</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter pH value" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="turbidity"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Turbidity (NTU)</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter turbidity" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="dissolvedOxygen"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Dissolved Oxygen (mg/L)</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter dissolved oxygen" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="conductivity"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Conductivity (µS/cm)</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter conductivity" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="calcium"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Calcium (as Ca) (mg/L)</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter calcium value" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="chloride"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Chloride (as Cl) (mg/L)</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter chloride value" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="totalColiform"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Total Coliform (MPN/100ml)</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter total coliform" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="eColiCount"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>E. coli Count (MPN/100ml)</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter E. coli count" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="fluoride"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Fluoride (as F) (mg/L)</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter fluoride value" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="freeResidualChlorine"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Free Residual Chlorine (mg/L)</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter free residual chlorine" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="iron"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Iron (as Fe) (mg/L)</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter iron value" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="magnesium"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Magnesium (as Mg) (mg/L)</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter magnesium value" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="sulphate"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Sulphate (as SO4) (mg/L)</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter sulphate value" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="tds"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>TDS (mg/L)</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter total dissolved solids" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="totalAlkalinity"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Total Alkalinity (as CaCO3) (mg/L)</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter total alkalinity" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="totalHardness"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Total Hardness (as CaCO3) (mg/L)</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter total hardness" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <div className="col-span-1 md:col-span-2">
-                    <FormField
-                      control={form.control}
-                      name="notes"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Additional Notes</FormLabel>
-                          <FormControl>
-                            <Textarea 
-                              placeholder="Enter any additional observations or notes"
-                              className="min-h-[100px]"
-                              {...field} 
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                </div>
-              </TabsContent>
-              
+              {/* Documents Section as its own tab */}
               <TabsContent value="documents" className="space-y-4">
                 <div className="space-y-4">
                   <div className="bg-gray-50 border border-dashed border-gray-300 rounded-lg p-4">
@@ -782,7 +816,6 @@ const LabTestsForm = ({ userId }: { userId: string }) => {
                       <p className="text-xs text-gray-500 text-center">
                         Upload lab reports, certificates, or any supporting documents (PDF, JPEG, PNG)
                       </p>
-                      
                       <FileUpload
                         onUploadComplete={handleDocumentUpload}
                         onFileUpload={handleDocumentUpload}
@@ -791,7 +824,6 @@ const LabTestsForm = ({ userId }: { userId: string }) => {
                         userId={userId}
                         fileType="lab"
                       />
-                      
                       {documentUrl && (
                         <div className="mt-2 text-sm text-green-600 flex items-center gap-1">
                           <FileText className="h-4 w-4" />
