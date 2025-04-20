@@ -81,6 +81,7 @@ export type Database = {
           fluoride: string | null
           free_residual_chlorine: string | null
           id: string
+          iron: string | null
           is_departmental: boolean | null
           magnesium: string | null
           notes: string | null
@@ -119,6 +120,7 @@ export type Database = {
           fluoride?: string | null
           free_residual_chlorine?: string | null
           id?: string
+          iron?: string | null
           is_departmental?: boolean | null
           magnesium?: string | null
           notes?: string | null
@@ -157,6 +159,7 @@ export type Database = {
           fluoride?: string | null
           free_residual_chlorine?: string | null
           id?: string
+          iron?: string | null
           is_departmental?: boolean | null
           magnesium?: string | null
           notes?: string | null
