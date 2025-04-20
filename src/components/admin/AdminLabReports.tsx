@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -28,6 +29,7 @@ export interface LabTest {
   ph_value: string | null;
   turbidity: string | null;
   document_url: string | null;
+  sample_image_url: string | null;
   // ...add more as desired
 }
 
@@ -56,10 +58,18 @@ export default function AdminLabReports() {
   const { data, isLoading, error } = useQuery({
     queryKey: ["lab_reports"],
     queryFn: async () => {
-      let query = supabase.from("lab_tests").select("*").order("created_at", { ascending: false });
-      // Filtering will be done client-side for now
-      const { data, error } = await query;
-      if (error) throw error;
+      console.log("Fetching lab reports data from Supabase");
+      const { data, error } = await supabase
+        .from("lab_tests")
+        .select("*")
+        .order("created_at", { ascending: false });
+      
+      if (error) {
+        console.error("Error fetching lab reports:", error);
+        throw error;
+      }
+      
+      console.log("Lab reports data retrieved:", data?.length || 0, "records");
       return data as LabTest[];
     },
   });
@@ -67,14 +77,17 @@ export default function AdminLabReports() {
   const filtered = useMemo(() => {
     if (!data) return [];
     let filtered = data;
+    
     if (search.trim()) {
+      const searchLower = search.toLowerCase();
       filtered = filtered.filter(row =>
-        row.sample_id?.toLowerCase().includes(search.toLowerCase()) ||
-        row.submitter_name?.toLowerCase().includes(search.toLowerCase()) ||
-        row.submitter_email?.toLowerCase().includes(search.toLowerCase()) ||
-        row.collected_by?.toLowerCase().includes(search.toLowerCase())
+        (row.sample_id?.toLowerCase().includes(searchLower) ||
+        row.submitter_name?.toLowerCase().includes(searchLower) ||
+        row.submitter_email?.toLowerCase().includes(searchLower) ||
+        row.collected_by?.toLowerCase().includes(searchLower))
       );
     }
+    
     if (dateRange.from || dateRange.to) {
       filtered = filtered.filter(row => {
         const testDate = new Date(row.collection_date);
@@ -83,6 +96,7 @@ export default function AdminLabReports() {
         return true;
       });
     }
+    
     return filtered;
   }, [data, search, dateRange]);
 
@@ -92,21 +106,24 @@ export default function AdminLabReports() {
       <span className="text-lg text-vividPurple">Loading lab test reports...</span>
     </div>
   );
-  if (error) return <div className="text-red-500 p-8">Failed to load: {error.message}</div>;
+  
+  if (error) return <div className="text-red-500 p-8">Failed to load: {(error as Error).message}</div>;
   
   return (
     <div>
       <Card className="mb-6 shadow-sm border-[1.5px] border-[#6E59A5] bg-[#F1F0FB]">
         <div className="flex flex-col md:flex-row md:items-end gap-4 p-4">
           <div className="flex-1 flex gap-2">
-            <Input
-              placeholder="Search by Sample ID, Name, or Email"
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              className="max-w-xs border-[#7E69AB] pl-9 relative"
-            />
-            <div className="absolute translate-x-3 translate-y-2.5 text-[#9b87f5] pointer-events-none">
-              <Search className="h-4 w-4" />
+            <div className="relative max-w-xs">
+              <Input
+                placeholder="Search by Sample ID, Name, or Email"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                className="max-w-xs border-[#7E69AB] pl-9"
+              />
+              <div className="absolute left-3 top-2.5 text-[#9b87f5] pointer-events-none">
+                <Search className="h-4 w-4" />
+              </div>
             </div>
             <DatePickerWithRange
               date={dateRange.from ? {from: dateRange.from, to: dateRange.to} : undefined}
@@ -134,6 +151,7 @@ export default function AdminLabReports() {
               <TableHead>Test Type</TableHead>
               <TableHead>pH</TableHead>
               <TableHead>Turbidity</TableHead>
+              <TableHead>Sample Image</TableHead>
               <TableHead>Document</TableHead>
               <TableHead>Download</TableHead>
             </TableRow>
@@ -141,7 +159,7 @@ export default function AdminLabReports() {
           <TableBody>
             {filtered.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={8} className="text-center text-gray-500">
+                <TableCell colSpan={9} className="text-center text-gray-500">
                   No reports found for selected filters.
                 </TableCell>
               </TableRow>
@@ -157,18 +175,30 @@ export default function AdminLabReports() {
                 <TableCell>{row.ph_value}</TableCell>
                 <TableCell>{row.turbidity}</TableCell>
                 <TableCell>
-                  <DocumentViewer documentUrl={row.document_url} buttonVariant="ghost" />
+                  {row.sample_image_url ? (
+                    <DocumentViewer documentUrl={row.sample_image_url} buttonVariant="ghost" />
+                  ) : (
+                    <span className="text-gray-400 text-xs">No image</span>
+                  )}
+                </TableCell>
+                <TableCell>
+                  {row.document_url ? (
+                    <DocumentViewer documentUrl={row.document_url} buttonVariant="ghost" />
+                  ) : (
+                    <span className="text-gray-400 text-xs">No document</span>
+                  )}
                 </TableCell>
                 <TableCell>
                   <Button
                     size="icon"
                     variant="outline"
                     onClick={() => {
-                      if (!row.document_url) {
-                        toast.error("No document attached.");
+                      const url = row.document_url || row.sample_image_url;
+                      if (!url) {
+                        toast.error("No documents attached.");
                         return;
                       }
-                      window.open(row.document_url, "_blank");
+                      window.open(url, "_blank");
                     }}
                   >
                     <Download />
