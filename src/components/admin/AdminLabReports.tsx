@@ -1,5 +1,5 @@
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table";
@@ -7,9 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DatePickerWithRange } from "@/components/ui/date-range-picker";
 import { Card } from "@/components/ui/card";
-import { Search, Download, FileText } from "lucide-react";
+import { Search, Download, FileText, RefreshCw } from "lucide-react";
 import * as XLSX from "xlsx";
-import { format } from "date-fns";
+import { format, isWithinInterval } from "date-fns";
 import { toast } from "sonner";
 
 export interface LabTest {
@@ -48,49 +48,112 @@ function downloadAsExcel(data: LabTest[]) {
     data.map(row => ({
       "Sample ID": row.sample_id,
       "Date": row.collection_date,
-      Status: row.document_url ? "Available" : "Missing",
+      "Type": row.test_type,
+      "Sample Type": row.sample_type,
+      "Collected By": row.collected_by,
+      "Submitter": row.submitter_name || "N/A",
+      "Status": row.document_url ? "Available" : "Missing",
     }))
   );
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, worksheet, "Lab Reports");
   XLSX.writeFile(workbook, "lab-reports.xlsx");
+  toast.success("Excel file downloaded successfully");
 }
 
 export default function AdminLabReports() {
   const [search, setSearch] = useState("");
   const [dateRange, setDateRange] = useState<{from: Date|undefined, to: Date|undefined}>({from: undefined, to: undefined});
 
-  const { data, isLoading, error } = useQuery({
+  // Use enabled: true to ensure the query always runs and refetchInterval for real-time updates
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["lab_reports"],
     queryFn: async () => {
+      console.log("Fetching lab reports...");
       const { data, error } = await supabase
         .from("lab_tests")
         .select("*")
         .order("created_at", { ascending: false });
-      if (error) throw error;
+      
+      if (error) {
+        console.error("Error fetching lab reports:", error);
+        throw error;
+      }
+      
+      console.log(`Fetched ${data?.length || 0} lab reports`);
       return data as LabTest[];
     },
-    refetchInterval: 9000, // Keep in sync every ~9 seconds for pseudo-realtime
+    refetchInterval: 10000, // Refresh every 10 seconds
+    staleTime: 5000, // Consider data stale after 5 seconds
+    enabled: true // Always run this query
   });
+
+  const handleRefresh = () => {
+    toast.info("Refreshing data...");
+    refetch();
+  };
+
+  useEffect(() => {
+    // Log when the component mounts or updates
+    console.log("AdminLabReports component rendered");
+    console.log("Current search:", search);
+    console.log("Current date range:", dateRange);
+    return () => {
+      console.log("AdminLabReports component unmounted");
+    };
+  }, [search, dateRange]);
 
   const filtered = useMemo(() => {
     if (!data) return [];
+    
+    console.log("Filtering lab reports...");
+    console.log("Total reports before filtering:", data.length);
+    
     let filtered = data;
+    
+    // Apply search filter
     if (search.trim()) {
       const searchLower = search.toLowerCase();
-      filtered = filtered.filter(row =>
-        row.sample_id?.toLowerCase().includes(searchLower)
-        || (row.collection_date && format(new Date(row.collection_date), "yyyy-MM-dd").includes(searchLower))
-      );
+      filtered = filtered.filter(row => {
+        const matchesSampleId = row.sample_id?.toLowerCase().includes(searchLower);
+        const matchesDate = row.collection_date && format(new Date(row.collection_date), "yyyy-MM-dd").includes(searchLower);
+        const matchesCollectedBy = row.collected_by?.toLowerCase().includes(searchLower);
+        const matchesSubmitter = row.submitter_name?.toLowerCase().includes(searchLower);
+        
+        return matchesSampleId || matchesDate || matchesCollectedBy || matchesSubmitter;
+      });
+      console.log("Reports after search filter:", filtered.length);
     }
+    
+    // Apply date range filter
     if (dateRange.from || dateRange.to) {
       filtered = filtered.filter(row => {
         const testDate = new Date(row.collection_date);
-        if (dateRange.from && testDate < dateRange.from) return false;
-        if (dateRange.to && testDate > dateRange.to) return false;
+        
+        // Handle case where only from date is provided
+        if (dateRange.from && !dateRange.to) {
+          return testDate >= dateRange.from;
+        }
+        
+        // Handle case where only to date is provided
+        if (!dateRange.from && dateRange.to) {
+          return testDate <= dateRange.to;
+        }
+        
+        // Handle case where both dates are provided
+        if (dateRange.from && dateRange.to) {
+          return isWithinInterval(testDate, { 
+            start: dateRange.from, 
+            end: dateRange.to 
+          });
+        }
+        
         return true;
       });
+      console.log("Reports after date filter:", filtered.length);
     }
+    
+    console.log("Final filtered reports count:", filtered.length);
     return filtered;
   }, [data, search, dateRange]);
 
@@ -100,13 +163,25 @@ export default function AdminLabReports() {
       <span className="text-lg text-vividPurple">Loading lab test reports...</span>
     </div>
   );
-  if (error) return <div className="text-red-500 p-8">Failed to load: {(error as Error).message}</div>;
+  
+  if (error) return (
+    <div className="text-red-500 p-8">
+      <p>Failed to load: {(error as Error).message}</p>
+      <Button 
+        variant="outline" 
+        className="mt-4"
+        onClick={() => refetch()}
+      >
+        Try Again
+      </Button>
+    </div>
+  );
 
   return (
     <div>
       <Card className="mb-6 shadow-sm border-[1.5px] border-[#6E59A5] bg-[#F1F0FB]">
         <div className="flex flex-col md:flex-row md:items-end gap-4 p-4">
-          <div className="flex-1 flex gap-2">
+          <div className="flex-1 flex flex-col md:flex-row gap-2">
             <div className="relative max-w-xs">
               <Input
                 placeholder="Search by Sample ID or Date"
@@ -123,14 +198,24 @@ export default function AdminLabReports() {
               onDateChange={d => setDateRange({from: d?.from, to: d?.to})}
             />
           </div>
-          <Button
-            variant="outline"
-            className="bg-[#9b87f5] text-white hover:bg-[#6E59A5]"
-            onClick={() => downloadAsExcel(filtered)}
-          >
-            <FileText className="mr-2" />
-            Export as Excel
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              className="bg-[#9b87f5] text-white hover:bg-[#6E59A5]"
+              onClick={() => downloadAsExcel(filtered)}
+            >
+              <FileText className="mr-2 h-4 w-4" />
+              Export as Excel
+            </Button>
+            <Button
+              variant="outline"
+              className="bg-white text-[#6E59A5] hover:bg-gray-100 border-[#6E59A5]"
+              onClick={handleRefresh}
+            >
+              <RefreshCw className="mr-2 h-4 w-4" />
+              Refresh
+            </Button>
+          </div>
         </div>
       </Card>
 
@@ -140,6 +225,9 @@ export default function AdminLabReports() {
             <TableRow>
               <TableHead>Date</TableHead>
               <TableHead>Sample ID</TableHead>
+              <TableHead>Test Type</TableHead>
+              <TableHead>Sample Type</TableHead>
+              <TableHead>Collected By</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Download Report</TableHead>
             </TableRow>
@@ -147,8 +235,21 @@ export default function AdminLabReports() {
           <TableBody>
             {filtered.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={4} className="text-center text-gray-500">
-                  No reports found for selected filters.
+                <TableCell colSpan={7} className="text-center text-gray-500 py-8">
+                  <div className="flex flex-col items-center">
+                    <p className="mb-2">No reports found for selected filters.</p>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => {
+                        setSearch('');
+                        setDateRange({from: undefined, to: undefined});
+                        refetch();
+                      }}
+                    >
+                      Clear Filters & Refresh
+                    </Button>
+                  </div>
                 </TableCell>
               </TableRow>
             ) : filtered.map(row => (
@@ -160,7 +261,16 @@ export default function AdminLabReports() {
                   {row.sample_id}
                 </TableCell>
                 <TableCell>
-                  {row.document_url
+                  {row.test_type}
+                </TableCell>
+                <TableCell>
+                  {row.sample_type}
+                </TableCell>
+                <TableCell>
+                  {row.collected_by}
+                </TableCell>
+                <TableCell>
+                  {row.document_url || row.sample_image_url
                     ? <span className="text-green-700 font-semibold">Available</span>
                     : <span className="text-gray-400">Missing</span>
                   }
@@ -170,12 +280,29 @@ export default function AdminLabReports() {
                     <Button
                       size="icon"
                       variant="outline"
-                      onClick={() => window.open(row.document_url as string, "_blank")}
+                      onClick={() => {
+                        console.log("Opening document URL:", row.document_url);
+                        window.open(row.document_url as string, "_blank");
+                      }}
                       className="text-blue-500 hover:text-blue-700 hover:bg-blue-50"
                       title="Download Full Report"
                     >
                       <Download className="h-4 w-4" />
                       <span className="sr-only">Download Report</span>
+                    </Button>
+                  ) : row.sample_image_url ? (
+                    <Button
+                      size="icon"
+                      variant="outline"
+                      onClick={() => {
+                        console.log("Opening image URL:", row.sample_image_url);
+                        window.open(row.sample_image_url as string, "_blank");
+                      }}
+                      className="text-green-500 hover:text-green-700 hover:bg-green-50"
+                      title="View Sample Image"
+                    >
+                      <FileText className="h-4 w-4" />
+                      <span className="sr-only">View Image</span>
                     </Button>
                   ) : (
                     <span className="text-xs text-gray-400">No file</span>
