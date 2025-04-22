@@ -7,12 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DatePickerWithRange } from "@/components/ui/date-range-picker";
 import { Card } from "@/components/ui/card";
-import { Search, Download, FileText, Filter, Calendar } from "lucide-react";
+import { Search, Download, FileText, Filter, Calendar, Image as ImageIcon, ExternalLink } from "lucide-react";
 import * as XLSX from "xlsx";
 import DocumentViewer from "@/components/admin/DocumentViewer";
 import { format } from "date-fns";
 import { toast } from "sonner";
-import colors from "@/styles/adminPalette.module.css"; // Hypothetical for palette
 
 export interface LabTest {
   id: string;
@@ -22,15 +21,27 @@ export interface LabTest {
   collected_by: string;
   collection_date: string;
   received_date: string;
-  submitter_name: string;
-  submitter_address: string;
-  submitter_email: string;
+  submitter_name: string | null;
+  submitter_address: string | null;
+  submitter_email: string | null;
   user_id: string;
   ph_value: string | null;
   turbidity: string | null;
   document_url: string | null;
   sample_image_url: string | null;
-  // ...add more as desired
+  // Additional fields from the database
+  temperature: string | null;
+  conductivity: string | null;
+  total_coliform: string | null;
+  e_coli_count: string | null;
+  tds: string | null;
+  calcium: string | null;
+  chloride: string | null;
+  fluoride: string | null;
+  iron: string | null;
+  magnesium: string | null;
+  total_alkalinity: string | null;
+  total_hardness: string | null;
 }
 
 function downloadAsExcel(data: LabTest[]) {
@@ -70,6 +81,10 @@ export default function AdminLabReports() {
       }
       
       console.log("Lab reports data retrieved:", data?.length || 0, "records");
+      if (data && data.length > 0) {
+        console.log("Sample record:", data[0]);
+      }
+      
       return data as LabTest[];
     },
   });
@@ -152,8 +167,8 @@ export default function AdminLabReports() {
               <TableHead>pH</TableHead>
               <TableHead>Turbidity</TableHead>
               <TableHead>Sample Image</TableHead>
-              <TableHead>Document</TableHead>
-              <TableHead>Download</TableHead>
+              <TableHead>Report Document</TableHead>
+              <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -189,21 +204,69 @@ export default function AdminLabReports() {
                   )}
                 </TableCell>
                 <TableCell>
-                  <Button
-                    size="icon"
-                    variant="outline"
-                    onClick={() => {
-                      const url = row.document_url || row.sample_image_url;
-                      if (!url) {
-                        toast.error("No documents attached.");
-                        return;
-                      }
-                      window.open(url, "_blank");
-                    }}
-                  >
-                    <Download />
-                    <span className="sr-only">Download</span>
-                  </Button>
+                  <div className="flex space-x-2">
+                    {row.sample_image_url && (
+                      <Button
+                        size="icon"
+                        variant="outline"
+                        onClick={() => {
+                          if (row.sample_image_url) {
+                            window.open(row.sample_image_url, "_blank");
+                          } else {
+                            toast.error("No sample image available");
+                          }
+                        }}
+                        className="text-blue-500 hover:text-blue-700 hover:bg-blue-50"
+                        title="View Sample Image"
+                      >
+                        <ImageIcon className="h-4 w-4" />
+                        <span className="sr-only">View Sample Image</span>
+                      </Button>
+                    )}
+                    
+                    {row.document_url && (
+                      <Button
+                        size="icon"
+                        variant="outline"
+                        onClick={() => {
+                          if (row.document_url) {
+                            window.open(row.document_url, "_blank");
+                          } else {
+                            toast.error("No report document available");
+                          }
+                        }}
+                        className="text-green-500 hover:text-green-700 hover:bg-green-50"
+                        title="Download Report"
+                      >
+                        <Download className="h-4 w-4" />
+                        <span className="sr-only">Download Report</span>
+                      </Button>
+                    )}
+
+                    <Button
+                      size="icon"
+                      variant="outline"
+                      onClick={() => {
+                        toast.info(
+                          <div className="space-y-2">
+                            <p className="font-medium">Lab Test Details</p>
+                            <p><span className="font-semibold">Sample ID:</span> {row.sample_id}</p>
+                            <p><span className="font-semibold">Type:</span> {row.test_type}</p>
+                            <p><span className="font-semibold">pH:</span> {row.ph_value || "N/A"}</p>
+                            <p><span className="font-semibold">Turbidity:</span> {row.turbidity || "N/A"}</p>
+                            <p><span className="font-semibold">Temperature:</span> {row.temperature || "N/A"}</p>
+                            <p><span className="font-semibold">TDS:</span> {row.tds || "N/A"}</p>
+                            <p><span className="font-semibold">Conductivity:</span> {row.conductivity || "N/A"}</p>
+                          </div>
+                        , { duration: 5000 });
+                      }}
+                      className="text-purple-500 hover:text-purple-700 hover:bg-purple-50"
+                      title="View Details"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                      <span className="sr-only">View Details</span>
+                    </Button>
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
