@@ -7,9 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DatePickerWithRange } from "@/components/ui/date-range-picker";
 import { Card } from "@/components/ui/card";
-import { Search, Download, FileText, Filter, Calendar, Image as ImageIcon, ExternalLink } from "lucide-react";
+import { Search, Download, FileText } from "lucide-react";
 import * as XLSX from "xlsx";
-import DocumentViewer from "@/components/admin/DocumentViewer";
 import { format } from "date-fns";
 import { toast } from "sonner";
 
@@ -29,7 +28,7 @@ export interface LabTest {
   turbidity: string | null;
   document_url: string | null;
   sample_image_url: string | null;
-  // Additional fields from the database
+  // Additional fields
   temperature: string | null;
   conductivity: string | null;
   total_coliform: string | null;
@@ -45,18 +44,13 @@ export interface LabTest {
 }
 
 function downloadAsExcel(data: LabTest[]) {
-  const worksheet = XLSX.utils.json_to_sheet(data.map(row => ({
-    "Sample ID": row.sample_id,
-    "Sample Type": row.sample_type,
-    "Test Type": row.test_type,
-    "Collected By": row.collected_by,
-    "Collection Date": row.collection_date,
-    "Submitter Name": row.submitter_name,
-    "Submitter Email": row.submitter_email,
-    "pH Value": row.ph_value,
-    "Turbidity": row.turbidity,
-    // Add any more fields you want exported
-  })));
+  const worksheet = XLSX.utils.json_to_sheet(
+    data.map(row => ({
+      "Sample ID": row.sample_id,
+      "Date": row.collection_date,
+      Status: row.document_url ? "Available" : "Missing",
+    }))
+  );
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, worksheet, "Lab Reports");
   XLSX.writeFile(workbook, "lab-reports.xlsx");
@@ -69,40 +63,26 @@ export default function AdminLabReports() {
   const { data, isLoading, error } = useQuery({
     queryKey: ["lab_reports"],
     queryFn: async () => {
-      console.log("Fetching lab reports data from Supabase");
       const { data, error } = await supabase
         .from("lab_tests")
         .select("*")
         .order("created_at", { ascending: false });
-      
-      if (error) {
-        console.error("Error fetching lab reports:", error);
-        throw error;
-      }
-      
-      console.log("Lab reports data retrieved:", data?.length || 0, "records");
-      if (data && data.length > 0) {
-        console.log("Sample record:", data[0]);
-      }
-      
+      if (error) throw error;
       return data as LabTest[];
     },
+    refetchInterval: 9000, // Keep in sync every ~9 seconds for pseudo-realtime
   });
 
   const filtered = useMemo(() => {
     if (!data) return [];
     let filtered = data;
-    
     if (search.trim()) {
       const searchLower = search.toLowerCase();
       filtered = filtered.filter(row =>
-        (row.sample_id?.toLowerCase().includes(searchLower) ||
-        row.submitter_name?.toLowerCase().includes(searchLower) ||
-        row.submitter_email?.toLowerCase().includes(searchLower) ||
-        row.collected_by?.toLowerCase().includes(searchLower))
+        row.sample_id?.toLowerCase().includes(searchLower)
+        || (row.collection_date && format(new Date(row.collection_date), "yyyy-MM-dd").includes(searchLower))
       );
     }
-    
     if (dateRange.from || dateRange.to) {
       filtered = filtered.filter(row => {
         const testDate = new Date(row.collection_date);
@@ -111,7 +91,6 @@ export default function AdminLabReports() {
         return true;
       });
     }
-    
     return filtered;
   }, [data, search, dateRange]);
 
@@ -121,9 +100,8 @@ export default function AdminLabReports() {
       <span className="text-lg text-vividPurple">Loading lab test reports...</span>
     </div>
   );
-  
   if (error) return <div className="text-red-500 p-8">Failed to load: {(error as Error).message}</div>;
-  
+
   return (
     <div>
       <Card className="mb-6 shadow-sm border-[1.5px] border-[#6E59A5] bg-[#F1F0FB]">
@@ -131,7 +109,7 @@ export default function AdminLabReports() {
           <div className="flex-1 flex gap-2">
             <div className="relative max-w-xs">
               <Input
-                placeholder="Search by Sample ID, Name, or Email"
+                placeholder="Search by Sample ID or Date"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 className="max-w-xs border-[#7E69AB] pl-9"
@@ -160,113 +138,48 @@ export default function AdminLabReports() {
         <Table>
           <TableHeader className="bg-[#9b87f5]/10 text-[#6E59A5]">
             <TableRow>
+              <TableHead>Date</TableHead>
               <TableHead>Sample ID</TableHead>
-              <TableHead>Collection Date</TableHead>
-              <TableHead>Submitter</TableHead>
-              <TableHead>Test Type</TableHead>
-              <TableHead>pH</TableHead>
-              <TableHead>Turbidity</TableHead>
-              <TableHead>Sample Image</TableHead>
-              <TableHead>Report Document</TableHead>
-              <TableHead>Actions</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Download Report</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filtered.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={9} className="text-center text-gray-500">
+                <TableCell colSpan={4} className="text-center text-gray-500">
                   No reports found for selected filters.
                 </TableCell>
               </TableRow>
             ) : filtered.map(row => (
               <TableRow key={row.id} className="hover:bg-[#F1F0FB] group">
-                <TableCell className="font-mono font-semibold text-[#7E69AB]">{row.sample_id}</TableCell>
-                <TableCell>{row.collection_date ? format(new Date(row.collection_date), "LLL dd, yyyy") : ""}</TableCell>
                 <TableCell>
-                  <div className="font-semibold">{row.submitter_name || row.collected_by}</div>
-                  <div className="text-xs text-gray-400">{row.submitter_email}</div>
+                  {row.collection_date ? format(new Date(row.collection_date), "LLL dd, yyyy") : ""}
                 </TableCell>
-                <TableCell>{row.test_type}</TableCell>
-                <TableCell>{row.ph_value}</TableCell>
-                <TableCell>{row.turbidity}</TableCell>
+                <TableCell className="font-mono font-semibold text-[#7E69AB]">
+                  {row.sample_id}
+                </TableCell>
                 <TableCell>
-                  {row.sample_image_url ? (
-                    <DocumentViewer documentUrl={row.sample_image_url} buttonVariant="ghost" />
-                  ) : (
-                    <span className="text-gray-400 text-xs">No image</span>
-                  )}
+                  {row.document_url
+                    ? <span className="text-green-700 font-semibold">Available</span>
+                    : <span className="text-gray-400">Missing</span>
+                  }
                 </TableCell>
                 <TableCell>
                   {row.document_url ? (
-                    <DocumentViewer documentUrl={row.document_url} buttonVariant="ghost" />
-                  ) : (
-                    <span className="text-gray-400 text-xs">No document</span>
-                  )}
-                </TableCell>
-                <TableCell>
-                  <div className="flex space-x-2">
-                    {row.sample_image_url && (
-                      <Button
-                        size="icon"
-                        variant="outline"
-                        onClick={() => {
-                          if (row.sample_image_url) {
-                            window.open(row.sample_image_url, "_blank");
-                          } else {
-                            toast.error("No sample image available");
-                          }
-                        }}
-                        className="text-blue-500 hover:text-blue-700 hover:bg-blue-50"
-                        title="View Sample Image"
-                      >
-                        <ImageIcon className="h-4 w-4" />
-                        <span className="sr-only">View Sample Image</span>
-                      </Button>
-                    )}
-                    
-                    {row.document_url && (
-                      <Button
-                        size="icon"
-                        variant="outline"
-                        onClick={() => {
-                          if (row.document_url) {
-                            window.open(row.document_url, "_blank");
-                          } else {
-                            toast.error("No report document available");
-                          }
-                        }}
-                        className="text-green-500 hover:text-green-700 hover:bg-green-50"
-                        title="Download Report"
-                      >
-                        <Download className="h-4 w-4" />
-                        <span className="sr-only">Download Report</span>
-                      </Button>
-                    )}
-
                     <Button
                       size="icon"
                       variant="outline"
-                      onClick={() => {
-                        toast.info(
-                          <div className="space-y-2">
-                            <p className="font-medium">Lab Test Details</p>
-                            <p><span className="font-semibold">Sample ID:</span> {row.sample_id}</p>
-                            <p><span className="font-semibold">Type:</span> {row.test_type}</p>
-                            <p><span className="font-semibold">pH:</span> {row.ph_value || "N/A"}</p>
-                            <p><span className="font-semibold">Turbidity:</span> {row.turbidity || "N/A"}</p>
-                            <p><span className="font-semibold">Temperature:</span> {row.temperature || "N/A"}</p>
-                            <p><span className="font-semibold">TDS:</span> {row.tds || "N/A"}</p>
-                            <p><span className="font-semibold">Conductivity:</span> {row.conductivity || "N/A"}</p>
-                          </div>
-                        , { duration: 5000 });
-                      }}
-                      className="text-purple-500 hover:text-purple-700 hover:bg-purple-50"
-                      title="View Details"
+                      onClick={() => window.open(row.document_url as string, "_blank")}
+                      className="text-blue-500 hover:text-blue-700 hover:bg-blue-50"
+                      title="Download Full Report"
                     >
-                      <ExternalLink className="h-4 w-4" />
-                      <span className="sr-only">View Details</span>
+                      <Download className="h-4 w-4" />
+                      <span className="sr-only">Download Report</span>
                     </Button>
-                  </div>
+                  ) : (
+                    <span className="text-xs text-gray-400">No file</span>
+                  )}
                 </TableCell>
               </TableRow>
             ))}
