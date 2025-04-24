@@ -1,43 +1,15 @@
-
 import React, { useState, useEffect } from "react";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  ReferenceLine,
-} from "recharts";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ReferenceLine } from "recharts";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { RefreshCw } from "lucide-react";
+import { ParameterValue } from "@/components/ui/parameter-value";
+import { sewerLimits } from "@/utils/parameterLimits";
 
 interface SewerQualityChartProps {
   plantName: string;
   inletWaterData: any;
   outletWaterData: any;
 }
-
-// Define parameter limits for sewer water
-const parameterLimits = {
-  tss: { min: 0, max: 100, unit: "mg/L" },
-  ph_value: { min: 6.0, max: 9.0, unit: "pH" },
-  cod: { min: 0, max: 120, unit: "mg/L" },
-  bod: { min: 0, max: 30, unit: "mg/L" },
-  ammonical_nitrogen: { min: 0, max: 50, unit: "mg/L" },
-  total_nitrogen: { min: 0, max: 100, unit: "mg/L" },
-  total_phosphorus: { min: 0, max: 5, unit: "mg/L" },
-  fecal_coliform: { min: 0, max: 1000, unit: "MPN/100mL" },
-};
 
 const SewerQualityChart: React.FC<SewerQualityChartProps> = ({
   plantName,
@@ -74,65 +46,65 @@ const SewerQualityChart: React.FC<SewerQualityChartProps> = ({
       name: "TSS",
       inlet: inletWaterData?.tss ? parseFloat(inletWaterData.tss) : 0,
       outlet: outletWaterData?.tss ? parseFloat(outletWaterData.tss) : 0,
-      min: parameterLimits.tss.min,
-      max: parameterLimits.tss.max,
-      unit: parameterLimits.tss.unit,
+      min: sewerLimits.tss.min,
+      max: sewerLimits.tss.max,
+      unit: sewerLimits.tss.unit,
     },
     {
       name: "pH Value",
       inlet: inletWaterData?.ph_value ? parseFloat(inletWaterData.ph_value) : 0,
       outlet: outletWaterData?.ph_value ? parseFloat(outletWaterData.ph_value) : 0,
-      min: parameterLimits.ph_value.min, 
-      max: parameterLimits.ph_value.max,
-      unit: parameterLimits.ph_value.unit,
+      min: sewerLimits.ph_value.min,
+      max: sewerLimits.ph_value.max,
+      unit: sewerLimits.ph_value.unit,
     },
     {
       name: "COD",
       inlet: inletWaterData?.cod ? parseFloat(inletWaterData.cod) : 0,
       outlet: outletWaterData?.cod ? parseFloat(outletWaterData.cod) : 0,
-      min: parameterLimits.cod.min,
-      max: parameterLimits.cod.max,
-      unit: parameterLimits.cod.unit,
+      min: sewerLimits.cod.min,
+      max: sewerLimits.cod.max,
+      unit: sewerLimits.cod.unit,
     },
     {
       name: "BOD",
       inlet: inletWaterData?.bod ? parseFloat(inletWaterData.bod) : 0,
       outlet: outletWaterData?.bod ? parseFloat(outletWaterData.bod) : 0,
-      min: parameterLimits.bod.min,
-      max: parameterLimits.bod.max,
-      unit: parameterLimits.bod.unit,
+      min: sewerLimits.bod.min,
+      max: sewerLimits.bod.max,
+      unit: sewerLimits.bod.unit,
     },
     {
       name: "Ammonical Nitrogen",
       inlet: inletWaterData?.ammonical_nitrogen ? parseFloat(inletWaterData.ammonical_nitrogen) : 0,
       outlet: outletWaterData?.ammonical_nitrogen ? parseFloat(outletWaterData.ammonical_nitrogen) : 0,
-      min: parameterLimits.ammonical_nitrogen.min,
-      max: parameterLimits.ammonical_nitrogen.max,
-      unit: parameterLimits.ammonical_nitrogen.unit,
+      min: sewerLimits.ammonical_nitrogen.min,
+      max: sewerLimits.ammonical_nitrogen.max,
+      unit: sewerLimits.ammonical_nitrogen.unit,
     },
     {
       name: "Total Nitrogen",
       inlet: inletWaterData?.total_nitrogen ? parseFloat(inletWaterData.total_nitrogen) : 0,
       outlet: outletWaterData?.total_nitrogen ? parseFloat(outletWaterData.total_nitrogen) : 0,
-      min: parameterLimits.total_nitrogen.min,
-      max: parameterLimits.total_nitrogen.max,
-      unit: parameterLimits.total_nitrogen.unit,
+      min: sewerLimits.total_nitrogen.min,
+      max: sewerLimits.total_nitrogen.max,
+      unit: sewerLimits.total_nitrogen.unit,
     },
     {
       name: "Total Phosphorus",
       inlet: inletWaterData?.total_phosphorus ? parseFloat(inletWaterData.total_phosphorus) : 0,
       outlet: outletWaterData?.total_phosphorus ? parseFloat(outletWaterData.total_phosphorus) : 0,
-      min: parameterLimits.total_phosphorus.min,
-      max: parameterLimits.total_phosphorus.max,
-      unit: parameterLimits.total_phosphorus.unit,
+      min: sewerLimits.total_phosphorus.min,
+      max: sewerLimits.total_phosphorus.max,
+      unit: sewerLimits.total_phosphorus.unit,
     },
     {
       name: "Fecal Coliform",
       inlet: inletWaterData?.fecal_coliform ? parseFloat(inletWaterData.fecal_coliform) : 0,
       outlet: outletWaterData?.fecal_coliform ? parseFloat(outletWaterData.fecal_coliform) : 0,
-      min: parameterLimits.fecal_coliform.min,
-      max: parameterLimits.fecal_coliform.max,
-      unit: parameterLimits.fecal_coliform.unit,
+      min: sewerLimits.fecal_coliform.min,
+      max: sewerLimits.fecal_coliform.max,
+      unit: sewerLimits.fecal_coliform.unit,
     },
   ];
 
@@ -204,71 +176,131 @@ const SewerQualityChart: React.FC<SewerQualityChartProps> = ({
       </CardHeader>
       <CardContent>
         <div className="h-[300px]">
-          <ChartContainer
-            config={chartConfig}
-            className="w-full"
-          >
-            <BarChart
-              data={chartData}
-              margin={{
-                top: 20,
-                right: 30,
-                left: 20,
-                bottom: 70,
-              }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" angle={-45} textAnchor="end" height={70} />
-              <YAxis />
-              <Tooltip content={<CustomTooltip />} />
-              <Legend wrapperStyle={{ bottom: 0 }} />
-              {/* Add reference lines for min and max values */}
-              <ReferenceLine 
-                y={9.0} 
-                label={{ value: "Max pH", position: 'insideTopRight' }} 
-                stroke="#ea384c"
-                strokeDasharray="3 3" 
-                strokeWidth={1.5}
-                ifOverflow="extendDomain"
-                isFront={true}
-              />
-              <ReferenceLine 
-                y={6.0} 
-                label={{ value: "Min pH", position: 'insideBottomRight' }} 
-                stroke="#0ea5e9" 
-                strokeDasharray="3 3"
-                strokeWidth={1.5}
-                ifOverflow="extendDomain"
-                isFront={true}
-              />
-              <Bar 
-                dataKey="inlet" 
-                fill="var(--color-inlet)" 
-                name="Inlet Water" 
-                animationBegin={0}
-                animationDuration={2000}
-                animationEasing="ease-in-out"
-                isAnimationActive={animate}
-              />
-              <Bar 
-                dataKey="outlet" 
-                fill="var(--color-outlet)" 
-                name="Outlet Water" 
-                animationBegin={300}
-                animationDuration={2000}
-                animationEasing="ease-in-out"
-                isAnimationActive={animate}
-              />
-            </BarChart>
-          </ChartContainer>
-        </div>
+          
+          
+            
+              
+                
+                  
+                    
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    
+                                      
+                                        
+                                          
+                                            
+                                              
+                                                
+                                                  
+                                                    
+                                                      
+                                                        
+                                                          
+                                                            
+                                                              
+                                                                
+                                                                  
+                                                                    
+                                                                      
+                                                                        
+                                                                          
+                                                                            
+                                                                              
+                                                                                
+                                                                                  
+                                                                                    
+                                                                                      
+                                                                                        
+                                                                                          
+                                                                                            
+                                                                                              
+                                                                                                
+                                                                                                  
+                                                                                                    
+                                                                                                      
+                                                                                                        
+                                                                                                          
+                                                                                                            
+                                                                                                              
+                                                                                                                
+                                                                                                                  
+                                                                                                                    
+                                                                                                                      
+                                                                                                                        
+                                                                                                                          
+                                                                                                                            
+                                                                                                
+                                                                                              
+                                                                                            
+                                                                                          
+                                                                                        
+                                                                                      
+                                                                                    
+                                                                                  
+                                                                                
+                                                                              
+                                                                            
+                                                                          
+                                                                        
+                                                                      
+                                                                    
+                                                                  
+                                                                
+                                                              
+                                                            
+                                                          
+                                                        
+                                                      
+                                                    
+                                                  
+                                                
+                                              
+                                            
+                                          
+                                        
+                                      
+                                    
+                                  
+                                
+                              
+                            
+                          
+                        
+                      
+                    
+                  
+                
+              
+            
+          
+        
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mt-4 text-xs">
           {chartData.map((param) => (
             <div key={param.name} className="border rounded p-2">
-              <div className="font-medium mb-1">{param.name}</div>
-              <div className="grid grid-cols-2 gap-1">
-                <div className="text-gray-600">Min: <span className="text-blue-600 font-medium">{param.min} {param.unit}</span></div>
-                <div className="text-gray-600">Max: <span className="text-red-600 font-medium">{param.max} {param.unit}</span></div>
+              <div className="font-medium mb-2">{param.name}</div>
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Inlet:</span>
+                  <ParameterValue
+                    value={inletWaterData?.[param.name.toLowerCase().replace(' ', '_')] || null}
+                    limit={sewerLimits[param.name.toLowerCase().replace(' ', '_')]}
+                    label={`Inlet water ${param.name}`}
+                  />
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Outlet:</span>
+                  <ParameterValue
+                    value={outletWaterData?.[param.name.toLowerCase().replace(' ', '_')] || null}
+                    limit={sewerLimits[param.name.toLowerCase().replace(' ', '_')]}
+                    label={`Outlet water ${param.name}`}
+                  />
+                </div>
               </div>
             </div>
           ))}

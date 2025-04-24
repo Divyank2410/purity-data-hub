@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -114,50 +113,7 @@ const AdminAmritData = () => {
         </CardHeader>
         <CardContent>
           <div className="rounded-md border overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Customer Name</TableHead>
-                  <TableHead>Mobile No.</TableHead>
-                  <TableHead>Ward No.</TableHead>
-                  <TableHead>Connection No.</TableHead>
-                  <TableHead>pH Value</TableHead>
-                  <TableHead>TDS</TableHead>
-                  <TableHead>Color</TableHead>
-                  <TableHead>Smell</TableHead>
-                  <TableHead>Conductivity</TableHead>
-                  <TableHead>Document</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {amritData?.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={11} className="text-center h-24">
-                      No records found
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  amritData?.map((record) => (
-                    <TableRow key={record.id}>
-                      <TableCell>{new Date(record.date).toLocaleDateString()}</TableCell>
-                      <TableCell>{record.customer_name}</TableCell>
-                      <TableCell>{record.mobile_no}</TableCell>
-                      <TableCell>{record.ward_no}</TableCell>
-                      <TableCell>{record.connection_number}</TableCell>
-                      <TableCell>{record.ph_value || "-"}</TableCell>
-                      <TableCell>{record.tds || "-"}</TableCell>
-                      <TableCell>{record.color || "-"}</TableCell>
-                      <TableCell>{record.smell || "-"}</TableCell>
-                      <TableCell>{record.conductivity_cl || "-"}</TableCell>
-                      <TableCell>
-                        <DocumentViewer documentUrl={record.document_url} />
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
+            <AmritDataTable data={amritData || []} isLoading={isLoading} />
           </div>
         </CardContent>
       </Card>
@@ -166,3 +122,52 @@ const AdminAmritData = () => {
 };
 
 export default AdminAmritData;
+
+const AmritDataTable = ({ data, isLoading }) => {
+  return (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Date</TableHead>
+          <TableHead>Customer Name</TableHead>
+          <TableHead>Mobile No.</TableHead>
+          <TableHead>Ward No.</TableHead>
+          <TableHead>Connection No.</TableHead>
+          <TableHead>pH Value</TableHead>
+          <TableHead>TDS</TableHead>
+          <TableHead>Color</TableHead>
+          <TableHead>Smell</TableHead>
+          <TableHead>Conductivity</TableHead>
+          <TableHead>Document</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {data?.length === 0 ? (
+          <TableRow>
+            <TableCell colSpan={11} className="text-center h-24">
+              No records found
+            </TableCell>
+          </TableRow>
+        ) : (
+          data?.map((record) => (
+            <TableRow key={record.id}>
+              <TableCell>{new Date(record.date).toLocaleDateString()}</TableCell>
+              <TableCell>{record.customer_name}</TableCell>
+              <TableCell>{record.mobile_no}</TableCell>
+              <TableCell>{record.ward_no}</TableCell>
+              <TableCell>{record.connection_number}</TableCell>
+              <TableCell>{record.ph_value || "-"}</TableCell>
+              <TableCell>{record.tds || "-"}</TableCell>
+              <TableCell>{record.color || "-"}</TableCell>
+              <TableCell>{record.smell || "-"}</TableCell>
+              <TableCell>{record.conductivity_cl || "-"}</TableCell>
+              <TableCell>
+                <DocumentViewer documentUrl={record.document_url} />
+              </TableCell>
+            </TableRow>
+          ))
+        )}
+      </TableBody>
+    </Table>
+  );
+};
