@@ -177,108 +177,40 @@ const SewerQualityChart: React.FC<SewerQualityChartProps> = ({
       <CardContent>
         <div className="h-[300px]">
           
+            <BarChart
+              width={700}
+              height={300}
+              data={chartData}
+              margin={{
+                top: 20,
+                right: 30,
+                left: 20,
+                bottom: 5,
+              }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip content={<CustomTooltip />} />
+              <Legend />
+              <ReferenceLine yAxisId="left" y={6} stroke="green" strokeDasharray="3 3" />
+              <Bar
+                yAxisId="left"
+                dataKey="inlet"
+                fill={chartConfig.inlet.theme.light}
+                name={chartConfig.inlet.label}
+                className={animate ? "animate-fadeIn" : ""}
+              />
+              <Bar
+                yAxisId="left"
+                dataKey="outlet"
+                fill={chartConfig.outlet.theme.light}
+                name={chartConfig.outlet.label}
+                className={animate ? "animate-fadeIn" : ""}
+              />
+            </BarChart>
           
-            
-              
-                
-                  
-                    
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    
-                                      
-                                        
-                                          
-                                            
-                                              
-                                                
-                                                  
-                                                    
-                                                      
-                                                        
-                                                          
-                                                            
-                                                              
-                                                                
-                                                                  
-                                                                    
-                                                                      
-                                                                        
-                                                                          
-                                                                            
-                                                                              
-                                                                                
-                                                                                  
-                                                                                    
-                                                                                      
-                                                                                        
-                                                                                          
-                                                                                            
-                                                                                              
-                                                                                                
-                                                                                                  
-                                                                                                    
-                                                                                                      
-                                                                                                        
-                                                                                                          
-                                                                                                            
-                                                                                                              
-                                                                                                                
-                                                                                                                  
-                                                                                                                    
-                                                                                                                      
-                                                                                                                        
-                                                                                                                          
-                                                                                                                            
-                                                                                                
-                                                                                              
-                                                                                            
-                                                                                          
-                                                                                        
-                                                                                      
-                                                                                    
-                                                                                  
-                                                                                
-                                                                              
-                                                                            
-                                                                          
-                                                                        
-                                                                      
-                                                                    
-                                                                  
-                                                                
-                                                              
-                                                            
-                                                          
-                                                        
-                                                      
-                                                    
-                                                  
-                                                
-                                              
-                                            
-                                          
-                                        
-                                      
-                                    
-                                  
-                                
-                              
-                            
-                          
-                        
-                      
-                    
-                  
-                
-              
-            
-          
+        </div>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mt-4 text-xs">
           {chartData.map((param) => (
