@@ -1,4 +1,3 @@
-
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -9,15 +8,12 @@ import { Button } from "@/components/ui/button";
 import WaterQualityForm from "@/components/forms/WaterQualityForm";
 import SewerQualityForm from "@/components/forms/SewerQualityForm";
 import AmritYojnaForm from "@/components/forms/AmritYojnaForm";
-import LabTestsForm from "@/components/forms/LabTestsForm";
-import { FlaskConical } from "lucide-react";
 
 const UserDashboard = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Use useCallback to prevent recreation on each render
   const checkUser = useCallback(async () => {
     try {
       const { data, error } = await supabase.auth.getSession();
@@ -40,7 +36,6 @@ const UserDashboard = () => {
   }, [navigate]);
 
   useEffect(() => {
-    // Check storage bucket exists on component mount
     const checkStorage = async () => {
       try {
         const { data: bucketExists } = await supabase.storage.getBucket('water-mgmt-files');
@@ -123,14 +118,10 @@ const UserDashboard = () => {
       </Card>
 
       <Tabs defaultValue="water-quality" className="w-full">
-        <TabsList className="grid grid-cols-4 mb-8">
+        <TabsList className="grid grid-cols-3 mb-8">
           <TabsTrigger value="water-quality">Water Quality Data</TabsTrigger>
           <TabsTrigger value="sewer-quality">Sewer Quality Data</TabsTrigger>
           <TabsTrigger value="amrit-yojna">Amrit Yojna Data</TabsTrigger>
-          <TabsTrigger value="lab-tests" className="flex items-center gap-1">
-            <FlaskConical className="h-4 w-4" />
-            <span>Lab Tests</span>
-          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="water-quality">
@@ -143,10 +134,6 @@ const UserDashboard = () => {
 
         <TabsContent value="amrit-yojna">
           <AmritYojnaForm userId={user?.id} />
-        </TabsContent>
-
-        <TabsContent value="lab-tests">
-          <LabTestsForm userId={user?.id} />
         </TabsContent>
       </Tabs>
     </div>
