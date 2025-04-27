@@ -30,7 +30,7 @@ const AdminLabTestReports = () => {
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
 
   // Fetch lab test data
-  const { data: labTests = [], isLoading } = useQuery({
+  const { data: labTests = [], isLoading, refetch } = useQuery({
     queryKey: [LAB_TESTS_QUERY_KEY],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -184,7 +184,11 @@ const AdminLabTestReports = () => {
                         onClick={() => handleDelete(test.id)}
                         disabled={isDeleting === test.id}
                       >
-                        <Trash2 className="h-4 w-4 text-red-500" />
+                        {isDeleting === test.id ? (
+                          <div className="h-4 w-4 animate-spin rounded-full border-2 border-b-transparent" />
+                        ) : (
+                          <Trash2 className="h-4 w-4 text-red-500" />
+                        )}
                       </Button>
                     </TableCell>
                   </TableRow>
