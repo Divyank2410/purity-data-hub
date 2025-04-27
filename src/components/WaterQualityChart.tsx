@@ -1,9 +1,11 @@
+
 import React, { useState, useEffect } from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ReferenceLine } from "recharts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { RefreshCw } from "lucide-react";
 import { ParameterValue } from "@/components/ui/parameter-value";
 import { waterLimits } from "@/utils/parameterLimits";
+import { ChartContainer } from "@/components/ui/chart";
 
 interface WaterQualityChartProps {
   plantName: string;
@@ -219,6 +221,7 @@ const WaterQualityChart: React.FC<WaterQualityChartProps> = ({
             </BarChart>
           </ChartContainer>
         </div>
+        
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mt-4 text-xs">
           {chartData.map((param) => (
             <div key={param.name} className="border rounded p-2">
