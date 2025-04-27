@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import AdminWaterData from "@/components/admin/AdminWaterData";
 import AdminSewerData from "@/components/admin/AdminSewerData";
 import AdminAmritData from "@/components/admin/AdminAmritData";
+import AdminLabTestReports from "@/components/admin/AdminLabTestReports";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 
@@ -101,10 +102,11 @@ const AdminDashboard = () => {
       </Card>
 
       <Tabs defaultValue="water-data" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 mb-8">
+        <TabsList className="grid w-full grid-cols-4 mb-8">
           <TabsTrigger value="water-data">Water Treatment Data</TabsTrigger>
           <TabsTrigger value="sewer-data">Sewer Treatment Data</TabsTrigger>
           <TabsTrigger value="amrit-data">Amrit Yojna Data</TabsTrigger>
+          <TabsTrigger value="lab-test-reports">Lab Test Reports</TabsTrigger>
         </TabsList>
 
         <TabsContent value="water-data">
@@ -118,10 +120,13 @@ const AdminDashboard = () => {
         <TabsContent value="amrit-data">
           <AdminAmritData />
         </TabsContent>
+
+        <TabsContent value="lab-test-reports">
+          <AdminLabTestReports />
+        </TabsContent>
       </Tabs>
     </div>
   );
 };
 
 export default AdminDashboard;
-
