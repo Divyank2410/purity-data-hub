@@ -66,6 +66,90 @@ export type Database = {
         }
         Relationships: []
       }
+      lab_tests: {
+        Row: {
+          calcium: string | null
+          chloride: string | null
+          created_at: string | null
+          e_coli: string | null
+          fluoride: string | null
+          free_residual_chlorine: string | null
+          id: string
+          iron: string | null
+          magnesium: string | null
+          notes: string | null
+          ph: string | null
+          sample_id: string
+          sample_image_url: string
+          submitter_address: string
+          submitter_email: string
+          submitter_mobile: string
+          submitter_name: string
+          sulphate: string | null
+          tds: string | null
+          total_alkalinity: string | null
+          total_coliform: string | null
+          total_hardness: string | null
+          turbidity: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          calcium?: string | null
+          chloride?: string | null
+          created_at?: string | null
+          e_coli?: string | null
+          fluoride?: string | null
+          free_residual_chlorine?: string | null
+          id?: string
+          iron?: string | null
+          magnesium?: string | null
+          notes?: string | null
+          ph?: string | null
+          sample_id: string
+          sample_image_url: string
+          submitter_address: string
+          submitter_email: string
+          submitter_mobile: string
+          submitter_name: string
+          sulphate?: string | null
+          tds?: string | null
+          total_alkalinity?: string | null
+          total_coliform?: string | null
+          total_hardness?: string | null
+          turbidity?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          calcium?: string | null
+          chloride?: string | null
+          created_at?: string | null
+          e_coli?: string | null
+          fluoride?: string | null
+          free_residual_chlorine?: string | null
+          id?: string
+          iron?: string | null
+          magnesium?: string | null
+          notes?: string | null
+          ph?: string | null
+          sample_id?: string
+          sample_image_url?: string
+          submitter_address?: string
+          submitter_email?: string
+          submitter_mobile?: string
+          submitter_name?: string
+          sulphate?: string | null
+          tds?: string | null
+          total_alkalinity?: string | null
+          total_coliform?: string | null
+          total_hardness?: string | null
+          turbidity?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
