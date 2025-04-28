@@ -83,9 +83,27 @@ const LabTestForm = () => {
     setSubmitting(true);
     try {
       const { error } = await supabase.from("lab_tests").insert({
-        ...data,
         sample_id: generateSampleId(),
+        submitter_name: data.submitter_name,
+        submitter_address: data.submitter_address,
+        submitter_mobile: data.submitter_mobile,
+        submitter_email: data.submitter_email,
         sample_image_url: imageUrl,
+        calcium: data.calcium,
+        chloride: data.chloride,
+        e_coli: data.e_coli,
+        fluoride: data.fluoride,
+        free_residual_chlorine: data.free_residual_chlorine,
+        iron: data.iron,
+        magnesium: data.magnesium,
+        ph: data.ph,
+        sulphate: data.sulphate,
+        tds: data.tds,
+        total_alkalinity: data.total_alkalinity,
+        total_coliform: data.total_coliform,
+        total_hardness: data.total_hardness,
+        turbidity: data.turbidity,
+        notes: data.notes,
       });
 
       if (error) throw error;
