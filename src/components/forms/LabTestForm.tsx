@@ -82,7 +82,19 @@ const LabTestForm = () => {
 
     setSubmitting(true);
     try {
+      // First, get the current user's session to get the user_id
+      const { data: sessionData } = await supabase.auth.getSession();
+      
+      if (!sessionData.session) {
+        toast.error("You must be logged in to submit lab tests");
+        setSubmitting(false);
+        return;
+      }
+      
+      const userId = sessionData.session.user.id;
+      
       const { error } = await supabase.from("lab_tests").insert({
+        user_id: userId,
         sample_id: generateSampleId(),
         submitter_name: data.submitter_name,
         submitter_address: data.submitter_address,
@@ -185,13 +197,18 @@ const LabTestForm = () => {
             />
 
             <div className="space-y-2">
-              <FormLabel>Sample Image</FormLabel>
+              <FormLabel>Sample Image <span className="text-red-500">*</span></FormLabel>
               <FileUpload
                 onUploadComplete={setImageUrl}
                 bucketName="water-mgmt-files"
                 folderPath="lab-samples"
                 fileType="lab"
               />
+              {!imageUrl && (
+                <p className="text-sm text-muted-foreground mt-1">
+                  A sample image is required before submission
+                </p>
+              )}
             </div>
           </CardContent>
         </Card>
