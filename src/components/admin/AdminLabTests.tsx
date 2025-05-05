@@ -24,32 +24,42 @@ const AdminLabTests = () => {
 
   // Fetch lab tests with filters and sorting
   const fetchLabTests = async () => {
-    let query = supabase
-      .from("lab_tests")
-      .select("*")
-      .order(sorting.column, { ascending: sorting.direction === "asc" });
+    try {
+      console.log("Fetching lab tests with filters:", filters);
+      console.log("Sorting by:", sorting);
 
-    // Apply filters
-    if (filters.sampleId) {
-      query = query.ilike("sample_id", `%${filters.sampleId}%`);
-    }
-    if (filters.submitterName) {
-      query = query.ilike("submitter_name", `%${filters.submitterName}%`);
-    }
-    if (filters.dateRange.from && filters.dateRange.to) {
-      query = query.gte("created_at", filters.dateRange.from.toISOString());
-      query = query.lte("created_at", filters.dateRange.to.toISOString());
-    }
+      let query = supabase
+        .from("lab_tests")
+        .select("*")
+        .order(sorting.column, { ascending: sorting.direction === "asc" });
 
-    const { data, error } = await query;
+      // Apply filters
+      if (filters.sampleId) {
+        query = query.ilike("sample_id", `%${filters.sampleId}%`);
+      }
+      if (filters.submitterName) {
+        query = query.ilike("submitter_name", `%${filters.submitterName}%`);
+      }
+      if (filters.dateRange.from && filters.dateRange.to) {
+        query = query.gte("created_at", filters.dateRange.from.toISOString());
+        query = query.lte("created_at", filters.dateRange.to.toISOString());
+      }
 
-    if (error) {
-      console.error("Error fetching lab tests:", error);
-      toast.error("Failed to load lab test data");
-      throw error;
+      const { data, error } = await query;
+
+      if (error) {
+        console.error("Error fetching lab tests:", error);
+        toast.error("Failed to load lab test data");
+        throw error;
+      }
+
+      console.log("Fetched lab tests:", data?.length || 0, "records");
+      return data || [];
+    } catch (error) {
+      console.error("Exception in fetchLabTests:", error);
+      toast.error("An error occurred while loading lab test data");
+      return [];
     }
-
-    return data || [];
   };
 
   const {
@@ -64,8 +74,10 @@ const AdminLabTests = () => {
 
   // Setup real-time listener for lab tests table
   useEffect(() => {
+    console.log("Setting up real-time listener for lab_tests table");
+    
     const channel = supabase
-      .channel("table-db-changes")
+      .channel("lab-tests-changes")
       .on(
         "postgres_changes",
         {
@@ -73,13 +85,24 @@ const AdminLabTests = () => {
           schema: "public",
           table: "lab_tests",
         },
-        () => {
+        (payload) => {
+          console.log("Real-time update received:", payload);
+          toast.info("Lab test data updated");
           refetch();
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log("Supabase channel status:", status);
+        if (status === "SUBSCRIBED") {
+          console.log("Successfully subscribed to real-time updates");
+        }
+      });
+
+    // Force initial data load
+    refetch();
 
     return () => {
+      console.log("Cleaning up Supabase channel");
       supabase.removeChannel(channel);
     };
   }, [refetch]);

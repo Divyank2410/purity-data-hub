@@ -15,6 +15,7 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [activeTab, setActiveTab] = useState("water-data");
 
   useEffect(() => {
     const checkAdminStatus = async () => {
@@ -61,6 +62,11 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleTabChange = (value) => {
+    setActiveTab(value);
+    console.log("Tab changed to:", value);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -101,7 +107,12 @@ const AdminDashboard = () => {
         </CardHeader>
       </Card>
 
-      <Tabs defaultValue="water-data" className="w-full">
+      <Tabs 
+        defaultValue="water-data" 
+        value={activeTab}
+        onValueChange={handleTabChange}
+        className="w-full"
+      >
         <TabsList className="grid w-full grid-cols-4 mb-8">
           <TabsTrigger value="water-data">Water Treatment Data</TabsTrigger>
           <TabsTrigger value="sewer-data">Sewer Treatment Data</TabsTrigger>
