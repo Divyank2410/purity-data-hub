@@ -4,8 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import LabTestsTable from "./lab-tests/LabTestsTable";
 import LabTestsFilters from "./lab-tests/LabTestsFilters";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
+import { FileText, CheckCircle, Clock } from "lucide-react";
 
 const AdminLabTests = () => {
   const [filters, setFilters] = useState({
@@ -20,6 +21,13 @@ const AdminLabTests = () => {
   const [sorting, setSorting] = useState({
     column: "created_at",
     direction: "desc",
+  });
+
+  // Statistics state
+  const [stats, setStats] = useState({
+    totalSamples: 0,
+    testedSamples: 0,
+    pendingSamples: 0,
   });
 
   // Fetch lab tests with filters and sorting
@@ -54,12 +62,37 @@ const AdminLabTests = () => {
       }
 
       console.log("Fetched lab tests:", data?.length || 0, "records");
+      
+      // Update statistics
+      if (data) {
+        updateStatistics(data);
+      }
+      
       return data || [];
     } catch (error) {
       console.error("Exception in fetchLabTests:", error);
       toast.error("An error occurred while loading lab test data");
       return [];
     }
+  };
+
+  // Calculate statistics from lab tests data
+  const updateStatistics = (data) => {
+    const total = data.length;
+    
+    // A sample is considered "tested" if it has data in at least one of the test fields
+    // These are the main test fields we'll check
+    const testFields = ['ph', 'tds', 'turbidity', 'total_hardness', 'iron', 'fluoride'];
+    
+    const tested = data.filter(sample => 
+      testFields.some(field => sample[field] !== null && sample[field] !== undefined && sample[field] !== '')
+    ).length;
+    
+    setStats({
+      totalSamples: total,
+      testedSamples: tested,
+      pendingSamples: total - tested
+    });
   };
 
   const {
@@ -109,6 +142,39 @@ const AdminLabTests = () => {
 
   return (
     <div className="space-y-6">
+      {/* Statistics Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card>
+          <CardContent className="flex flex-row items-center justify-between pt-6">
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">Total Samples</p>
+              <h3 className="text-3xl font-bold">{stats.totalSamples}</h3>
+            </div>
+            <FileText className="h-8 w-8 text-blue-500" />
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="flex flex-row items-center justify-between pt-6">
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">Tested Samples</p>
+              <h3 className="text-3xl font-bold">{stats.testedSamples}</h3>
+            </div>
+            <CheckCircle className="h-8 w-8 text-green-500" />
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="flex flex-row items-center justify-between pt-6">
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">Pending Analysis</p>
+              <h3 className="text-3xl font-bold">{stats.pendingSamples}</h3>
+            </div>
+            <Clock className="h-8 w-8 text-amber-500" />
+          </CardContent>
+        </Card>
+      </div>
+
       <Card>
         <CardContent className="pt-6">
           <LabTestsFilters 
