@@ -3,16 +3,6 @@ import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@
 import DocumentViewer from "../DocumentViewer";
 import { SewerQualityData } from "./types";
 
-// List of plant names to exclude
-const excludedPlantNames = [
-  "Motijheel WTP - Motijheel Area",
-  "Maharajpura STP - Maharajpura",
-  "Morar STP - Morar Region",
-  "Hazira STP - Hazira Area",
-  "Lashkar STP - Lashkar Region",
-  "Jhansi Road STP - Jhansi Road"
-];
-
 interface SewerDataTableProps {
   data: SewerQualityData[];
   isLoading?: boolean;
@@ -23,11 +13,6 @@ const SewerDataTable = ({ data, isLoading }: SewerDataTableProps) => {
     <div className="flex justify-center items-center p-8">
       <p className="text-lg">Loading sewer treatment data...</p>
     </div>
-  );
-
-  // Filter out excluded plants from the displayed data
-  const filteredData = data.filter(
-    record => !excludedPlantNames.includes(record.sewer_treatment_plants?.name || '')
   );
 
   return (
@@ -52,12 +37,12 @@ const SewerDataTable = ({ data, isLoading }: SewerDataTableProps) => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {filteredData?.length === 0 && (
+          {data?.length === 0 && (
             <TableRow>
               <TableCell colSpan={14} className="text-center py-4">No data found for the selected filters</TableCell>
             </TableRow>
           )}
-          {filteredData?.map((record) => (
+          {data?.map((record) => (
             <TableRow key={record.id}>
               <TableCell>{new Date(record.created_at).toLocaleDateString()}</TableCell>
               <TableCell>{record.sewer_treatment_plants?.name || 'N/A'}</TableCell>

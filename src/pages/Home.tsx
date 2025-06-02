@@ -16,14 +16,9 @@ import SewerQualityChart from "@/components/SewerQualityChart";
 import ParameterLimitsDisplay from "@/components/ParameterLimitsDisplay";
 import { waterLimits, sewerLimits } from "@/utils/parameterLimits";
 
-// List of plant names to exclude
-const excludedPlantNames = [
-  "Motijheel WTP - Motijheel Area",
-  "Maharajpura STP - Maharajpura",
-  "Morar STP - Morar Region",
-  "Hazira STP - Hazira Area",
-  "Lashkar STP - Lashkar Region",
-  "Jhansi Road STP - Jhansi Road"
+// List of plant names to exclude (for water treatment plants only)
+const excludedWaterPlantNames = [
+  "Motijheel WTP - Motijheel Area"
 ];
 
 interface WaterTreatmentPlant {
@@ -157,9 +152,9 @@ const Home = () => {
       const { data, error } = await supabase.from("water_treatment_plants").select("*");
       if (error) throw error;
       
-      // Filter out excluded plants
+      // Filter out excluded water plants only
       const filteredPlants = (data || []).filter(
-        plant => !excludedPlantNames.includes(plant.name)
+        plant => !excludedWaterPlantNames.includes(plant.name)
       );
       
       return filteredPlants as WaterTreatmentPlant[] || [];
@@ -173,12 +168,8 @@ const Home = () => {
       const { data, error } = await supabase.from("sewer_treatment_plants").select("*");
       if (error) throw error;
       
-      // Filter out excluded plants
-      const filteredPlants = (data || []).filter(
-        plant => !excludedPlantNames.includes(plant.name)
-      );
-      
-      return filteredPlants as SewerTreatmentPlant[] || [];
+      // No filtering needed for sewer plants since unwanted ones were deleted
+      return (data || []) as SewerTreatmentPlant[] || [];
     },
     staleTime: 5 * 60 * 1000,
   });
@@ -193,9 +184,9 @@ const Home = () => {
       
       if (plantsError) throw plantsError;
       
-      // Filter out excluded plants first
+      // Filter out excluded water plants only
       const filteredPlants = allPlants.filter(plant => 
-        !excludedPlantNames.includes(plant.name)
+        !excludedWaterPlantNames.includes(plant.name)
       );
       
       const latestEntries = [];
@@ -234,22 +225,17 @@ const Home = () => {
   const { data: sewerData = [], isLoading: isLoadingSewerData } = useQuery({
     queryKey: [SEWER_DATA_QUERY_KEY],
     queryFn: async () => {
-      // First get all plants that are not excluded
+      // Get all sewer plants (no filtering needed since unwanted ones were deleted)
       const { data: allPlants, error: plantsError } = await supabase
         .from("sewer_treatment_plants")
         .select("id, name");
       
       if (plantsError) throw plantsError;
       
-      // Filter out excluded plants first
-      const filteredPlants = allPlants.filter(plant => 
-        !excludedPlantNames.includes(plant.name)
-      );
-      
       const latestEntries = [];
       
-      // Only process data for non-excluded plants
-      for (const plant of filteredPlants) {
+      // Process data for all plants
+      for (const plant of allPlants) {
         const { data: inletData, error: inletError } = await supabase
           .from("sewer_quality_data")
           .select("*, sewer_treatment_plants(name)")
