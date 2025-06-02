@@ -441,7 +441,7 @@ const Home = () => {
                             <Tabs defaultValue="raw" className="w-full">
                               <TabsList className="w-full mb-4">
                                 <TabsTrigger value="raw" className="flex-1">Raw Water</TabsTrigger>
-                                <TabsTrigger value="clean" className="flex-1">Clean Water</TabsTrigger>
+                                <TabsTrigger value="clean" className="flex-1">Treated Water</TabsTrigger>
                               </TabsList>
                               
                               <TabsContent value="raw">
@@ -465,7 +465,7 @@ const Home = () => {
                               </TabsContent>
                               
                               <TabsContent value="clean">
-                                <h4 className="text-sm font-medium mb-2">Clean Water Parameters</h4>
+                                <h4 className="text-sm font-medium mb-2">Treated Water Parameters</h4>
                                 <DataTable 
                                   data={waterData.filter(
                                     item => item.plant_id === plant.id && item.water_type === 'clean_water'

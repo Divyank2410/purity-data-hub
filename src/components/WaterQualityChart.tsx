@@ -107,7 +107,7 @@ const WaterQualityChart: React.FC<WaterQualityChartProps> = ({
       },
     },
     clean: {
-      label: "Clean Water",
+      label: "Treated Water",
       theme: {
         light: "#10b981",
         dark: "#34d399",
@@ -124,7 +124,7 @@ const WaterQualityChart: React.FC<WaterQualityChartProps> = ({
           <div className="grid grid-cols-2 gap-2 mt-1 text-xs">
             <div>
               <p className="text-indigo-600">Raw: {payload[0].value} {dataItem?.unit}</p>
-              <p className="text-emerald-600">Clean: {payload[1].value} {dataItem?.unit}</p>
+              <p className="text-emerald-600">Treated: {payload[1].value} {dataItem?.unit}</p>
             </div>
             <div className="border-l pl-2">
               <p>Min: <span className="text-blue-600">{dataItem?.min} {dataItem?.unit}</span></p>
@@ -212,7 +212,7 @@ const WaterQualityChart: React.FC<WaterQualityChartProps> = ({
               <Bar 
                 dataKey="clean" 
                 fill="var(--color-clean)" 
-                name="Clean Water" 
+                name="Treated Water" 
                 animationBegin={300}
                 animationDuration={2000}
                 animationEasing="ease-in-out"
@@ -236,11 +236,11 @@ const WaterQualityChart: React.FC<WaterQualityChartProps> = ({
                   />
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Clean:</span>
+                  <span className="text-gray-600">Treated:</span>
                   <ParameterValue
                     value={cleanWaterData?.[param.name.toLowerCase().replace(' ', '_')] || null}
                     limit={waterLimits[param.name.toLowerCase().replace(' ', '_')]}
-                    label={`Clean water ${param.name}`}
+                    label={`Treated water ${param.name}`}
                   />
                 </div>
               </div>
