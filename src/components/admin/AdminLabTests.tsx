@@ -63,30 +63,53 @@ const AdminLabTests = () => {
 
       console.log("Fetched lab tests:", data?.length || 0, "records");
       
-      // Update statistics
-      if (data) {
-        updateStatistics(data);
-      }
+      const safeData = data || [];
       
-      return data || [];
+      // Update statistics only if we have valid data
+      updateStatistics(safeData);
+      
+      return safeData;
     } catch (error) {
       console.error("Exception in fetchLabTests:", error);
       toast.error("An error occurred while loading lab test data");
+      // Reset stats on error
+      setStats({
+        totalSamples: 0,
+        testedSamples: 0,
+        pendingSamples: 0,
+      });
       return [];
     }
   };
 
-  // Calculate statistics from lab tests data
-  const updateStatistics = (data) => {
+  // Calculate statistics from lab tests data with proper type checking
+  const updateStatistics = (data: any[]) => {
+    // Ensure data is an array
+    if (!Array.isArray(data)) {
+      console.warn("updateStatistics received non-array data:", data);
+      setStats({
+        totalSamples: 0,
+        testedSamples: 0,
+        pendingSamples: 0,
+      });
+      return;
+    }
+
     const total = data.length;
     
     // A sample is considered "tested" if it has data in at least one of the test fields
     // These are the main test fields we'll check
     const testFields = ['ph', 'tds', 'turbidity', 'total_hardness', 'iron', 'fluoride'];
     
-    const tested = data.filter(sample => 
-      testFields.some(field => sample[field] !== null && sample[field] !== undefined && sample[field] !== '')
-    ).length;
+    const tested = data.filter(sample => {
+      // Ensure sample is an object before checking fields
+      if (!sample || typeof sample !== 'object') return false;
+      
+      return testFields.some(field => {
+        const value = sample[field];
+        return value !== null && value !== undefined && value !== '';
+      });
+    }).length;
     
     setStats({
       totalSamples: total,
