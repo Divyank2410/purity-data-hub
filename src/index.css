@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -97,5 +98,136 @@
 
   body {
     @apply bg-background text-foreground;
+    /* Increased base font size from default */
+    font-size: 16px;
+    line-height: 1.6;
   }
+
+  /* Enhanced font sizes for better readability */
+  h1 { @apply text-4xl font-bold leading-tight; }
+  h2 { @apply text-3xl font-semibold leading-tight; }
+  h3 { @apply text-2xl font-semibold leading-tight; }
+  h4 { @apply text-xl font-medium leading-tight; }
+  h5 { @apply text-lg font-medium leading-tight; }
+  h6 { @apply text-base font-medium leading-tight; }
+  
+  /* Enhanced text sizes */
+  p, div, span { font-size: 16px; }
+  small { font-size: 14px; }
+  
+  /* Enhanced button and input sizes */
+  button {
+    min-height: 44px;
+    padding: 12px 20px;
+    font-size: 16px;
+    font-weight: 500;
+  }
+  
+  input, textarea, select {
+    min-height: 44px;
+    padding: 12px 16px;
+    font-size: 16px;
+  }
+  
+  /* Enhanced icon sizes */
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+  
+  /* Enhanced table text */
+  table {
+    font-size: 15px;
+  }
+  
+  th, td {
+    padding: 12px 16px;
+  }
+}
+
+@layer components {
+  /* Rapid blinking animation for danger indicators */
+  .danger-blink {
+    animation: dangerBlink 0.6s ease-in-out infinite;
+  }
+  
+  .danger-blink-fast {
+    animation: dangerBlinkFast 0.4s ease-in-out infinite;
+  }
+  
+  .danger-pulse {
+    animation: dangerPulse 0.8s ease-in-out infinite;
+  }
+}
+
+@layer utilities {
+  /* Enhanced spacing utilities */
+  .text-enhanced { font-size: 17px; line-height: 1.6; }
+  .text-large { font-size: 18px; line-height: 1.6; }
+  .text-xl-enhanced { font-size: 22px; line-height: 1.5; }
+  
+  /* Enhanced padding for better touch targets */
+  .p-enhanced { padding: 16px; }
+  .px-enhanced { padding-left: 20px; padding-right: 20px; }
+  .py-enhanced { padding-top: 12px; padding-bottom: 12px; }
+  
+  /* Enhanced margin utilities */
+  .m-enhanced { margin: 16px; }
+  .mb-enhanced { margin-bottom: 20px; }
+  .mt-enhanced { margin-top: 20px; }
+}
+
+/* Keyframes for danger indicators */
+@keyframes dangerBlink {
+  0%, 50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  25%, 75% {
+    opacity: 0.3;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes dangerBlinkFast {
+  0%, 50% {
+    opacity: 1;
+    transform: scale(1);
+    background-color: rgb(239 68 68); /* red-500 */
+  }
+  25%, 75% {
+    opacity: 0.4;
+    transform: scale(1.08);
+    background-color: rgb(220 38 38); /* red-600 */
+  }
+}
+
+@keyframes dangerPulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+    box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+  }
+}
+
+/* Enhanced focus styles for accessibility */
+*:focus-visible {
+  outline: 3px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+/* Enhanced contrast for better readability */
+.high-contrast {
+  color: #000000;
+  background-color: #ffffff;
+}
+
+.high-contrast-dark {
+  color: #ffffff;
+  background-color: #000000;
 }
