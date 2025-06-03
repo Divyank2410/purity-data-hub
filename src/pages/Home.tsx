@@ -1,8 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useNavigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { RefreshCw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -19,6 +18,15 @@ import { waterLimits, sewerLimits } from "@/utils/parameterLimits";
 // List of plant names to exclude (for water treatment plants only)
 const excludedWaterPlantNames = [
   "Motijheel WTP - Motijheel Area"
+];
+
+// List of duplicate water plant names to exclude (keeping only one version per plant)
+const duplicateWaterPlantNames = [
+  "Motijheel Old WTP", // Keep "Motijheel Old Water Treatment Plant"
+  "Motijheel New WTP", // Keep "Motijheel New Water Treatment Plant"  
+  "Tighra WTP", // Keep "Tighra Water Treatment Plant"
+  "Jalapur WTP", // Keep "Jalapur Water Treatment Plant"
+  "Motijheel WTP" // This is also a duplicate
 ];
 
 // List of sewer plant names to exclude (these have been deleted but we want to ensure they don't appear)
@@ -115,6 +123,7 @@ interface DataTableProps {
 }
 
 const Home = () => {
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [autoRefreshEnabled, setAutoRefreshEnabled] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -170,9 +179,10 @@ const Home = () => {
       const { data, error } = await supabase.from("water_treatment_plants").select("*");
       if (error) throw error;
       
-      // Filter out excluded water plants only
+      // Filter out excluded water plants and duplicates
       const filteredPlants = (data || []).filter(
-        plant => !excludedWaterPlantNames.includes(plant.name)
+        plant => !excludedWaterPlantNames.includes(plant.name) && 
+                 !duplicateWaterPlantNames.includes(plant.name)
       );
       
       return filteredPlants as WaterTreatmentPlant[] || [];
@@ -199,21 +209,22 @@ const Home = () => {
   const { data: waterData = [], isLoading: isLoadingWaterData } = useQuery({
     queryKey: [WATER_DATA_QUERY_KEY],
     queryFn: async () => {
-      // First get all plants that are not excluded
+      // First get all plants that are not excluded or duplicates
       const { data: allPlants, error: plantsError } = await supabase
         .from("water_treatment_plants")
         .select("id, name");
       
       if (plantsError) throw plantsError;
       
-      // Filter out excluded water plants only
+      // Filter out excluded water plants and duplicates
       const filteredPlants = allPlants.filter(plant => 
-        !excludedWaterPlantNames.includes(plant.name)
+        !excludedWaterPlantNames.includes(plant.name) &&
+        !duplicateWaterPlantNames.includes(plant.name)
       );
       
       const latestEntries = [];
       
-      // Only process data for non-excluded plants
+      // Only process data for non-excluded, non-duplicate plants
       for (const plant of filteredPlants) {
         const { data: rawData, error: rawError } = await supabase
           .from("water_quality_data")
