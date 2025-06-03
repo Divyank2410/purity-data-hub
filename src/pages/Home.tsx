@@ -21,6 +21,24 @@ const excludedWaterPlantNames = [
   "Motijheel WTP - Motijheel Area"
 ];
 
+// List of sewer plant names to exclude (these have been deleted but we want to ensure they don't appear)
+const excludedSewerPlantNames = [
+  "Lal Tipara STP",
+  "Shatabdipuram STP",
+  "Jalalpur STP",
+  "Laliyapura STP",
+  "Maharajpura STP",
+  "Maharajpura STP - Maharajpura",
+  "Morar STP",
+  "Morar STP - Morar Region",
+  "Hazira STP",
+  "Hazira STP - Hazira Area",
+  "Lashkar STP",
+  "Lashkar STP - Lashkar Region",
+  "Jhansi Road STP",
+  "Jhansi Road STP - Jhansi Road"
+];
+
 interface WaterTreatmentPlant {
   id: string;
   name: string;
@@ -168,8 +186,12 @@ const Home = () => {
       const { data, error } = await supabase.from("sewer_treatment_plants").select("*");
       if (error) throw error;
       
-      // No filtering needed for sewer plants since unwanted ones were deleted
-      return (data || []) as SewerTreatmentPlant[] || [];
+      // Filter out excluded sewer plants (double check in case any still exist)
+      const filteredPlants = (data || []).filter(
+        plant => !excludedSewerPlantNames.includes(plant.name)
+      );
+      
+      return filteredPlants as SewerTreatmentPlant[] || [];
     },
     staleTime: 5 * 60 * 1000,
   });
@@ -225,17 +247,22 @@ const Home = () => {
   const { data: sewerData = [], isLoading: isLoadingSewerData } = useQuery({
     queryKey: [SEWER_DATA_QUERY_KEY],
     queryFn: async () => {
-      // Get all sewer plants (no filtering needed since unwanted ones were deleted)
+      // Get all sewer plants and filter out excluded ones
       const { data: allPlants, error: plantsError } = await supabase
         .from("sewer_treatment_plants")
         .select("id, name");
       
       if (plantsError) throw plantsError;
       
+      // Filter out excluded sewer plants
+      const filteredPlants = allPlants.filter(plant => 
+        !excludedSewerPlantNames.includes(plant.name)
+      );
+      
       const latestEntries = [];
       
-      // Process data for all plants
-      for (const plant of allPlants) {
+      // Process data for filtered plants only
+      for (const plant of filteredPlants) {
         const { data: inletData, error: inletError } = await supabase
           .from("sewer_quality_data")
           .select("*, sewer_treatment_plants(name)")
