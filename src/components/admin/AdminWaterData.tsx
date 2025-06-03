@@ -13,12 +13,7 @@ export const WATER_DATA_QUERY_KEY = "waterData";
 
 // List of plant names to exclude
 const excludedPlantNames = [
-  "Motijheel WTP - Motijheel Area",
-  "Maharajpura STP - Maharajpura",
-  "Morar STP - Morar Region",
-  "Hazira STP - Hazira Area",
-  "Lashkar STP - Lashkar Region",
-  "Jhansi Road STP - Jhansi Road"
+  "Motijheel WTP - Motijheel Area"
 ];
 
 interface WaterTreatmentPlant {
