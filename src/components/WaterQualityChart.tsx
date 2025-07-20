@@ -178,7 +178,7 @@ const WaterQualityChart: React.FC<WaterQualityChartProps> = ({
               }}
             >
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" angle={-45} textAnchor="end" height={70} />
+              <XAxis dataKey="name" />
               <YAxis />
               <Tooltip content={<CustomTooltip />} />
               <Legend wrapperStyle={{ bottom: 0 }} />
