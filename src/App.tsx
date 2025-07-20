@@ -14,6 +14,7 @@ import Login from "./pages/auth/Login";
 import UserDashboard from "./pages/user/UserDashboard";
 import NotFound from "./pages/NotFound";
 import AdminDashboard from "./pages/admin/AdminDashboard";
+import LabTestReports from "./pages/LabTestReports";
 
 // Create QueryClient with optimized settings
 const queryClient = new QueryClient({
@@ -136,6 +137,7 @@ const App = () => {
                 <Route path="/user-dashboard" element={!session ? <Login /> : <Navigate to="/dashboard" />} />
                 <Route path="/dashboard" element={renderProtectedRoute(UserDashboard)} />
                 <Route path="/admin-dashboard" element={renderProtectedRoute(AdminDashboard, "admin")} />
+                <Route path="/lab-test-reports" element={renderProtectedRoute(LabTestReports)} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

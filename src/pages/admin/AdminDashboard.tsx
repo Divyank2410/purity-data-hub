@@ -89,13 +89,21 @@ const AdminDashboard = () => {
           <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
           <p className="text-gray-600 mt-1">View and manage all data</p>
         </div>
-        <Button 
-          variant="outline" 
-          onClick={handleSignOut}
-          className="mt-4 md:mt-0"
-        >
-          Sign Out
-        </Button>
+        <div className="flex gap-3 mt-4 md:mt-0">
+          <Button
+            onClick={() => navigate("/lab-test-reports")}
+            variant="outline"
+            className="bg-blue-50 border-blue-200 hover:bg-blue-100"
+          >
+            Lab Test Reports
+          </Button>
+          <Button 
+            variant="outline" 
+            onClick={handleSignOut}
+          >
+            Sign Out
+          </Button>
+        </div>
       </div>
 
       <Card className="mb-8">
