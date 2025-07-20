@@ -174,14 +174,22 @@ const WaterQualityChart: React.FC<WaterQualityChartProps> = ({
                 top: 20,
                 right: 30,
                 left: 20,
-                bottom: 70,
+                bottom: 40,
               }}
             >
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" tick={{ fontSize: 10 }} interval={0} />
               <YAxis />
               <Tooltip content={<CustomTooltip />} />
-              <Legend wrapperStyle={{ bottom: 0 }} />
+              <Legend 
+                wrapperStyle={{ 
+                  paddingTop: '20px',
+                  position: 'relative',
+                  bottom: 'auto'
+                }} 
+                align="center"
+                verticalAlign="bottom"
+              />
               <ReferenceLine 
                 y={8.5} 
                 label={{ value: "Max pH", position: 'insideTopRight' }} 
