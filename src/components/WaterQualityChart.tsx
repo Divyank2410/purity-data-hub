@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { RefreshCw } from "lucide-react";
 import { ParameterValue } from "@/components/ui/parameter-value";
 import { waterLimits } from "@/utils/parameterLimits";
-import { ChartContainer } from "@/components/ui/chart";
+
 
 interface WaterQualityChartProps {
   plantName: string;
@@ -164,70 +164,36 @@ const WaterQualityChart: React.FC<WaterQualityChartProps> = ({
       </CardHeader>
       <CardContent>
         <div className="h-[300px]">
-          <ChartContainer
-            config={chartConfig}
-            className="w-full"
+          <BarChart
+            width={700}
+            height={300}
+            data={chartData}
+            margin={{
+              top: 20,
+              right: 30,
+              left: 20,
+              bottom: 5,
+            }}
           >
-            <BarChart
-              data={chartData}
-              margin={{
-                top: 20,
-                right: 30,
-                left: 20,
-                bottom: 40,
-              }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" tick={{ fontSize: 10 }} interval={0} />
-              <YAxis />
-              <Tooltip content={<CustomTooltip />} />
-              <Legend 
-                wrapperStyle={{ 
-                  paddingTop: '20px',
-                  position: 'relative',
-                  bottom: 'auto'
-                }} 
-                align="center"
-                verticalAlign="bottom"
-              />
-              <ReferenceLine 
-                y={8.5} 
-                label={{ value: "Max pH", position: 'insideTopRight' }} 
-                stroke="#ea384c"
-                strokeDasharray="3 3" 
-                strokeWidth={1.5}
-                ifOverflow="extendDomain"
-                isFront={true}
-              />
-              <ReferenceLine 
-                y={6.5} 
-                label={{ value: "Min pH", position: 'insideBottomRight' }} 
-                stroke="#0ea5e9" 
-                strokeDasharray="3 3"
-                strokeWidth={1.5}
-                ifOverflow="extendDomain"
-                isFront={true}
-              />
-              <Bar 
-                dataKey="raw" 
-                fill="var(--color-raw)" 
-                name="Raw Water" 
-                animationBegin={0}
-                animationDuration={2000}
-                animationEasing="ease-in-out"
-                isAnimationActive={animate}
-              />
-              <Bar 
-                dataKey="clean" 
-                fill="var(--color-clean)" 
-                name="Treated Water" 
-                animationBegin={300}
-                animationDuration={2000}
-                animationEasing="ease-in-out"
-                isAnimationActive={animate}
-              />
-            </BarChart>
-          </ChartContainer>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip content={<CustomTooltip />} />
+            <Legend />
+            <ReferenceLine y={6} stroke="green" strokeDasharray="3 3" />
+            <Bar
+              dataKey="raw"
+              fill={chartConfig.raw.theme.light}
+              name={chartConfig.raw.label}
+              className={animate ? "animate-fadeIn" : ""}
+            />
+            <Bar
+              dataKey="clean"
+              fill={chartConfig.clean.theme.light}
+              name={chartConfig.clean.label}
+              className={animate ? "animate-fadeIn" : ""}
+            />
+          </BarChart>
         </div>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mt-4 text-xs">
