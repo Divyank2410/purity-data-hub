@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon, Search, Filter, FileText, Clock, CheckCircle, Eye, Download, Droplets } from "lucide-react";
+import { CalendarIcon, Search, Filter, FileText, Clock, CheckCircle, Eye, Download, Droplets, FlaskConical } from "lucide-react";
 import { format } from "date-fns";
 import DocumentViewer from "@/components/admin/DocumentViewer";
 import SampleSubmissionForm from "@/components/forms/SampleSubmissionForm";
@@ -384,10 +384,37 @@ const LabTestReports = () => {
                     <p><strong>Submitted:</strong> {format(new Date(sample.created_at), "PPP")}</p>
                   </div>
                   
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 mb-3">
                     <DocumentViewer documentUrl={sample.sample_image_url} />
                     <span className="text-sm text-gray-500">Sample Image</span>
                   </div>
+
+                  {isAdmin && (
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button 
+                          className="w-full bg-green-600 hover:bg-green-700 text-white"
+                          size="sm"
+                        >
+                          <FlaskConical className="h-4 w-4 mr-2" />
+                          Enter Test Parameters
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+                        <DialogHeader>
+                          <DialogTitle>Test Parameter Entry - {sample.sample_id}</DialogTitle>
+                        </DialogHeader>
+                        <AdminTestEntry
+                          sampleId={sample.sample_id}
+                          sampleData={sample}
+                          onTestComplete={() => {
+                            fetchSamples();
+                            toast.success("Test completed successfully! Sample moved to treated section.");
+                          }}
+                        />
+                      </DialogContent>
+                    </Dialog>
+                  )}
                 </CardContent>
               </Card>
             ))}
