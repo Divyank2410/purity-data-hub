@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import WaterQualityForm from "@/components/forms/WaterQualityForm";
 import SewerQualityForm from "@/components/forms/SewerQualityForm";
 import AmritYojnaForm from "@/components/forms/AmritYojnaForm";
-
+import LabTestForm from "@/components/forms/LabTestForm";
 
 const UserDashboard = () => {
   const navigate = useNavigate();
@@ -119,10 +119,12 @@ const UserDashboard = () => {
       </Card>
 
       <Tabs defaultValue="water-quality" className="w-full">
-        <TabsList className="grid grid-cols-3 mb-8">
+        <TabsList className="grid grid-cols-5 mb-8">
           <TabsTrigger value="water-quality">Water Quality Data</TabsTrigger>
           <TabsTrigger value="sewer-quality">Sewer Quality Data</TabsTrigger>
           <TabsTrigger value="amrit-yojna">Amrit Yojna Data</TabsTrigger>
+          <TabsTrigger value="lab-test">Lab Test</TabsTrigger>
+          <TabsTrigger value="lab-reports">Lab Reports</TabsTrigger>
         </TabsList>
 
         <TabsContent value="water-quality">
@@ -135,6 +137,22 @@ const UserDashboard = () => {
 
         <TabsContent value="amrit-yojna">
           <AmritYojnaForm userId={user?.id} />
+        </TabsContent>
+
+        <TabsContent value="lab-test">
+          <LabTestForm />
+        </TabsContent>
+
+        <TabsContent value="lab-reports">
+          <div className="text-center py-8">
+            <p className="text-gray-600 mb-4">Access the comprehensive Lab Test Reports system</p>
+            <Button 
+              onClick={() => navigate("/lab-test-reports")}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              Open Lab Test Reports
+            </Button>
+          </div>
         </TabsContent>
       </Tabs>
     </div>

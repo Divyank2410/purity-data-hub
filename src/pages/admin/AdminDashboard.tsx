@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import AdminWaterData from "@/components/admin/AdminWaterData";
 import AdminSewerData from "@/components/admin/AdminSewerData";
 import AdminAmritData from "@/components/admin/AdminAmritData";
-
+import AdminLabTests from "@/components/admin/AdminLabTests";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 
@@ -89,13 +89,21 @@ const AdminDashboard = () => {
           <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
           <p className="text-gray-600 mt-1">View and manage all data</p>
         </div>
-        <Button 
-          variant="outline" 
-          onClick={handleSignOut}
-          className="mt-4 md:mt-0"
-        >
-          Sign Out
-        </Button>
+        <div className="flex gap-3 mt-4 md:mt-0">
+          <Button
+            onClick={() => navigate("/lab-test-reports")}
+            variant="outline"
+            className="bg-blue-50 border-blue-200 hover:bg-blue-100"
+          >
+            Lab Test Reports
+          </Button>
+          <Button 
+            variant="outline" 
+            onClick={handleSignOut}
+          >
+            Sign Out
+          </Button>
+        </div>
       </div>
 
       <Card className="mb-8">
@@ -113,10 +121,11 @@ const AdminDashboard = () => {
         onValueChange={handleTabChange}
         className="w-full"
       >
-        <TabsList className="grid w-full grid-cols-3 mb-8">
+        <TabsList className="grid w-full grid-cols-4 mb-8">
           <TabsTrigger value="water-data">Water Treatment Data</TabsTrigger>
           <TabsTrigger value="sewer-data">Sewer Treatment Data</TabsTrigger>
           <TabsTrigger value="amrit-data">Amrit Yojna Data</TabsTrigger>
+          <TabsTrigger value="lab-tests">Lab Test Reports</TabsTrigger>
         </TabsList>
 
         <TabsContent value="water-data">
@@ -129,6 +138,10 @@ const AdminDashboard = () => {
 
         <TabsContent value="amrit-data">
           <AdminAmritData />
+        </TabsContent>
+
+        <TabsContent value="lab-tests">
+          <AdminLabTests />
         </TabsContent>
       </Tabs>
     </div>
