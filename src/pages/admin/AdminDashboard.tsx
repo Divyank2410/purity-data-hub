@@ -8,6 +8,7 @@ import AdminWaterData from "@/components/admin/AdminWaterData";
 import AdminSewerData from "@/components/admin/AdminSewerData";
 import AdminAmritData from "@/components/admin/AdminAmritData";
 import AdminLabTests from "@/components/admin/AdminLabTests";
+import AdminPendingLabTests from "@/components/admin/AdminPendingLabTests";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 
@@ -121,10 +122,11 @@ const AdminDashboard = () => {
         onValueChange={handleTabChange}
         className="w-full"
       >
-        <TabsList className="grid w-full grid-cols-4 mb-8">
+        <TabsList className="grid w-full grid-cols-5 mb-8">
           <TabsTrigger value="water-data">Water Treatment Data</TabsTrigger>
           <TabsTrigger value="sewer-data">Sewer Treatment Data</TabsTrigger>
           <TabsTrigger value="amrit-data">Amrit Yojna Data</TabsTrigger>
+          <TabsTrigger value="pending-lab-tests">Pending Lab Tests</TabsTrigger>
           <TabsTrigger value="lab-tests">Lab Test Reports</TabsTrigger>
         </TabsList>
 
@@ -138,6 +140,10 @@ const AdminDashboard = () => {
 
         <TabsContent value="amrit-data">
           <AdminAmritData />
+        </TabsContent>
+
+        <TabsContent value="pending-lab-tests">
+          <AdminPendingLabTests />
         </TabsContent>
 
         <TabsContent value="lab-tests">

@@ -14,8 +14,6 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { CalendarIcon, Search, Filter, FileText, Clock, CheckCircle, Eye, Download, Droplets, FlaskConical } from "lucide-react";
 import { format } from "date-fns";
 import DocumentViewer from "@/components/admin/DocumentViewer";
-import SampleSubmissionForm from "@/components/forms/SampleSubmissionForm";
-import AdminTestEntry from "@/components/admin/lab-tests/AdminTestEntry";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 interface LabTest {
@@ -281,18 +279,11 @@ const LabTestReports = () => {
       </div>
 
       {/* Main Content */}
-      <Tabs defaultValue="submit" className="w-full">
-        <TabsList className="grid w-full grid-cols-4 mb-8">
-          <TabsTrigger value="submit">Submit Sample</TabsTrigger>
+      <Tabs defaultValue="pending" className="w-full">
+        <TabsList className="grid w-full grid-cols-2 mb-8">
           <TabsTrigger value="pending">Pending Samples</TabsTrigger>
           <TabsTrigger value="treated">Treated Samples</TabsTrigger>
-          {isAdmin && <TabsTrigger value="admin">Admin Testing</TabsTrigger>}
         </TabsList>
-
-        {/* Submit Sample Tab */}
-        <TabsContent value="submit">
-          <SampleSubmissionForm />
-        </TabsContent>
 
         {/* Pending Samples Tab */}
         <TabsContent value="pending" className="space-y-6">
@@ -303,6 +294,9 @@ const LabTestReports = () => {
                 <Filter className="h-5 w-5" />
                 Filter Pending Samples
               </CardTitle>
+              <CardDescription>
+                View samples awaiting laboratory testing and analysis
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -390,30 +384,11 @@ const LabTestReports = () => {
                   </div>
 
                   {isAdmin && (
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button 
-                          className="w-full bg-green-600 hover:bg-green-700 text-white"
-                          size="sm"
-                        >
-                          <FlaskConical className="h-4 w-4 mr-2" />
-                          Enter Test Parameters
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
-                        <DialogHeader>
-                          <DialogTitle>Test Parameter Entry - {sample.sample_id}</DialogTitle>
-                        </DialogHeader>
-                        <AdminTestEntry
-                          sampleId={sample.sample_id}
-                          sampleData={sample}
-                          onTestComplete={() => {
-                            fetchSamples();
-                            toast.success("Test completed successfully! Sample moved to treated section.");
-                          }}
-                        />
-                      </DialogContent>
-                    </Dialog>
+                    <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded">
+                      <p className="text-sm text-blue-700 text-center">
+                        Use the Admin Dashboard → Pending Lab Tests to enter test parameters
+                      </p>
+                    </div>
                   )}
                 </CardContent>
               </Card>
@@ -611,63 +586,6 @@ const LabTestReports = () => {
             ))}
           </div>
         </TabsContent>
-
-        {/* Admin Testing Tab */}
-        {isAdmin && (
-          <TabsContent value="admin" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Admin Test Entry</CardTitle>
-                <CardDescription>Select a pending sample to enter test parameters</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {samples.filter(sample => getSampleStatus(sample) === 'pending').length === 0 ? (
-                    <p className="text-center text-gray-500 py-8">No pending samples available for testing</p>
-                  ) : (
-                    <div className="space-y-4">
-                      {samples.filter(sample => getSampleStatus(sample) === 'pending').map((sample) => (
-                        <Dialog key={sample.id}>
-                          <DialogTrigger asChild>
-                            <Card className="cursor-pointer hover:shadow-md transition-shadow border-amber-200">
-                              <CardContent className="pt-6">
-                                <div className="flex items-center justify-between">
-                                  <div>
-                                    <h3 className="font-semibold">{sample.sample_id}</h3>
-                                    <p className="text-sm text-gray-600">{sample.submitter_name}</p>
-                                    <p className="text-xs text-gray-500">
-                                      Submitted: {format(new Date(sample.created_at), "PPP")}
-                                    </p>
-                                  </div>
-                                  <Button variant="outline">
-                                    Enter Test Results
-                                  </Button>
-                                </div>
-                              </CardContent>
-                            </Card>
-                          </DialogTrigger>
-                          <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
-                            <DialogHeader>
-                              <DialogTitle>Test Parameter Entry</DialogTitle>
-                            </DialogHeader>
-                            <AdminTestEntry
-                              sampleId={sample.sample_id}
-                              sampleData={sample}
-                              onTestComplete={() => {
-                                fetchSamples();
-                                toast.success("Test completed successfully!");
-                              }}
-                            />
-                          </DialogContent>
-                        </Dialog>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        )}
       </Tabs>
     </div>
   );

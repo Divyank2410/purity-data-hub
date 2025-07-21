@@ -72,6 +72,7 @@ const SampleSubmissionForm = () => {
         submitter_address: data.submitter_address,
         submitter_mobile: data.submitter_mobile,
         submitter_email: data.submitter_email,
+        sample_type: data.sample_type,
         sample_image_url: imageUrl,
         // Note: All test parameters are left null for admin to fill later
       });
