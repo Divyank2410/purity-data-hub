@@ -7,8 +7,6 @@ import { supabase } from "@/integrations/supabase/client";
 import AdminWaterData from "@/components/admin/AdminWaterData";
 import AdminSewerData from "@/components/admin/AdminSewerData";
 import AdminAmritData from "@/components/admin/AdminAmritData";
-import AdminLabTests from "@/components/admin/AdminLabTests";
-import AdminPendingLabTests from "@/components/admin/AdminPendingLabTests";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 
@@ -91,13 +89,6 @@ const AdminDashboard = () => {
           <p className="text-gray-600 mt-1">View and manage all data</p>
         </div>
         <div className="flex gap-3 mt-4 md:mt-0">
-          <Button
-            onClick={() => navigate("/lab-test-reports")}
-            variant="outline"
-            className="bg-blue-50 border-blue-200 hover:bg-blue-100"
-          >
-            Lab Test Reports
-          </Button>
           <Button 
             variant="outline" 
             onClick={handleSignOut}
@@ -122,12 +113,10 @@ const AdminDashboard = () => {
         onValueChange={handleTabChange}
         className="w-full"
       >
-        <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-5 mb-8">
+        <TabsList className="grid w-full grid-cols-1 md:grid-cols-3 mb-8">
           <TabsTrigger value="water-data" className="text-xs md:text-sm">Water</TabsTrigger>
           <TabsTrigger value="sewer-data" className="text-xs md:text-sm">Sewer</TabsTrigger>
           <TabsTrigger value="amrit-data" className="text-xs md:text-sm">Amrit</TabsTrigger>
-          <TabsTrigger value="pending-lab-tests" className="text-xs md:text-sm">Pending</TabsTrigger>
-          <TabsTrigger value="lab-tests" className="text-xs md:text-sm">Reports</TabsTrigger>
         </TabsList>
 
         <TabsContent value="water-data">
@@ -142,13 +131,6 @@ const AdminDashboard = () => {
           <AdminAmritData />
         </TabsContent>
 
-        <TabsContent value="pending-lab-tests">
-          <AdminPendingLabTests />
-        </TabsContent>
-
-        <TabsContent value="lab-tests">
-          <AdminLabTests />
-        </TabsContent>
       </Tabs>
     </div>
   );

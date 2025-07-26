@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import WaterQualityForm from "@/components/forms/WaterQualityForm";
 import SewerQualityForm from "@/components/forms/SewerQualityForm";
 import AmritYojnaForm from "@/components/forms/AmritYojnaForm";
-import SampleSubmissionForm from "@/components/forms/SampleSubmissionForm";
+
 
 const UserDashboard = () => {
   const navigate = useNavigate();
@@ -119,11 +119,10 @@ const UserDashboard = () => {
       </Card>
 
       <Tabs defaultValue="water-quality" className="w-full">
-        <TabsList className="grid grid-cols-2 md:grid-cols-4 mb-8">
+        <TabsList className="grid grid-cols-1 md:grid-cols-3 mb-8">
           <TabsTrigger value="water-quality" className="text-xs md:text-sm">Water Quality</TabsTrigger>
           <TabsTrigger value="sewer-quality" className="text-xs md:text-sm">Sewer Quality</TabsTrigger>
           <TabsTrigger value="amrit-yojna" className="text-xs md:text-sm">Amrit Yojna</TabsTrigger>
-          <TabsTrigger value="sample-submission" className="text-xs md:text-sm">Lab Sample</TabsTrigger>
         </TabsList>
 
         <TabsContent value="water-quality">
@@ -138,19 +137,6 @@ const UserDashboard = () => {
           <AmritYojnaForm userId={user?.id} />
         </TabsContent>
 
-        <TabsContent value="sample-submission">
-          <Card>
-            <CardHeader className="bg-blue-50">
-              <CardTitle>Lab Sample Submission</CardTitle>
-              <CardDescription>
-                Submit water samples for comprehensive laboratory testing and analysis
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="pt-6">
-              <SampleSubmissionForm />
-            </CardContent>
-          </Card>
-        </TabsContent>
       </Tabs>
     </div>
   );
