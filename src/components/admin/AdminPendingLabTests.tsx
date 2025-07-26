@@ -65,6 +65,7 @@ const AdminPendingLabTests = () => {
 
   const fetchPendingSamples = async () => {
     try {
+      console.log("Fetching lab tests data...");
       const { data, error } = await supabase
         .from("lab_tests")
         .select("*")
@@ -72,12 +73,15 @@ const AdminPendingLabTests = () => {
 
       if (error) throw error;
 
+      console.log("Raw lab tests data:", data);
+
       // Filter for pending samples (no test parameters filled)
       const testFields = ['ph', 'tds', 'turbidity', 'calcium', 'chloride'];
       const pending = (data || []).filter(sample => 
         !testFields.some(field => sample[field as keyof LabTest] && sample[field as keyof LabTest] !== null && sample[field as keyof LabTest] !== "")
       );
 
+      console.log("Filtered pending samples:", pending);
       setPendingSamples(pending);
     } catch (error) {
       console.error("Error fetching pending samples:", error);
