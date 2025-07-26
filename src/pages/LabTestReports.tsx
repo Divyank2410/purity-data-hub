@@ -124,7 +124,7 @@ const LabTestReports = () => {
     const testFields = ['ph', 'tds', 'turbidity', 'calcium', 'chloride'];
     
     const treated = data.filter(sample => 
-      testFields.some(field => sample[field as keyof LabTest])
+      testFields.some(field => sample[field as keyof LabTest] && sample[field as keyof LabTest] !== null && sample[field as keyof LabTest] !== "")
     ).length;
     
     setStats({
@@ -151,11 +151,11 @@ const LabTestReports = () => {
       
       if (statusFilter === "pending") {
         filtered = filtered.filter(sample => 
-          !testFields.some(field => sample[field as keyof LabTest])
+          !testFields.some(field => sample[field as keyof LabTest] && sample[field as keyof LabTest] !== null && sample[field as keyof LabTest] !== "")
         );
       } else if (statusFilter === "treated") {
         filtered = filtered.filter(sample => 
-          testFields.some(field => sample[field as keyof LabTest])
+          testFields.some(field => sample[field as keyof LabTest] && sample[field as keyof LabTest] !== null && sample[field as keyof LabTest] !== "")
         );
       }
     }
@@ -173,7 +173,7 @@ const LabTestReports = () => {
 
   const getSampleStatus = (sample: LabTest) => {
     const testFields = ['ph', 'tds', 'turbidity', 'calcium', 'chloride'];
-    return testFields.some(field => sample[field as keyof LabTest]) ? 'treated' : 'pending';
+    return testFields.some(field => sample[field as keyof LabTest] && sample[field as keyof LabTest] !== null && sample[field as keyof LabTest] !== "") ? 'treated' : 'pending';
   };
 
   const exportSampleReport = (sample: LabTest) => {

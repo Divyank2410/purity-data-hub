@@ -75,7 +75,7 @@ const AdminPendingLabTests = () => {
       // Filter for pending samples (no test parameters filled)
       const testFields = ['ph', 'tds', 'turbidity', 'calcium', 'chloride'];
       const pending = (data || []).filter(sample => 
-        !testFields.some(field => sample[field as keyof LabTest])
+        !testFields.some(field => sample[field as keyof LabTest] && sample[field as keyof LabTest] !== null && sample[field as keyof LabTest] !== "")
       );
 
       setPendingSamples(pending);
@@ -88,7 +88,7 @@ const AdminPendingLabTests = () => {
   };
 
   const handleTestComplete = () => {
-    fetchPendingSamples();
+    fetchPendingSamples(); // This will refresh the pending samples list
     toast.success("Test completed successfully! Sample moved to treated section.");
   };
 
