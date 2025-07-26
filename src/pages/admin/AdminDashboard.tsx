@@ -122,12 +122,12 @@ const AdminDashboard = () => {
         onValueChange={handleTabChange}
         className="w-full"
       >
-        <TabsList className="grid w-full grid-cols-5 mb-8">
-          <TabsTrigger value="water-data">Water Treatment Data</TabsTrigger>
-          <TabsTrigger value="sewer-data">Sewer Treatment Data</TabsTrigger>
-          <TabsTrigger value="amrit-data">Amrit Yojna Data</TabsTrigger>
-          <TabsTrigger value="pending-lab-tests">Pending Lab Tests</TabsTrigger>
-          <TabsTrigger value="lab-tests">Lab Test Reports</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-5 mb-8">
+          <TabsTrigger value="water-data" className="text-xs md:text-sm">Water</TabsTrigger>
+          <TabsTrigger value="sewer-data" className="text-xs md:text-sm">Sewer</TabsTrigger>
+          <TabsTrigger value="amrit-data" className="text-xs md:text-sm">Amrit</TabsTrigger>
+          <TabsTrigger value="pending-lab-tests" className="text-xs md:text-sm">Pending</TabsTrigger>
+          <TabsTrigger value="lab-tests" className="text-xs md:text-sm">Reports</TabsTrigger>
         </TabsList>
 
         <TabsContent value="water-data">

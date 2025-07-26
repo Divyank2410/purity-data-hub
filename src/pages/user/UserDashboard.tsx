@@ -119,11 +119,11 @@ const UserDashboard = () => {
       </Card>
 
       <Tabs defaultValue="water-quality" className="w-full">
-        <TabsList className="grid grid-cols-4 mb-8">
-          <TabsTrigger value="water-quality">Water Quality Data</TabsTrigger>
-          <TabsTrigger value="sewer-quality">Sewer Quality Data</TabsTrigger>
-          <TabsTrigger value="amrit-yojna">Amrit Yojna Data</TabsTrigger>
-          <TabsTrigger value="sample-submission">Submit Lab Sample</TabsTrigger>
+        <TabsList className="grid grid-cols-2 md:grid-cols-4 mb-8">
+          <TabsTrigger value="water-quality" className="text-xs md:text-sm">Water Quality</TabsTrigger>
+          <TabsTrigger value="sewer-quality" className="text-xs md:text-sm">Sewer Quality</TabsTrigger>
+          <TabsTrigger value="amrit-yojna" className="text-xs md:text-sm">Amrit Yojna</TabsTrigger>
+          <TabsTrigger value="sample-submission" className="text-xs md:text-sm">Lab Sample</TabsTrigger>
         </TabsList>
 
         <TabsContent value="water-quality">

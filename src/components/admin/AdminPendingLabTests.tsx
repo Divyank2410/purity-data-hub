@@ -157,18 +157,18 @@ const AdminPendingLabTests = () => {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
           {filteredSamples.map((sample) => (
             <Card key={sample.id} className="border-amber-200 hover:shadow-md transition-shadow">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg">{sample.sample_id}</CardTitle>
-                  <Badge variant="destructive" className="bg-amber-100 text-amber-800 border-amber-300">
-                    <Clock className="h-3 w-3 mr-1" />
+              <CardHeader className="pb-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <CardTitle className="text-lg break-all">{sample.sample_id}</CardTitle>
+                  <Badge variant="destructive" className="bg-amber-100 text-amber-800 border-amber-300 w-fit">
+                    <Clock className="h-3 w-3 mr-1 flex-shrink-0" />
                     Awaiting Test
                   </Badge>
                 </div>
-                <CardDescription>{sample.submitter_name}</CardDescription>
+                <CardDescription className="break-words">{sample.submitter_name}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="text-sm text-gray-600">

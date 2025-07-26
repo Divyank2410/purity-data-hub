@@ -420,10 +420,10 @@ const Home = () => {
       </section>
 
       <Tabs defaultValue="water" className="mb-12">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="water">Water Treatment Plants</TabsTrigger>
-          <TabsTrigger value="sewer">Sewer Treatment Plants</TabsTrigger>
-          <TabsTrigger value="amrit">Amrit Yojna</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-1 md:grid-cols-3">
+          <TabsTrigger value="water" className="text-sm">Water Treatment Plants</TabsTrigger>
+          <TabsTrigger value="sewer" className="text-sm">Sewer Treatment Plants</TabsTrigger>
+          <TabsTrigger value="amrit" className="text-sm">Amrit Yojna</TabsTrigger>
         </TabsList>
 
         <TabsContent value="water" className="mt-6">
@@ -443,9 +443,9 @@ const Home = () => {
                       <CardDescription>Location: {plant.location}</CardDescription>
                       {plant.capacity && <CardDescription>Capacity: {plant.capacity}</CardDescription>}
                     </CardHeader>
-                    <CardContent className="p-0">
-                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                        <div className="lg:col-span-2 p-6 border-r border-b lg:border-b-0">
+                     <CardContent className="p-0">
+                      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
+                        <div className="xl:col-span-2 p-4 md:p-6 border-r border-b xl:border-b-0">
                           <WaterQualityChart 
                             plantName={plant.name}
                             rawWaterData={rawWaterData}
