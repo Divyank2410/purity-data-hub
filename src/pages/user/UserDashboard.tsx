@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import WaterQualityForm from "@/components/forms/WaterQualityForm";
 import SewerQualityForm from "@/components/forms/SewerQualityForm";
 import AmritYojnaForm from "@/components/forms/AmritYojnaForm";
+import WaterSampleForm from "@/components/forms/WaterSampleForm";
 
 
 const UserDashboard = () => {
@@ -119,10 +120,11 @@ const UserDashboard = () => {
       </Card>
 
       <Tabs defaultValue="water-quality" className="w-full">
-        <TabsList className="grid grid-cols-1 md:grid-cols-3 mb-8">
+        <TabsList className="grid grid-cols-2 md:grid-cols-4 mb-8">
           <TabsTrigger value="water-quality" className="text-xs md:text-sm">Water Quality</TabsTrigger>
           <TabsTrigger value="sewer-quality" className="text-xs md:text-sm">Sewer Quality</TabsTrigger>
           <TabsTrigger value="amrit-yojna" className="text-xs md:text-sm">Amrit Yojna</TabsTrigger>
+          <TabsTrigger value="water-sample" className="text-xs md:text-sm">Lab Sample</TabsTrigger>
         </TabsList>
 
         <TabsContent value="water-quality">
@@ -135,6 +137,10 @@ const UserDashboard = () => {
 
         <TabsContent value="amrit-yojna">
           <AmritYojnaForm userId={user?.id} />
+        </TabsContent>
+
+        <TabsContent value="water-sample">
+          <WaterSampleForm userId={user?.id} />
         </TabsContent>
 
       </Tabs>

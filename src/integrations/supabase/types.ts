@@ -360,6 +360,122 @@ export type Database = {
           },
         ]
       }
+      water_samples: {
+        Row: {
+          address: string
+          admin_notes: string | null
+          created_at: string
+          id: string
+          mobile_number: string
+          name: string
+          sample_image_url: string
+          source_of_sample: string
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          address: string
+          admin_notes?: string | null
+          created_at?: string
+          id?: string
+          mobile_number: string
+          name: string
+          sample_image_url: string
+          source_of_sample: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          address?: string
+          admin_notes?: string | null
+          created_at?: string
+          id?: string
+          mobile_number?: string
+          name?: string
+          sample_image_url?: string
+          source_of_sample?: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      water_test_reports: {
+        Row: {
+          additional_notes: string | null
+          calcium_ca: number | null
+          chloride_cl: number | null
+          created_at: string
+          ecoli: string | null
+          fluoride_f: number | null
+          id: string
+          iron_fe: number | null
+          magnesium_mg: number | null
+          ph_level: number | null
+          residual_chlorine: number | null
+          sample_id: string
+          sulphate_so4: number | null
+          tds: number | null
+          total_alkalinity: number | null
+          total_coliform: string | null
+          total_hardness: number | null
+          turbidity: number | null
+          updated_at: string
+        }
+        Insert: {
+          additional_notes?: string | null
+          calcium_ca?: number | null
+          chloride_cl?: number | null
+          created_at?: string
+          ecoli?: string | null
+          fluoride_f?: number | null
+          id?: string
+          iron_fe?: number | null
+          magnesium_mg?: number | null
+          ph_level?: number | null
+          residual_chlorine?: number | null
+          sample_id: string
+          sulphate_so4?: number | null
+          tds?: number | null
+          total_alkalinity?: number | null
+          total_coliform?: string | null
+          total_hardness?: number | null
+          turbidity?: number | null
+          updated_at?: string
+        }
+        Update: {
+          additional_notes?: string | null
+          calcium_ca?: number | null
+          chloride_cl?: number | null
+          created_at?: string
+          ecoli?: string | null
+          fluoride_f?: number | null
+          id?: string
+          iron_fe?: number | null
+          magnesium_mg?: number | null
+          ph_level?: number | null
+          residual_chlorine?: number | null
+          sample_id?: string
+          sulphate_so4?: number | null
+          tds?: number | null
+          total_alkalinity?: number | null
+          total_coliform?: string | null
+          total_hardness?: number | null
+          turbidity?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "water_test_reports_sample_id_fkey"
+            columns: ["sample_id"]
+            isOneToOne: false
+            referencedRelation: "water_samples"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       water_treatment_plants: {
         Row: {
           capacity: string | null

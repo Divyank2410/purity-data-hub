@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import AdminWaterData from "@/components/admin/AdminWaterData";
 import AdminSewerData from "@/components/admin/AdminSewerData";
 import AdminAmritData from "@/components/admin/AdminAmritData";
+import AdminWaterSamples from "@/components/admin/AdminWaterSamples";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 
@@ -113,10 +114,11 @@ const AdminDashboard = () => {
         onValueChange={handleTabChange}
         className="w-full"
       >
-        <TabsList className="grid w-full grid-cols-1 md:grid-cols-3 mb-8">
+        <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 mb-8">
           <TabsTrigger value="water-data" className="text-xs md:text-sm">Water</TabsTrigger>
           <TabsTrigger value="sewer-data" className="text-xs md:text-sm">Sewer</TabsTrigger>
           <TabsTrigger value="amrit-data" className="text-xs md:text-sm">Amrit</TabsTrigger>
+          <TabsTrigger value="water-samples" className="text-xs md:text-sm">Lab Samples</TabsTrigger>
         </TabsList>
 
         <TabsContent value="water-data">
@@ -129,6 +131,10 @@ const AdminDashboard = () => {
 
         <TabsContent value="amrit-data">
           <AdminAmritData />
+        </TabsContent>
+
+        <TabsContent value="water-samples">
+          <AdminWaterSamples />
         </TabsContent>
 
       </Tabs>
