@@ -92,7 +92,7 @@ const AdminWaterSamples = () => {
           </div>
           <Badge 
             variant={sample.status === 'treated' ? 'default' : 'secondary'}
-            className={sample.status === 'treated' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}
+            className={sample.status === 'treated' ? 'bg-success/10 text-success border-success/20' : 'bg-warning/10 text-warning border-warning/20'}
           >
             {sample.status === 'treated' ? (
               <div className="flex items-center gap-1">
@@ -152,7 +152,7 @@ const AdminWaterSamples = () => {
             <Button
               size="sm"
               onClick={() => handleTestReport(sample)}
-              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700"
+              className="flex items-center gap-2 bg-info hover:bg-info/90 text-info-foreground"
             >
               <TestTube className="h-4 w-4" />
               Enter Test Parameters
@@ -164,7 +164,7 @@ const AdminWaterSamples = () => {
               size="sm"
               variant="outline"
               onClick={() => handleViewTestReport(sample)}
-              className="flex items-center gap-2 border-green-600 text-green-600 hover:bg-green-50"
+              className="flex items-center gap-2 border-success text-success hover:bg-success/5"
             >
               <FileText className="h-4 w-4" />
               View Test Report
@@ -190,38 +190,38 @@ const AdminWaterSamples = () => {
     <div className="space-y-6">
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
+        <Card className="bg-gradient-to-br from-info/5 to-info/10 border-info/20">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-blue-800">Total Samples</p>
-                <p className="text-3xl font-bold text-blue-900">{totalSamples}</p>
+                <p className="text-sm font-medium text-info">Total Samples</p>
+                <p className="text-3xl font-bold text-info-foreground">{totalSamples}</p>
               </div>
-              <FlaskConical className="h-8 w-8 text-blue-600" />
+              <FlaskConical className="h-8 w-8 text-info" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100 border-yellow-200">
+        <Card className="bg-gradient-to-br from-warning/5 to-warning/10 border-warning/20">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-yellow-800">Untreated</p>
-                <p className="text-3xl font-bold text-yellow-900">{untreatedSamples.length}</p>
+                <p className="text-sm font-medium text-warning">Untreated</p>
+                <p className="text-3xl font-bold text-warning-foreground">{untreatedSamples.length}</p>
               </div>
-              <Clock className="h-8 w-8 text-yellow-600" />
+              <Clock className="h-8 w-8 text-warning" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
+        <Card className="bg-gradient-to-br from-success/5 to-success/10 border-success/20">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-green-800">Treated</p>
-                <p className="text-3xl font-bold text-green-900">{treatedSamples.length}</p>
+                <p className="text-sm font-medium text-success">Treated</p>
+                <p className="text-3xl font-bold text-success-foreground">{treatedSamples.length}</p>
               </div>
-              <CheckCircle className="h-8 w-8 text-green-600" />
+              <CheckCircle className="h-8 w-8 text-success" />
             </div>
           </CardContent>
         </Card>
@@ -250,8 +250,8 @@ const AdminWaterSamples = () => {
                 ))}
                 {samples.length === 0 && (
                   <div className="text-center py-12">
-                    <FlaskConical className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-500">No water samples submitted yet</p>
+                    <FlaskConical className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-muted-foreground">No water samples submitted yet</p>
                   </div>
                 )}
               </div>
@@ -264,8 +264,8 @@ const AdminWaterSamples = () => {
                 ))}
                 {untreatedSamples.length === 0 && (
                   <div className="text-center py-12">
-                    <CheckCircle className="h-12 w-12 text-green-400 mx-auto mb-4" />
-                    <p className="text-gray-500">All samples have been treated!</p>
+                    <CheckCircle className="h-12 w-12 text-success mx-auto mb-4" />
+                    <p className="text-muted-foreground">All samples have been treated!</p>
                   </div>
                 )}
               </div>
@@ -278,8 +278,8 @@ const AdminWaterSamples = () => {
                 ))}
                 {treatedSamples.length === 0 && (
                   <div className="text-center py-12">
-                    <Clock className="h-12 w-12 text-yellow-400 mx-auto mb-4" />
-                    <p className="text-gray-500">No samples have been treated yet</p>
+                    <Clock className="h-12 w-12 text-warning mx-auto mb-4" />
+                    <p className="text-muted-foreground">No samples have been treated yet</p>
                   </div>
                 )}
               </div>

@@ -102,7 +102,7 @@ const ViewTestReportModal = ({ isOpen, onClose, sample }: ViewTestReportModalPro
 
         {loading ? (
           <div className="flex items-center justify-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-info"></div>
           </div>
         ) : testReport ? (
           <div className="space-y-6">
@@ -157,9 +157,9 @@ const ViewTestReportModal = ({ isOpen, onClose, sample }: ViewTestReportModalPro
                     if (value === null || value === undefined) return null;
                     
                     return (
-                      <div key={param.key} className="p-3 border rounded-lg bg-gray-50">
-                        <p className="text-sm font-medium text-gray-700">{param.label}</p>
-                        <p className="text-lg font-semibold text-gray-900">
+                      <div key={param.key} className="p-3 border rounded-lg bg-muted/50">
+                        <p className="text-sm font-medium text-muted-foreground">{param.label}</p>
+                        <p className="text-lg font-semibold text-foreground">
                           {value} {param.unit}
                         </p>
                       </div>
@@ -185,14 +185,14 @@ const ViewTestReportModal = ({ isOpen, onClose, sample }: ViewTestReportModalPro
 
             {/* Status Badge */}
             <div className="flex justify-center">
-              <Badge className="bg-green-100 text-green-800 px-4 py-2">
+              <Badge className="bg-success/10 text-success border-success/20 px-4 py-2">
                 Test Completed
               </Badge>
             </div>
           </div>
         ) : (
           <div className="text-center py-8">
-            <p className="text-gray-500">No test report found for this sample</p>
+            <p className="text-muted-foreground">No test report found for this sample</p>
           </div>
         )}
       </DialogContent>

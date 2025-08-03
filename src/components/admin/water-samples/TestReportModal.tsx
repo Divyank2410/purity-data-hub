@@ -98,6 +98,14 @@ const TestReportModal = ({ isOpen, onClose, sample, onSubmit }: TestReportModalP
 
       if (error) throw error;
 
+      // Update sample status to treated
+      const { error: updateError } = await supabase
+        .from('water_samples')
+        .update({ status: 'treated' })
+        .eq('id', sample.id);
+
+      if (updateError) throw updateError;
+
       toast.success("Test report submitted successfully! Sample status updated to treated.");
       reset();
       onSubmit();
@@ -188,11 +196,11 @@ const TestReportModal = ({ isOpen, onClose, sample, onSubmit }: TestReportModalP
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="bg-blue-600 hover:bg-blue-700"
+              className="bg-info hover:bg-info/90 text-info-foreground"
             >
               {isSubmitting ? (
                 <div className="flex items-center gap-2">
-                  <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div>
+                  <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-current"></div>
                   Submitting Report...
                 </div>
               ) : (
