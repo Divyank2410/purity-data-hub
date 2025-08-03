@@ -5,8 +5,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { FlaskConical, TestTube, CheckCircle, Clock, Eye } from "lucide-react";
+import { FlaskConical, TestTube, CheckCircle, Clock, Eye, FileText } from "lucide-react";
 import TestReportModal from "./water-samples/TestReportModal";
+import ViewTestReportModal from "./water-samples/ViewTestReportModal";
 
 interface WaterSample {
   id: string;
@@ -25,6 +26,8 @@ const AdminWaterSamples = () => {
   const [loading, setLoading] = useState(true);
   const [selectedSample, setSelectedSample] = useState<WaterSample | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [viewReportSample, setViewReportSample] = useState<WaterSample | null>(null);
+  const [isViewReportModalOpen, setIsViewReportModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("total");
 
   useEffect(() => {
@@ -61,6 +64,11 @@ const AdminWaterSamples = () => {
     setIsModalOpen(false);
     setSelectedSample(null);
     fetchSamples(); // Refresh the samples list
+  };
+
+  const handleViewTestReport = (sample: WaterSample) => {
+    setViewReportSample(sample);
+    setIsViewReportModalOpen(true);
   };
 
   const getFilteredSamples = () => {
@@ -148,6 +156,18 @@ const AdminWaterSamples = () => {
             >
               <TestTube className="h-4 w-4" />
               Enter Test Parameters
+            </Button>
+          )}
+
+          {sample.status === 'treated' && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => handleViewTestReport(sample)}
+              className="flex items-center gap-2 border-green-600 text-green-600 hover:bg-green-50"
+            >
+              <FileText className="h-4 w-4" />
+              View Test Report
             </Button>
           )}
         </div>
@@ -275,6 +295,15 @@ const AdminWaterSamples = () => {
           onClose={() => setIsModalOpen(false)}
           sample={selectedSample}
           onSubmit={handleTestReportSubmit}
+        />
+      )}
+
+      {/* View Test Report Modal */}
+      {viewReportSample && (
+        <ViewTestReportModal
+          isOpen={isViewReportModalOpen}
+          onClose={() => setIsViewReportModalOpen(false)}
+          sample={viewReportSample}
         />
       )}
     </div>
