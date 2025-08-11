@@ -91,6 +91,12 @@ const AdminDashboard = () => {
         </div>
         <div className="flex gap-3 mt-4 md:mt-0">
           <Button 
+            variant="secondary" 
+            onClick={() => navigate("/admin/reports")}
+          >
+            Reports & Analytics
+          </Button>
+          <Button 
             variant="outline" 
             onClick={handleSignOut}
           >
