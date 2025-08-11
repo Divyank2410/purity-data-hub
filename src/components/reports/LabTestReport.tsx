@@ -150,15 +150,21 @@ export const LabTestReport = ({ dateRange }: LabTestReportProps) => {
     chart: {
       type: 'line' as const,
       height: 250,
-      background: 'transparent'
+      background: 'transparent',
+      toolbar: {
+        show: false
+      }
     },
     xaxis: {
-      categories: chartData.categories
+      categories: chartData.categories.length > 0 ? chartData.categories : ['No Data']
     },
-    colors: ['hsl(var(--primary))', 'hsl(var(--secondary))', 'hsl(var(--accent))'],
+    colors: ['#10b981', '#3b82f6', '#8b5cf6'],
     stroke: {
       curve: 'smooth' as const,
       width: 2
+    },
+    grid: {
+      borderColor: '#e5e7eb'
     }
   };
 
@@ -166,16 +172,22 @@ export const LabTestReport = ({ dateRange }: LabTestReportProps) => {
     chart: {
       type: 'bar' as const,
       height: 250,
-      background: 'transparent'
+      background: 'transparent',
+      toolbar: {
+        show: false
+      }
     },
     xaxis: {
       categories: barChartData.categories
     },
-    colors: ['hsl(var(--primary))'],
+    colors: ['#10b981'],
     plotOptions: {
       bar: {
         columnWidth: '50%'
       }
+    },
+    grid: {
+      borderColor: '#e5e7eb'
     }
   };
 

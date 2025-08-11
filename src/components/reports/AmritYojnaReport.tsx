@@ -137,25 +137,32 @@ export const AmritYojnaReport = ({ dateRange }: AmritYojnaReportProps) => {
     chart: {
       type: 'line' as const,
       height: 250,
-      background: 'transparent'
+      background: 'transparent',
+      toolbar: {
+        show: false
+      }
     },
     xaxis: {
-      categories: chartData.categories
+      categories: chartData.categories.length > 0 ? chartData.categories : ['No Data']
     },
-    colors: ['hsl(var(--primary))', 'hsl(var(--secondary))'],
+    colors: ['#10b981', '#3b82f6'],
     stroke: {
       curve: 'smooth' as const,
       width: 2
+    },
+    grid: {
+      borderColor: '#e5e7eb'
     }
   };
 
   const pieOptions = {
     chart: {
       type: 'pie' as const,
-      height: 250
+      height: 250,
+      background: 'transparent'
     },
     labels: pieChartData.labels,
-    colors: ['hsl(var(--success))', 'hsl(var(--warning))', 'hsl(var(--destructive))'],
+    colors: ['#10b981', '#f59e0b', '#ef4444'],
     legend: {
       position: 'bottom' as const
     }

@@ -138,15 +138,21 @@ export const WaterTreatmentReport = ({ dateRange }: WaterTreatmentReportProps) =
     chart: {
       type: 'line' as const,
       height: 300,
-      background: 'transparent'
+      background: 'transparent',
+      toolbar: {
+        show: false
+      }
     },
     xaxis: {
-      categories: chartData.categories
+      categories: chartData.categories.length > 0 ? chartData.categories : ['No Data']
     },
-    colors: ['hsl(var(--primary))', 'hsl(var(--secondary))'],
+    colors: ['#10b981', '#3b82f6', '#8b5cf6'],
     stroke: {
       curve: 'smooth' as const,
       width: 2
+    },
+    grid: {
+      borderColor: '#e5e7eb'
     }
   };
 
