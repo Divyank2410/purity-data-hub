@@ -114,7 +114,34 @@ const AdminDashboard = () => {
         </CardHeader>
       </Card>
 
-      <Tabs 
+      {/* License Management Quick Access */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+        <Card className="hover:shadow-lg transition-shadow border-blue-200">
+          <CardHeader>
+            <CardTitle className="text-blue-600">License Applications</CardTitle>
+            <CardDescription>Review and approve water supply license applications</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button className="w-full" onClick={() => navigate("/admin/license-applications")}>
+              Manage Applications
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card className="hover:shadow-lg transition-shadow border-green-200">
+          <CardHeader>
+            <CardTitle className="text-green-600">License Management</CardTitle>
+            <CardDescription>View all issued licenses and expiry notifications</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button className="w-full" variant="outline" onClick={() => navigate("/admin/licenses")}>
+              View All Licenses
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Tabs
         defaultValue="water-data" 
         value={activeTab}
         onValueChange={handleTabChange}

@@ -158,6 +158,124 @@ export type Database = {
         }
         Relationships: []
       }
+      license_applications: {
+        Row: {
+          applicant_name: string
+          created_at: string
+          documents_url: string[] | null
+          email: string
+          id: string
+          mobile_number: string
+          shop_registration_number: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          applicant_name: string
+          created_at?: string
+          documents_url?: string[] | null
+          email: string
+          id?: string
+          mobile_number: string
+          shop_registration_number: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          applicant_name?: string
+          created_at?: string
+          documents_url?: string[] | null
+          email?: string
+          id?: string
+          mobile_number?: string
+          shop_registration_number?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      license_notifications: {
+        Row: {
+          created_at: string
+          id: string
+          is_read: boolean | null
+          license_id: string
+          message: string
+          notification_type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_read?: boolean | null
+          license_id: string
+          message: string
+          notification_type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_read?: boolean | null
+          license_id?: string
+          message?: string
+          notification_type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "license_notifications_license_id_fkey"
+            columns: ["license_id"]
+            isOneToOne: false
+            referencedRelation: "licenses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      licenses: {
+        Row: {
+          application_id: string
+          approval_date: string
+          created_at: string
+          expiry_date: string
+          id: string
+          license_number: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          application_id: string
+          approval_date: string
+          created_at?: string
+          expiry_date: string
+          id?: string
+          license_number: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          application_id?: string
+          approval_date?: string
+          created_at?: string
+          expiry_date?: string
+          id?: string
+          license_number?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "licenses_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: true
+            referencedRelation: "license_applications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string

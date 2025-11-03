@@ -16,6 +16,11 @@ import NotFound from "./pages/NotFound";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import ReportsAnalytics from "./pages/admin/ReportsAnalytics";
 import LabTestReports from "./pages/LabTestReports";
+import ApplyLicense from "./pages/ApplyLicense";
+import TrackApplication from "./pages/TrackApplication";
+import MyLicenses from "./pages/MyLicenses";
+import LicenseApplications from "./pages/admin/LicenseApplications";
+import LicenseManagement from "./pages/admin/LicenseManagement";
 
 // Create QueryClient with optimized settings
 const queryClient = new QueryClient({
@@ -140,6 +145,14 @@ const App = () => {
                 <Route path="/admin-dashboard" element={renderProtectedRoute(AdminDashboard, "admin")} />
                 <Route path="/admin/reports" element={renderProtectedRoute(ReportsAnalytics, "admin")} />
                 <Route path="/lab-test-reports" element={renderProtectedRoute(LabTestReports)} />
+                
+                {/* License System Routes */}
+                <Route path="/apply-license" element={renderProtectedRoute(ApplyLicense)} />
+                <Route path="/track-application" element={renderProtectedRoute(TrackApplication)} />
+                <Route path="/my-licenses" element={renderProtectedRoute(MyLicenses)} />
+                <Route path="/admin/license-applications" element={renderProtectedRoute(LicenseApplications, "admin")} />
+                <Route path="/admin/licenses" element={renderProtectedRoute(LicenseManagement, "admin")} />
+                
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

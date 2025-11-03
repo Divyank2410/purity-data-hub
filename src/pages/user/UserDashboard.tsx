@@ -1,10 +1,11 @@
 import { useEffect, useState, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { FileText, TrendingUp, ScrollText } from "lucide-react";
 import WaterQualityForm from "@/components/forms/WaterQualityForm";
 import SewerQualityForm from "@/components/forms/SewerQualityForm";
 import AmritYojnaForm from "@/components/forms/AmritYojnaForm";
@@ -118,6 +119,54 @@ const UserDashboard = () => {
           </CardDescription>
         </CardHeader>
       </Card>
+
+      {/* License System Quick Access */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <Card className="hover:shadow-lg transition-shadow">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5 text-blue-600" />
+              Apply for License
+            </CardTitle>
+            <CardDescription>Submit a new water supply license application</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Link to="/apply-license">
+              <Button className="w-full">Apply Now</Button>
+            </Link>
+          </CardContent>
+        </Card>
+
+        <Card className="hover:shadow-lg transition-shadow">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="h-5 w-5 text-yellow-600" />
+              Track Application
+            </CardTitle>
+            <CardDescription>Monitor the status of your applications</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Link to="/track-application">
+              <Button className="w-full" variant="outline">Track Status</Button>
+            </Link>
+          </CardContent>
+        </Card>
+
+        <Card className="hover:shadow-lg transition-shadow">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <ScrollText className="h-5 w-5 text-green-600" />
+              My Licenses
+            </CardTitle>
+            <CardDescription>View and manage your active licenses</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Link to="/my-licenses">
+              <Button className="w-full" variant="outline">View Licenses</Button>
+            </Link>
+          </CardContent>
+        </Card>
+      </div>
 
       <Tabs defaultValue="water-quality" className="w-full">
         <TabsList className="grid grid-cols-2 md:grid-cols-4 mb-8">
