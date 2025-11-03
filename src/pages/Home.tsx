@@ -301,7 +301,7 @@ const Home = () => {
         .from("amrit_yojna_data")
         .select("*")
         .order("created_at", { ascending: false })
-        .limit(1);
+        .limit(10);
       
       if (error) throw error;
       return data as AmritYojnaData[] || [];
