@@ -16,6 +16,7 @@ import WaterQualityChart from "@/components/WaterQualityChart";
 import SewerQualityChart from "@/components/SewerQualityChart";
 import ParameterLimitsDisplay from "@/components/ParameterLimitsDisplay";
 import { waterLimits, sewerLimits } from "@/utils/parameterLimits";
+import PublicTracking from "@/components/PublicTracking";
 
 // List of plant names to exclude (for water treatment plants only)
 const excludedWaterPlantNames = [
@@ -418,6 +419,9 @@ const Home = () => {
           </div>
         </div>
       </section>
+
+      {/* Public License Tracking Section */}
+      <PublicTracking />
 
       <Tabs defaultValue="water" className="mb-12">
         <TabsList className="grid w-full grid-cols-1 md:grid-cols-3">

@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Loader2, Upload, X } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import TrackingNumberDisplay from "@/components/TrackingNumberDisplay";
 
 const ApplyLicense = () => {
   const navigate = useNavigate();
@@ -18,6 +19,7 @@ const ApplyLicense = () => {
   const [files, setFiles] = useState<File[]>([]);
   const [session, setSession] = useState<Session | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
+  const [trackingNumber, setTrackingNumber] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     applicantName: "",
     mobileNumber: "",
@@ -82,7 +84,7 @@ const ApplyLicense = () => {
       }
 
       // Insert application
-      const { error: insertError } = await supabase
+      const { data: newApp, error: insertError } = await supabase
         .from('license_applications')
         .insert({
           user_id: user.id,
@@ -92,16 +94,19 @@ const ApplyLicense = () => {
           shop_registration_number: formData.shopRegistrationNumber,
           documents_url: documentUrls,
           status: 'submitted'
-        });
+        })
+        .select()
+        .single();
 
       if (insertError) throw insertError;
+
+      // Show tracking number
+      setTrackingNumber(newApp.tracking_number);
 
       toast({
         title: "Application Submitted",
         description: "Your license application has been submitted successfully.",
       });
-
-      navigate('/track-application');
     } catch (error: any) {
       toast({
         title: "Error",
@@ -117,6 +122,15 @@ const ApplyLicense = () => {
     <div className="min-h-screen flex flex-col">
       <Navbar session={session} userRole={userRole} />
       <main className="flex-1 container mx-auto px-4 py-8">
+        {trackingNumber && (
+          <TrackingNumberDisplay
+            trackingNumber={trackingNumber}
+            onClose={() => {
+              setTrackingNumber(null);
+              navigate('/track-application');
+            }}
+          />
+        )}
         <Card className="max-w-2xl mx-auto">
           <CardHeader>
             <CardTitle>Apply for Water Supply License</CardTitle>

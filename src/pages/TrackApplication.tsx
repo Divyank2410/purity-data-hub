@@ -10,6 +10,7 @@ import Footer from "@/components/Footer";
 
 interface Application {
   id: string;
+  tracking_number: string;
   applicant_name: string;
   mobile_number: string;
   email: string;
@@ -139,7 +140,12 @@ const TrackApplication = () => {
                 <Card key={app.id}>
                   <CardHeader>
                     <div className="flex items-center justify-between">
-                      <CardTitle>{app.applicant_name}</CardTitle>
+                      <div>
+                        <CardTitle>{app.applicant_name}</CardTitle>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Tracking: <span className="font-mono font-bold text-blue-600">{app.tracking_number}</span>
+                        </p>
+                      </div>
                       <Badge className={getStatusColor(app.status)}>
                         {getStatusText(app.status)}
                       </Badge>

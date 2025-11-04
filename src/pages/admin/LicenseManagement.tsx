@@ -46,13 +46,14 @@ const LicenseManagement = () => {
       return;
     }
 
-    const { data: profile } = await supabase
-      .from('profiles')
+    const { data: roles } = await supabase
+      .from('user_roles')
       .select('role')
-      .eq('id', user.id)
+      .eq('user_id', user.id)
+      .eq('role', 'admin')
       .single();
 
-    if (profile?.role !== 'admin') {
+    if (!roles) {
       navigate('/');
     }
   };

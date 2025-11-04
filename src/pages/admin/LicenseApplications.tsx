@@ -13,6 +13,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 
 interface Application {
   id: string;
+  tracking_number: string;
   applicant_name: string;
   mobile_number: string;
   email: string;
@@ -48,13 +49,14 @@ const LicenseApplications = () => {
       return;
     }
 
-    const { data: profile } = await supabase
-      .from('profiles')
+    const { data: roles } = await supabase
+      .from('user_roles')
       .select('role')
-      .eq('id', user.id)
+      .eq('user_id', user.id)
+      .eq('role', 'admin')
       .single();
 
-    if (profile?.role !== 'admin') {
+    if (!roles) {
       navigate('/');
     }
   };
@@ -197,6 +199,7 @@ const LicenseApplications = () => {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead>Tracking No.</TableHead>
                 <TableHead>Applicant Name</TableHead>
                 <TableHead>Shop Reg No.</TableHead>
                 <TableHead>Contact</TableHead>
@@ -208,6 +211,7 @@ const LicenseApplications = () => {
             <TableBody>
               {applications.map((app) => (
                 <TableRow key={app.id}>
+                  <TableCell className="font-mono text-xs">{app.tracking_number}</TableCell>
                   <TableCell className="font-medium">{app.applicant_name}</TableCell>
                   <TableCell>{app.shop_registration_number}</TableCell>
                   <TableCell>
